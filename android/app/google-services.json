@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:123456789000:android:abcdef1234567890",
         "android_client_info": {
-          "package_name": "com.pethealth.app"
+          "package_name": "com.waggly.waggly_flutter"
         }
       },
       "oauth_client": [
