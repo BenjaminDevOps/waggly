@@ -1,4 +1,4 @@
-package com.waggly.waggly_flutter
+package com.waggly.app
 
 import io.flutter.embedding.android.FlutterActivity
 
