@@ -7,8 +7,14 @@ import 'features/auth/screens/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  await Firebase.initializeApp();
+  // Initialize Firebase with error handling
+  try {
+    await Firebase.initializeApp();
+    debugPrint('✅ Firebase initialized successfully');
+  } catch (e) {
+    debugPrint('⚠️ Firebase initialization failed: $e');
+    debugPrint('🔧 App will run in local mode without Firebase features');
+  }
 
   runApp(
     const ProviderScope(
