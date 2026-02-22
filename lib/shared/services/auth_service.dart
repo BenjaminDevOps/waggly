@@ -1,17 +1,33 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
+import '../../core/config/firebase_config.dart';
 
 /// Authentication service using Firebase Auth
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // Lazy initialization to avoid crashes when Firebase is not available
+  FirebaseAuth? get _auth => FirebaseConfig.isAvailable ? FirebaseAuth.instance : null;
+  FirebaseFirestore? get _firestore => FirebaseConfig.isAvailable ? FirebaseFirestore.instance : null;
+
+  /// Check if Firebase is available
+  bool get isFirebaseAvailable => FirebaseConfig.isAvailable;
+
+  /// Throw error if Firebase is not available
+  void _checkFirebaseAvailability() {
+    if (!FirebaseConfig.isAvailable) {
+      throw Exception(
+        'Firebase is not available. The app is running in OFFLINE MODE.\n'
+        'Please configure Firebase properly to use authentication features.'
+      );
+    }
+  }
 
   // Get current user
-  User? get currentUser => _auth.currentUser;
+  User? get currentUser => _auth?.currentUser;
 
   // Auth state changes
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
+  Stream<User?> get authStateChanges =>
+    _auth?.authStateChanges() ?? Stream.value(null);
 
   // Sign up with email and password
   Future<UserModel?> signUpWithEmail({
@@ -19,8 +35,10 @@ class AuthService {
     required String password,
     required String displayName,
   }) async {
+    _checkFirebaseAvailability();
+
     try {
-      final userCredential = await _auth.createUserWithEmailAndPassword(
+      final userCredential = await _auth!.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -39,7 +57,7 @@ class AuthService {
         createdAt: DateTime.now(),
       );
 
-      await _firestore
+      await _firestore!
           .collection('users')
           .doc(user.uid)
           .set(userModel.toFirestore());
@@ -55,8 +73,10 @@ class AuthService {
     required String email,
     required String password,
   }) async {
+    _checkFirebaseAvailability();
+
     try {
-      final userCredential = await _auth.signInWithEmailAndPassword(
+      final userCredential = await _auth!.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -65,7 +85,7 @@ class AuthService {
       if (user == null) return null;
 
       // Get user data from Firestore
-      final doc = await _firestore.collection('users').doc(user.uid).get();
+      final doc = await _firestore!.collection('users').doc(user.uid).get();
       return UserModel.fromFirestore(doc);
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
@@ -74,13 +94,15 @@ class AuthService {
 
   // Sign out
   Future<void> signOut() async {
-    await _auth.signOut();
+    _checkFirebaseAvailability();
+    await _auth!.signOut();
   }
 
   // Reset password
   Future<void> resetPassword(String email) async {
+    _checkFirebaseAvailability();
     try {
-      await _auth.sendPasswordResetEmail(email: email);
+      await _auth!.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
     }
@@ -88,8 +110,9 @@ class AuthService {
 
   // Get user data from Firestore
   Future<UserModel?> getUserData(String userId) async {
+    _checkFirebaseAvailability();
     try {
-      final doc = await _firestore.collection('users').doc(userId).get();
+      final doc = await _firestore!.collection('users').doc(userId).get();
       if (!doc.exists) return null;
       return UserModel.fromFirestore(doc);
     } catch (e) {
@@ -99,8 +122,9 @@ class AuthService {
 
   // Update user data
   Future<void> updateUserData(UserModel user) async {
+    _checkFirebaseAvailability();
     try {
-      await _firestore
+      await _firestore!
           .collection('users')
           .doc(user.id)
           .update(user.toFirestore());
