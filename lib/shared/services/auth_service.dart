@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../models/user_model.dart';
 import '../../core/config/firebase_config.dart';
 
@@ -89,6 +90,61 @@ class AuthService {
       return UserModel.fromFirestore(doc);
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
+    }
+  }
+
+  // Sign in with Google
+  Future<UserModel?> signInWithGoogle() async {
+    _checkFirebaseAvailability();
+
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      // If user cancels the sign-in
+      if (googleUser == null) return null;
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in to Firebase with the Google credential
+      final userCredential = await _auth!.signInWithCredential(credential);
+      final user = userCredential.user;
+      if (user == null) return null;
+
+      // Check if user document exists in Firestore
+      final doc = await _firestore!.collection('users').doc(user.uid).get();
+
+      if (doc.exists) {
+        // User already exists, return existing data
+        return UserModel.fromFirestore(doc);
+      } else {
+        // New user, create document
+        final userModel = UserModel(
+          id: user.uid,
+          email: user.email ?? '',
+          displayName: user.displayName ?? 'User',
+          photoUrl: user.photoURL,
+          createdAt: DateTime.now(),
+        );
+
+        await _firestore!
+            .collection('users')
+            .doc(user.uid)
+            .set(userModel.toFirestore());
+
+        return userModel;
+      }
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    } catch (e) {
+      throw Exception('Google Sign-In failed: $e');
     }
   }
 

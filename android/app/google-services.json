@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "123456789000",
-    "project_id": "pethealth-placeholder",
-    "storage_bucket": "pethealth-placeholder.appspot.com"
+    "project_number": "487205630695",
+    "project_id": "waggly-4a041",
+    "storage_bucket": "waggly-4a041.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:123456789000:android:abcdef1234567890",
+        "mobilesdk_app_id": "1:487205630695:android:952e554fa6f4bbed02a842",
         "android_client_info": {
           "package_name": "com.waggly.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "123456789000-abcdefghijklmnop.apps.googleusercontent.com",
+          "client_id": "487205630695-ibuel4sf4a6t97crob0o685hdhpg7072.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA-placeholder-key-replace-with-real"
+          "current_key": "AIzaSyCo2w1m-RlrQIhyqP-ZjxqdMmCassNDKDU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "123456789000-abcdefghijklmnop.apps.googleusercontent.com",
+              "client_id": "487205630695-ibuel4sf4a6t97crob0o685hdhpg7072.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
