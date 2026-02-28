@@ -87,6 +87,25 @@ class AuthService {
 
       // Get user data from Firestore
       final doc = await _firestore!.collection('users').doc(user.uid).get();
+
+      // If document doesn't exist, create it (for legacy users)
+      if (!doc.exists) {
+        final userModel = UserModel(
+          id: user.uid,
+          email: email,
+          displayName: user.displayName ?? email.split('@')[0],
+          photoUrl: user.photoURL,
+          createdAt: DateTime.now(),
+        );
+
+        await _firestore!
+            .collection('users')
+            .doc(user.uid)
+            .set(userModel.toFirestore());
+
+        return userModel;
+      }
+
       return UserModel.fromFirestore(doc);
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
@@ -144,7 +163,22 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
     } catch (e) {
-      throw Exception('Google Sign-In failed: $e');
+      // Handle specific Google Sign-In errors
+      final errorMessage = e.toString();
+      if (errorMessage.contains('ApiException: 10')) {
+        throw Exception(
+          'Google Sign-In configuration error.\n\n'
+          'Please add SHA-1 fingerprint to Firebase Console:\n'
+          '1. Run: cd android && ./gradlew signingReport\n'
+          '2. Copy the SHA-1 fingerprint\n'
+          '3. Add it to Firebase Console → Project Settings → Your App\n\n'
+          'Then restart the app.'
+        );
+      } else if (errorMessage.contains('sign_in_canceled')) {
+        return null; // User canceled, don't show error
+      } else {
+        throw Exception('Google Sign-In failed: $errorMessage');
+      }
     }
   }
 
