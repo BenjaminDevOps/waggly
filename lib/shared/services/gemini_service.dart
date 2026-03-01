@@ -1,165 +1,216 @@
-import 'dart:typed_data';
+import 'dart:io';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import '../../core/config/gemini_config.dart';
-import '../models/diagnosis_model.dart';
 
-/// Gemini AI service for veterinary diagnosis
+/// Service for interacting with Google Gemini AI
 class GeminiService {
+  // TODO: Get API key from environment or secure storage
+  // For now, using a placeholder - user needs to add their own API key
+  static const String _apiKey = 'YOUR_GEMINI_API_KEY_HERE';
+  
   late final GenerativeModel _model;
+  late final GenerativeModel _visionModel;
 
   GeminiService() {
-    _model = GeminiConfig.getModel();
+    // Text-only model for general queries
+    _model = GenerativeModel(
+      model: 'gemini-1.5-flash',
+      apiKey: _apiKey,
+      generationConfig: GenerationConfig(
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 2048,
+      ),
+      safetySettings: [
+        SafetySetting(HarmCategory.harassment, HarmBlockThreshold.medium),
+        SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.medium),
+      ],
+    );
+
+    // Vision model for image analysis
+    _visionModel = GenerativeModel(
+      model: 'gemini-1.5-flash',
+      apiKey: _apiKey,
+    );
   }
 
-  /// Analyze pet symptoms and provide diagnosis
-  Future<DiagnosisResult> analyzePetSymptoms({
-    required String petType,
-    required String petAge,
+  /// Analyze pet symptoms with text only
+  Future<String> analyzeSy
+mptoms({
+    required String petName,
+    required String species,
+    required String breed,
+    required int ageYears,
     required String symptoms,
-    List<Uint8List>? images,
   }) async {
+    final prompt = '''
+You are an experienced veterinary AI assistant helping pet owners understand their pet's health concerns.
+
+Pet Information:
+- Name: $petName
+- Species: $species
+- Breed: $breed
+- Age: $ageYears years
+
+Symptoms described by owner:
+$symptoms
+
+Please provide:
+1. **Initial Assessment**: What these symptoms might indicate
+2. **Severity Level**: Rate as Low, Medium, High, or Critical
+3. **Possible Causes**: List potential health issues (most likely first)
+4. **Recommendations**: 
+   - Immediate actions to take
+   - Whether veterinary visit is needed (and how urgent)
+   - Home care tips if applicable
+5. **Questions**: 3-5 follow-up questions to better understand the situation
+
+IMPORTANT: 
+- You are NOT providing a diagnosis, only educational information
+- Always recommend consulting a licensed veterinarian for serious concerns
+- Be clear, compassionate, and helpful
+- Format your response in clear sections with markdown
+
+Provide your analysis:
+''';
+
     try {
-      final prompt = _buildDiagnosisPrompt(
-        petType: petType,
-        petAge: petAge,
-        symptoms: symptoms,
-      );
-
-      final content = <Content>[];
-      final parts = <Part>[];
-
-      // Add system prompt and user query
-      parts.add(TextPart(GeminiConfig.systemPrompt));
-      parts.add(TextPart(prompt));
-
-      // Add images if provided
-      if (images != null && images.isNotEmpty) {
-        for (final image in images) {
-          parts.add(DataPart('image/jpeg', image));
-        }
-      }
-
-      content.add(Content.multi(parts));
-
-      // Generate response
-      final response = await _model.generateContent(content);
-      final responseText = response.text ?? '';
-
-      // Parse response
-      return _parseResponse(responseText);
+      final response = await _model.generateContent([Content.text(prompt)]);
+      return response.text ?? 'Unable to generate analysis. Please try again.';
     } catch (e) {
       throw Exception('Failed to analyze symptoms: $e');
     }
   }
 
-  /// Build diagnosis prompt
-  String _buildDiagnosisPrompt({
-    required String petType,
-    required String petAge,
+  /// Analyze pet with photo
+  Future<String> analyzeWithPhoto({
+    required String petName,
+    required String species,
+    required String breed,
+    required int ageYears,
     required String symptoms,
-  }) {
-    return '''
+    required File photoFile,
+  }) async {
+    final prompt = '''
+You are an experienced veterinary AI assistant analyzing a pet's health concern.
+
 Pet Information:
-- Type: $petType
-- Age: $petAge
+- Name: $petName
+- Species: $species
+- Breed: $breed
+- Age: $ageYears years
 
-Symptoms Reported:
-$symptoms
+Symptoms described: $symptoms
 
-Please provide:
-1. Assessment of the symptoms
-2. Possible conditions (list up to 3)
-3. Recommendations for care
-4. When to seek immediate veterinary help
-5. Severity level (low/medium/high/emergency)
+Please analyze the provided photo and symptoms together to provide:
+1. **Visual Observations**: What you notice in the photo that's relevant to health
+2. **Initial Assessment**: Combined analysis of symptoms + visual observations
+3. **Severity Level**: Rate as Low, Medium, High, or Critical
+4. **Possible Causes**: What the symptoms + photo might indicate
+5. **Recommendations**: Specific advice based on visual findings
 
-Format your response clearly with these sections.
+IMPORTANT: 
+- This is educational information only, not a veterinary diagnosis
+- Recommend professional veterinary care for concerning findings
+- Be specific about visual observations
+
+Provide your analysis:
 ''';
+
+    try {
+      final imageBytes = await photoFile.readAsBytes();
+      final imagePart = DataPart('image/jpeg', imageBytes);
+
+      final response = await _visionModel.generateContent([
+        Content.multi([TextPart(prompt), imagePart])
+      ]);
+
+      return response.text ?? 'Unable to analyze photo. Please try again.';
+    } catch (e) {
+      throw Exception('Failed to analyze photo: $e');
+    }
   }
 
-  /// Parse Gemini response into structured data
-  DiagnosisResult _parseResponse(String response) {
-    // Simple parsing logic - can be enhanced with regex
-    DiagnosisSeverity severity = DiagnosisSeverity.medium;
-    List<String> possibleConditions = [];
-    List<String> recommendations = [];
-    bool requiresVetVisit = false;
+  /// Ask follow-up question in conversation
+  Future<String> askFollowUp({
+    required String conversationContext,
+    required String userQuestion,
+  }) async {
+    final prompt = '''
+Continue the veterinary consultation conversation.
 
-    // Parse severity
-    if (response.toLowerCase().contains('emergency') ||
-        response.toLowerCase().contains('severe')) {
-      severity = DiagnosisSeverity.emergency;
-      requiresVetVisit = true;
-    } else if (response.toLowerCase().contains('high')) {
-      severity = DiagnosisSeverity.high;
-      requiresVetVisit = true;
-    } else if (response.toLowerCase().contains('medium') ||
-        response.toLowerCase().contains('moderate')) {
-      severity = DiagnosisSeverity.medium;
-    } else if (response.toLowerCase().contains('low') ||
-        response.toLowerCase().contains('mild')) {
-      severity = DiagnosisSeverity.low;
+Previous context:
+$conversationContext
+
+User's question: $userQuestion
+
+Provide a helpful, professional response that:
+- Addresses their specific question
+- Provides relevant veterinary insights
+- Asks clarifying questions if needed
+- Maintains a compassionate tone
+
+Response:
+''';
+
+    try {
+      final response = await _model.generateContent([Content.text(prompt)]);
+      return response.text ?? 'Unable to generate response. Please try again.';
+    } catch (e) {
+      throw Exception('Failed to get response: $e');
     }
-
-    // Simple extraction (in production, use better parsing)
-    final lines = response.split('\n');
-    bool inConditions = false;
-    bool inRecommendations = false;
-
-    for (final line in lines) {
-      if (line.toLowerCase().contains('possible condition')) {
-        inConditions = true;
-        inRecommendations = false;
-        continue;
-      }
-      if (line.toLowerCase().contains('recommendation')) {
-        inRecommendations = true;
-        inConditions = false;
-        continue;
-      }
-
-      if (inConditions && line.trim().startsWith('-')) {
-        possibleConditions.add(line.trim().substring(1).trim());
-      }
-      if (inRecommendations && line.trim().startsWith('-')) {
-        recommendations.add(line.trim().substring(1).trim());
-      }
-    }
-
-    // Check if vet visit is mentioned
-    if (response.toLowerCase().contains('see a vet') ||
-        response.toLowerCase().contains('veterinar') ||
-        response.toLowerCase().contains('consult a professional')) {
-      requiresVetVisit = true;
-    }
-
-    return DiagnosisResult(
-      fullResponse: response,
-      severity: severity,
-      possibleConditions: possibleConditions.isNotEmpty
-          ? possibleConditions
-          : ['Unable to determine specific conditions'],
-      recommendations: recommendations.isNotEmpty
-          ? recommendations
-          : ['Monitor symptoms and consult a vet if they worsen'],
-      requiresVetVisit: requiresVetVisit,
-    );
   }
-}
 
-/// Diagnosis result data class
-class DiagnosisResult {
-  final String fullResponse;
-  final DiagnosisSeverity severity;
-  final List<String> possibleConditions;
-  final List<String> recommendations;
-  final bool requiresVetVisit;
+  /// Generate final diagnosis report
+  Future<Map<String, String>> generateDiagnosisReport({
+    required String fullConversation,
+    required String petName,
+  }) async {
+    final prompt = '''
+Based on the following consultation about $petName, create a concise diagnosis report.
 
-  DiagnosisResult({
-    required this.fullResponse,
-    required this.severity,
-    required this.possibleConditions,
-    required this.recommendations,
-    required this.requiresVetVisit,
-  });
+Full conversation:
+$fullConversation
+
+Generate a structured report with these sections (use markdown):
+
+1. **Summary**: Brief overview of the consultation
+2. **Key Findings**: Main health concerns identified
+3. **Severity**: Rate as Low, Medium, High, or Critical (ONLY return the word)
+4. **Recommendations**: Clear action items for the pet owner
+5. **Follow-up**: What to monitor and when to seek help
+
+Provide the report in a professional, easy-to-understand format.
+
+Return ONLY a JSON object with these exact keys: "summary", "findings", "severity", "recommendations", "followup"
+''';
+
+    try {
+      final response = await _model.generateContent([Content.text(prompt)]);
+      final text = response.text ?? '';
+
+      // Parse the response (simplified - in production, use proper JSON parsing)
+      return {
+        'analysis': text,
+        'recommendations': text,
+        'severity': _extractSeverity(text),
+      };
+    } catch (e) {
+      throw Exception('Failed to generate report: $e');
+    }
+  }
+
+  /// Extract severity from AI response
+  String _extractSeverity(String text) {
+    final lowerText = text.toLowerCase();
+    if (lowerText.contains('critical')) return 'Critical';
+    if (lowerText.contains('high')) return 'High';
+    if (lowerText.contains('medium') || lowerText.contains('moderate')) {
+      return 'Medium';
+    }
+    return 'Low';
+  }
+
+  /// Check if API key is configured
+  static bool get isConfigured => _apiKey != 'YOUR_GEMINI_API_KEY_HERE';
 }
