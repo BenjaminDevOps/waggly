@@ -1,125 +1,136 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum PetType { dog, cat, bird, rabbit, other }
-
-enum PetGender { male, female, unknown }
-
-/// Pet model for Waggly app
+/// Pet model for storing animal information
 class PetModel {
   final String id;
-  final String userId;
+  final String userId; // Owner's user ID
   final String name;
-  final PetType type;
-  final String? breed;
-  final PetGender gender;
-  final DateTime? birthDate;
+  final String species; // Dog, Cat, Bird, etc.
+  final String breed;
+  final DateTime dateOfBirth;
+  final String gender; // Male, Female
   final double? weight; // in kg
   final String? photoUrl;
+  final String? microchipNumber;
+  final String? notes;
   final DateTime createdAt;
-  final DateTime updatedAt;
-  final String? microchipId;
-  final Map<String, dynamic>? medicalNotes;
+  final DateTime? lastVetVisit;
 
   PetModel({
     required this.id,
     required this.userId,
     required this.name,
-    required this.type,
-    this.breed,
-    this.gender = PetGender.unknown,
-    this.birthDate,
+    required this.species,
+    required this.breed,
+    required this.dateOfBirth,
+    required this.gender,
     this.weight,
     this.photoUrl,
+    this.microchipNumber,
+    this.notes,
     required this.createdAt,
-    required this.updatedAt,
-    this.microchipId,
-    this.medicalNotes,
+    this.lastVetVisit,
   });
 
-  // Age in years
-  int? get age {
-    if (birthDate == null) return null;
+  /// Calculate pet's age in years
+  int get ageInYears {
     final now = DateTime.now();
-    return now.year - birthDate!.year;
+    int age = now.year - dateOfBirth.year;
+    if (now.month < dateOfBirth.month ||
+        (now.month == dateOfBirth.month && now.day < dateOfBirth.day)) {
+      age--;
+    }
+    return age;
   }
 
-  // From Firestore
+  /// Get age as a formatted string (e.g., "2 years", "6 months")
+  String get ageString {
+    final now = DateTime.now();
+    final difference = now.difference(dateOfBirth);
+    final years = (difference.inDays / 365).floor();
+    final months = ((difference.inDays % 365) / 30).floor();
+
+    if (years > 0) {
+      return years == 1 ? '1 year' : '$years years';
+    } else if (months > 0) {
+      return months == 1 ? '1 month' : '$months months';
+    } else {
+      final days = difference.inDays;
+      return days == 1 ? '1 day' : '$days days';
+    }
+  }
+
+  /// From Firestore
   factory PetModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return PetModel(
       id: doc.id,
       userId: data['userId'] ?? '',
       name: data['name'] ?? '',
-      type: PetType.values.firstWhere(
-        (e) => e.name == data['type'],
-        orElse: () => PetType.other,
-      ),
-      breed: data['breed'],
-      gender: PetGender.values.firstWhere(
-        (e) => e.name == data['gender'],
-        orElse: () => PetGender.unknown,
-      ),
-      birthDate: data['birthDate'] != null
-          ? (data['birthDate'] as Timestamp).toDate()
-          : null,
+      species: data['species'] ?? '',
+      breed: data['breed'] ?? '',
+      dateOfBirth: (data['dateOfBirth'] as Timestamp).toDate(),
+      gender: data['gender'] ?? '',
       weight: data['weight']?.toDouble(),
       photoUrl: data['photoUrl'],
+      microchipNumber: data['microchipNumber'],
+      notes: data['notes'],
       createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
-      microchipId: data['microchipId'],
-      medicalNotes: data['medicalNotes'],
+      lastVetVisit: data['lastVetVisit'] != null
+          ? (data['lastVetVisit'] as Timestamp).toDate()
+          : null,
     );
   }
 
-  // To Firestore
+  /// To Firestore
   Map<String, dynamic> toFirestore() {
     return {
       'userId': userId,
       'name': name,
-      'type': type.name,
+      'species': species,
       'breed': breed,
-      'gender': gender.name,
-      'birthDate':
-          birthDate != null ? Timestamp.fromDate(birthDate!) : null,
+      'dateOfBirth': Timestamp.fromDate(dateOfBirth),
+      'gender': gender,
       'weight': weight,
       'photoUrl': photoUrl,
+      'microchipNumber': microchipNumber,
+      'notes': notes,
       'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
-      'microchipId': microchipId,
-      'medicalNotes': medicalNotes,
+      'lastVetVisit':
+          lastVetVisit != null ? Timestamp.fromDate(lastVetVisit!) : null,
     };
   }
 
-  // Copy with
+  /// Copy with
   PetModel copyWith({
     String? id,
     String? userId,
     String? name,
-    PetType? type,
+    String? species,
     String? breed,
-    PetGender? gender,
-    DateTime? birthDate,
+    DateTime? dateOfBirth,
+    String? gender,
     double? weight,
     String? photoUrl,
+    String? microchipNumber,
+    String? notes,
     DateTime? createdAt,
-    DateTime? updatedAt,
-    String? microchipId,
-    Map<String, dynamic>? medicalNotes,
+    DateTime? lastVetVisit,
   }) {
     return PetModel(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       name: name ?? this.name,
-      type: type ?? this.type,
+      species: species ?? this.species,
       breed: breed ?? this.breed,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       gender: gender ?? this.gender,
-      birthDate: birthDate ?? this.birthDate,
       weight: weight ?? this.weight,
       photoUrl: photoUrl ?? this.photoUrl,
+      microchipNumber: microchipNumber ?? this.microchipNumber,
+      notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      microchipId: microchipId ?? this.microchipId,
-      medicalNotes: medicalNotes ?? this.medicalNotes,
+      lastVetVisit: lastVetVisit ?? this.lastVetVisit,
     );
   }
 }

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/services/pet_service.dart';
+import '../../../shared/models/pet_model.dart';
 import '../../ai_diagnosis/screens/ai_diagnosis_screen.dart';
 import '../../pets/screens/pets_screen.dart';
+import '../../pets/screens/add_pet_screen.dart';
 import '../../shop/screens/shop_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 
@@ -68,12 +72,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-/// Dashboard screen with gamification elements
+/// Dashboard screen with pet list and gamification elements
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final user = FirebaseAuth.instance.currentUser;
+    final petService = PetService();
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Please log in')),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Waggly'),
@@ -114,19 +127,19 @@ class DashboardScreen extends ConsumerWidget {
                 gradient: AppTheme.primaryGradient,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Welcome back! 👋',
-                    style: TextStyle(
+                    'Welcome back, ${user.displayName ?? 'Pet Lover'}! 👋',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
+                  const SizedBox(height: 8),
+                  const Text(
                     'Keep your pets healthy and happy!',
                     style: TextStyle(
                       color: Colors.white70,
@@ -135,6 +148,104 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                 ],
               ),
+            ),
+            const SizedBox(height: 24),
+
+            // My Pets Section
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'My Pets',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const AddPetScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Pet'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Pets List (StreamBuilder)
+            StreamBuilder<List<PetModel>>(
+              stream: petService.getUserPets(user.uid),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(32.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error: ${snapshot.error}'),
+                  );
+                }
+
+                final pets = snapshot.data ?? [];
+
+                if (pets.isEmpty) {
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Column(
+                        children: [
+                          const Icon(
+                            Icons.pets,
+                            size: 64,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'No pets yet',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Add your first pet to get started!',
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const AddPetScreen()),
+                              );
+                            },
+                            icon: const Icon(Icons.add),
+                            label: const Text('Add Your First Pet'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: pets.length,
+                  itemBuilder: (context, index) {
+                    final pet = pets[index];
+                    return _PetCard(pet: pet);
+                  },
+                );
+              },
             ),
             const SizedBox(height: 24),
 
@@ -207,32 +318,9 @@ class DashboardScreen extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _QuickActionCard(
-                    icon: Icons.pets,
-                    label: 'Add Pet',
-                    color: AppTheme.secondaryColor,
-                    onTap: () {},
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            Row(
-              children: [
-                Expanded(
-                  child: _QuickActionCard(
                     icon: Icons.shopping_bag,
                     label: 'Shop',
                     color: AppTheme.accentColor,
-                    onTap: () {},
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _QuickActionCard(
-                    icon: Icons.emoji_events,
-                    label: 'Badges',
-                    color: AppTheme.successColor,
                     onTap: () {},
                   ),
                 ),
@@ -274,6 +362,91 @@ class _QuickActionCard extends StatelessWidget {
                 label,
                 style: const TextStyle(fontWeight: FontWeight.w500),
                 textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Pet card widget for displaying pet information
+class _PetCard extends StatelessWidget {
+  final PetModel pet;
+
+  const _PetCard({required this.pet});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: InkWell(
+        onTap: () {
+          // TODO: Navigate to pet details
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${pet.name} details coming soon!')),
+          );
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              // Pet Photo
+              CircleAvatar(
+                radius: 32,
+                backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
+                backgroundImage:
+                    pet.photoUrl != null ? NetworkImage(pet.photoUrl!) : null,
+                child: pet.photoUrl == null
+                    ? Text(
+                        pet.name[0].toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryColor,
+                        ),
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 16),
+              // Pet Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      pet.name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${pet.species} • ${pet.breed}',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      pet.ageString,
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Arrow Icon
+              Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.grey[400],
+                size: 16,
               ),
             ],
           ),
