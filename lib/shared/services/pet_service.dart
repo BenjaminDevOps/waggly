@@ -56,10 +56,13 @@ class PetService {
     return _firestore!
         .collection('pets')
         .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => PetModel.fromFirestore(doc)).toList());
+        .map((snapshot) {
+      final pets = snapshot.docs.map((doc) => PetModel.fromFirestore(doc)).toList();
+      // Sort by createdAt descending (newest first) on client side
+      pets.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return pets;
+    });
   }
 
   /// Get a single pet by ID
