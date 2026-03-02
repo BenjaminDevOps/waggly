@@ -57,9 +57,9 @@ class PetSelectionCard extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: pet.photoUrl.isNotEmpty
+                  child: (pet.photoUrl?.isNotEmpty ?? false)
                       ? CachedNetworkImage(
-                          imageUrl: pet.photoUrl,
+                          imageUrl: pet.photoUrl!,
                           fit: BoxFit.cover,
                           placeholder: (context, url) => const Center(
                             child: CircularProgressIndicator(),
