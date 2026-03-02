@@ -126,21 +126,33 @@ class DiagnosisService {
 
   /// Get diagnosis count for current month (for freemium check)
   Future<int> getMonthlyDiagnosisCount(String userId) async {
-    _checkFirebaseAvailability();
+    // If Firebase is not available, return 0 (allow unlimited diagnoses)
+    if (!FirebaseConfig.isAvailable) {
+      return 0;
+    }
 
     try {
       final now = DateTime.now();
       final startOfMonth = DateTime(now.year, now.month, 1);
-      
+
+      // Get all user diagnoses and filter client-side to avoid index requirement
       final snapshot = await _firestore!
           .collection('diagnoses')
           .where('userId', isEqualTo: userId)
-          .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
           .get();
 
-      return snapshot.docs.length;
+      // Filter by date on client side
+      final monthlyDocs = snapshot.docs.where((doc) {
+        final data = doc.data();
+        final createdAt = (data['createdAt'] as Timestamp).toDate();
+        return createdAt.isAfter(startOfMonth) || createdAt.isAtSameMomentAs(startOfMonth);
+      });
+
+      return monthlyDocs.length;
     } catch (e) {
-      throw Exception('Failed to get diagnosis count: $e');
+      // If error, allow diagnosis (return 0)
+      print('Warning: Could not check diagnosis quota: $e');
+      return 0;
     }
   }
 
