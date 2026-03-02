@@ -125,6 +125,12 @@ class DiagnosisService {
   }
 
   /// Get diagnosis count for current month (for freemium check)
+  ///
+  /// IMPORTANT: Requires Firestore composite index on 'diagnoses':
+  /// - userId (Ascending)
+  /// - createdAt (Ascending)
+  ///
+  /// Create via Firebase Console > Firestore > Indexes
   Future<int> getMonthlyDiagnosisCount(String userId) async {
     // If Firebase is not available, return 0 (allow unlimited diagnoses)
     if (!FirebaseConfig.isAvailable) {
@@ -135,24 +141,39 @@ class DiagnosisService {
       final now = DateTime.now();
       final startOfMonth = DateTime(now.year, now.month, 1);
 
-      // Get all user diagnoses and filter client-side to avoid index requirement
+      // Optimized server-side query (requires composite index)
       final snapshot = await _firestore!
           .collection('diagnoses')
           .where('userId', isEqualTo: userId)
+          .where('createdAt', isGreaterThanOrEqualTo: Timestamp.fromDate(startOfMonth))
           .get();
 
-      // Filter by date on client side
-      final monthlyDocs = snapshot.docs.where((doc) {
-        final data = doc.data();
-        final createdAt = (data['createdAt'] as Timestamp).toDate();
-        return createdAt.isAfter(startOfMonth) || createdAt.isAtSameMomentAs(startOfMonth);
-      });
-
-      return monthlyDocs.length;
+      return snapshot.docs.length;
     } catch (e) {
-      // If error, allow diagnosis (return 0)
-      print('Warning: Could not check diagnosis quota: $e');
-      return 0;
+      // If index not created yet or other error, fall back to client-side filtering
+      print('Warning: Falling back to client-side filtering: $e');
+
+      try {
+        final now = DateTime.now();
+        final startOfMonth = DateTime(now.year, now.month, 1);
+
+        final snapshot = await _firestore!
+            .collection('diagnoses')
+            .where('userId', isEqualTo: userId)
+            .get();
+
+        final monthlyDocs = snapshot.docs.where((doc) {
+          final data = doc.data();
+          final createdAt = (data['createdAt'] as Timestamp).toDate();
+          return createdAt.isAfter(startOfMonth) || createdAt.isAtSameMomentAs(startOfMonth);
+        });
+
+        return monthlyDocs.length;
+      } catch (e2) {
+        // If all fails, allow diagnosis
+        print('Error: Could not check diagnosis quota: $e2');
+        return 0;
+      }
     }
   }
 
