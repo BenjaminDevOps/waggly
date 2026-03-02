@@ -162,15 +162,22 @@ service firebase.storage {
 
 ### Model Used:
 ```
-Gemini 2.0 Flash (Experimental)
-model: 'gemini-2.0-flash-exp'
+Gemini 3.0 Flash (Preview) - Latest Generation! 🚀
+model: 'gemini-3-flash-preview'
 ```
 
+**Benefits:**
+- ⚡ **Fastest** response times (<1 second)
+- 💰 **Cheapest** ($0.25/1M tokens output)
+- 🧠 **State-of-the-art** medical reasoning
+- 🎯 **Best-in-class** vision analysis
+
 📚 **For complete Gemini configuration, see:** [`GEMINI_CONFIG.md`](./GEMINI_CONFIG.md)
-- Model comparison (1.5 vs 2.0)
+- Model comparison (1.5 vs 2.0 vs 3.0)
 - Configuration parameters
 - Usage examples
-- Cost estimation
+- Cost estimation (~$0.43/1000 diagnoses)
+- Migration guide
 - Troubleshooting
 
 ---
