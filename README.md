@@ -5,8 +5,12 @@
 ## 🌟 Features
 
 ### 🤖 AI-Powered Veterinary Diagnosis
-- **Gemini 2.5 Lite Integration** for intelligent pet health assessments
-- Symptom analysis with photo support
+- **Gemini 3.0 Flash Preview** - Latest generation AI model
+  - ⚡ Ultra-fast responses (<1 second)
+  - 🧠 State-of-the-art medical reasoning
+  - 🎯 Superior image analysis
+  - 💰 Cost-effective (~$0.43/1000 diagnoses)
+- Intelligent pet health assessments with photo support
 - Preliminary health condition identification
 - Smart recommendations and care guidance
 - Severity level assessment (low/medium/high/emergency)
@@ -67,7 +71,8 @@ lib/
 
 - **Framework**: Flutter 3.41.2 (Dart 3.11.0)
 - **Backend**: Firebase (Auth, Firestore, Storage, Analytics)
-- **AI**: Google Generative AI (Gemini 2.5 Lite)
+- **AI**: Google Generative AI (Gemini 3.0 Flash Preview)
+- **Environment**: flutter_dotenv 6.0.0
 - **State Management**: Riverpod + Provider
 - **UI/UX**: Material 3 Design
 - **Payments**: In-App Purchase
@@ -87,7 +92,7 @@ lib/
 1. **Clone the repository**
 ```bash
 git clone <repository-url>
-cd waggly_flutter
+cd waggly
 ```
 
 2. **Install dependencies**
@@ -95,14 +100,33 @@ cd waggly_flutter
 flutter pub get
 ```
 
-3. **Configure Firebase**
-- Add `google-services.json` to `android/app/`
-- Add `GoogleService-Info.plist` to `ios/Runner/`
+3. **Configure environment variables**
+```bash
+# Create .env file from template
+cp .env.example .env
 
-4. **Run the app**
+# Add your Gemini API key
+# Get it from: https://aistudio.google.com/apikey
+nano .env
+```
+
+4. **Configure Firebase**
+```bash
+# Download from: https://console.firebase.google.com/
+# - google-services.json → android/app/
+# - GoogleService-Info.plist → ios/Runner/
+```
+
+5. **Run the app**
 ```bash
 flutter run
 ```
+
+### 📚 Detailed Setup Guides
+
+- 🔐 **[ENV_SETUP.md](./ENV_SETUP.md)** - Environment variables configuration (flutter_dotenv 6.0.0)
+- 🤖 **[GEMINI_CONFIG.md](./GEMINI_CONFIG.md)** - Gemini 3.0 AI setup and usage
+- 🔥 **[FIREBASE_SETUP.md](./FIREBASE_SETUP.md)** - Complete Firebase configuration guide
 
 ## 📄 License
 

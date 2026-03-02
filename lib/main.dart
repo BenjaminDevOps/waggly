@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/config/firebase_config.dart';
@@ -10,12 +11,15 @@ import 'features/auth/screens/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load environment variables
+  // Load environment variables from .env file (flutter_dotenv 6.0.0)
   try {
-    await EnvConfig.load();
-    debugPrint('✅ Environment configuration loaded');
+    await dotenv.load(fileName: '.env');
+    debugPrint('✅ Environment variables loaded from .env');
+    debugPrint('🔑 Gemini API configured: ${EnvConfig.isGeminiConfigured}');
   } catch (e) {
-    debugPrint('⚠️ Failed to load environment: $e');
+    debugPrint('⚠️ Failed to load .env file: $e');
+    debugPrint('📝 Create a .env file in project root (use .env.example as template)');
+    debugPrint('🔗 Get Gemini API key: https://aistudio.google.com/apikey');
   }
 
   // Initialize Firebase with error handling
