@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../shared/models/diagnosis_model.dart';
 import '../../../shared/services/diagnosis_service.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../widgets/diagnosis_history_card.dart';
 import 'pet_selection_screen.dart';
 
@@ -12,10 +12,10 @@ class DiagnosisHistoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(currentUserProvider);
+    final firebaseUser = FirebaseAuth.instance.currentUser;
     final diagnosisService = DiagnosisService();
 
-    if (user == null) {
+    if (firebaseUser == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Diagnosis History')),
         body: const Center(child: Text('Please login first')),
@@ -41,7 +41,7 @@ class DiagnosisHistoryScreen extends ConsumerWidget {
         ],
       ),
       body: StreamBuilder<List<DiagnosisModel>>(
-        stream: diagnosisService.getUserDiagnoses(user.id),
+        stream: diagnosisService.getUserDiagnoses(firebaseUser.uid),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

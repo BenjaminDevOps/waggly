@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../shared/models/pet_model.dart';
+import '../../../shared/models/user_model.dart';
 import '../../../shared/services/pet_service.dart';
 import '../../../shared/services/diagnosis_service.dart';
-import '../../auth/providers/auth_provider.dart';
+import '../../../shared/services/auth_service.dart';
 import '../widgets/pet_selection_card.dart';
 import 'ai_diagnosis_screen.dart';
 
@@ -18,26 +20,46 @@ class PetSelectionScreen extends ConsumerStatefulWidget {
 class _PetSelectionScreenState extends ConsumerState<PetSelectionScreen> {
   final PetService _petService = PetService();
   final DiagnosisService _diagnosisService = DiagnosisService();
+  final AuthService _authService = AuthService();
 
   bool _isCheckingQuota = false;
   int _remainingDiagnoses = 0;
+  UserModel? _currentUser;
 
   @override
   void initState() {
     super.initState();
-    _checkQuota();
+    _loadUserAndCheckQuota();
+  }
+
+  Future<void> _loadUserAndCheckQuota() async {
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    if (firebaseUser == null) return;
+
+    // Get user data from Firestore
+    try {
+      _currentUser = await _authService.getUserData(firebaseUser.uid);
+      await _checkQuota();
+    } catch (e) {
+      // If user data fetch fails, continue with basic Firebase user
+      _currentUser = UserModel(
+        id: firebaseUser.uid,
+        email: firebaseUser.email ?? '',
+        displayName: firebaseUser.displayName ?? 'User',
+        createdAt: DateTime.now(),
+      );
+    }
   }
 
   Future<void> _checkQuota() async {
-    final user = ref.read(currentUserProvider);
-    if (user == null) return;
+    if (_currentUser == null) return;
 
     setState(() => _isCheckingQuota = true);
 
     try {
       final remaining = await _diagnosisService.getRemainingFreeDiagnoses(
-        user.id,
-        user.isPremium,
+        _currentUser!.id,
+        _currentUser!.isPremium,
       );
       setState(() {
         _remainingDiagnoses = remaining;
@@ -54,16 +76,15 @@ class _PetSelectionScreenState extends ConsumerState<PetSelectionScreen> {
   }
 
   Future<void> _selectPet(PetModel pet) async {
-    final user = ref.read(currentUserProvider);
-    if (user == null) return;
+    if (_currentUser == null) return;
 
     // Check quota before proceeding
     setState(() => _isCheckingQuota = true);
 
     try {
       final canDiagnose = await _diagnosisService.canCreateDiagnosis(
-        user.id,
-        user.isPremium,
+        _currentUser!.id,
+        _currentUser!.isPremium,
       );
 
       setState(() => _isCheckingQuota = false);
@@ -165,9 +186,9 @@ class _PetSelectionScreenState extends ConsumerState<PetSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(currentUserProvider);
+    final firebaseUser = FirebaseAuth.instance.currentUser;
 
-    if (user == null) {
+    if (firebaseUser == null || _currentUser == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Select Pet')),
         body: const Center(child: Text('Please login first')),
@@ -189,7 +210,7 @@ class _PetSelectionScreenState extends ConsumerState<PetSelectionScreen> {
                 const Icon(Icons.psychology, size: 24),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: user.isPremium
+                  child: _currentUser!.isPremium
                       ? const Text(
                           '✨ Premium: Unlimited diagnoses',
                           style: TextStyle(
@@ -213,7 +234,7 @@ class _PetSelectionScreenState extends ConsumerState<PetSelectionScreen> {
         ),
       ),
       body: StreamBuilder<List<PetModel>>(
-        stream: _petService.getUserPets(user.id),
+        stream: _petService.getUserPets(_currentUser!.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

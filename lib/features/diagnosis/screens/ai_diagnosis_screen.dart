@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../../../shared/models/pet_model.dart';
 import '../../../shared/models/diagnosis_model.dart';
 import '../../../shared/services/gemini_service.dart';
 import '../../../shared/services/diagnosis_service.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../models/chat_message.dart';
 import '../widgets/message_bubble.dart';
 import '../widgets/photo_preview.dart';
@@ -223,13 +223,13 @@ class _AiDiagnosisScreenState extends ConsumerState<AiDiagnosisScreen> {
         petName: widget.pet.name,
       );
 
-      final user = ref.read(currentUserProvider);
-      if (user == null) throw Exception('User not logged in');
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      if (firebaseUser == null) throw Exception('User not logged in');
 
       // Create diagnosis model
       final diagnosis = DiagnosisModel(
         id: const Uuid().v4(),
-        userId: user.id,
+        userId: firebaseUser.uid,
         petId: widget.pet.id,
         petName: widget.pet.name,
         symptoms: _messages
