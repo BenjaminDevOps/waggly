@@ -4,10 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/config/firebase_config.dart';
+import 'core/config/env_config.dart';
 import 'features/auth/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load environment variables
+  try {
+    await EnvConfig.load();
+    debugPrint('✅ Environment configuration loaded');
+  } catch (e) {
+    debugPrint('⚠️ Failed to load environment: $e');
+  }
 
   // Initialize Firebase with error handling
   try {

@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/services/pet_service.dart';
 import '../../../shared/models/pet_model.dart';
-import '../../ai_diagnosis/screens/ai_diagnosis_screen.dart';
+import '../../diagnosis/screens/pet_selection_screen.dart';
 import '../../pets/screens/pets_screen.dart';
 import '../../pets/screens/add_pet_screen.dart';
 import '../../shop/screens/shop_screen.dart';
@@ -24,7 +24,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final List<Widget> _screens = [
     const DashboardScreen(),
     const PetsScreen(),
-    const AiDiagnosisScreen(),
+    const PetSelectionScreen(),
     const ShopScreen(),
     const ProfileScreen(),
   ];
@@ -309,10 +309,16 @@ class DashboardScreen extends ConsumerWidget {
               children: [
                 Expanded(
                   child: _QuickActionCard(
-                    icon: Icons.medical_services,
+                    icon: Icons.psychology,
                     label: 'AI Diagnosis',
                     color: AppTheme.primaryColor,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const PetSelectionScreen(),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(width: 12),

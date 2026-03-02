@@ -1,20 +1,20 @@
 import 'dart:io';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import '../../core/config/env_config.dart';
 
 /// Service for interacting with Google Gemini AI
 class GeminiService {
-  // TODO: Get API key from environment or secure storage
-  // For now, using a placeholder - user needs to add their own API key
-  static const String _apiKey = 'YOUR_GEMINI_API_KEY_HERE';
-  
   late final GenerativeModel _model;
   late final GenerativeModel _visionModel;
 
   GeminiService() {
+    // Get API key from environment configuration
+    final apiKey = EnvConfig.geminiApiKey;
+
     // Text-only model for general queries
     _model = GenerativeModel(
       model: 'gemini-1.5-flash',
-      apiKey: _apiKey,
+      apiKey: apiKey,
       generationConfig: GenerationConfig(
         temperature: 0.7,
         topK: 40,
@@ -30,7 +30,7 @@ class GeminiService {
     // Vision model for image analysis
     _visionModel = GenerativeModel(
       model: 'gemini-1.5-flash',
-      apiKey: _apiKey,
+      apiKey: apiKey,
     );
   }
 
@@ -212,5 +212,5 @@ Return ONLY a JSON object with these exact keys: "summary", "findings", "severit
   }
 
   /// Check if API key is configured
-  static bool get isConfigured => _apiKey != 'YOUR_GEMINI_API_KEY_HERE';
+  static bool get isConfigured => EnvConfig.isGeminiConfigured;
 }

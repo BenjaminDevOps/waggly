@@ -47,6 +47,9 @@ dependencies:
   # Gemini AI
   google_generative_ai: ^0.4.6
 
+  # Environment Variables
+  flutter_dotenv: ^5.1.0
+
   # State Management
   provider: ^6.1.2
   riverpod: ^2.6.1
@@ -114,6 +117,7 @@ flutter:
     - assets/icons/
     - assets/animations/
     - assets/badges/
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
