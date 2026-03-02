@@ -35,8 +35,7 @@ class GeminiService {
   }
 
   /// Analyze pet symptoms with text only
-  Future<String> analyzeSy
-mptoms({
+  Future<String> analyzeSymptoms({
     required String petName,
     required String species,
     required String breed,
