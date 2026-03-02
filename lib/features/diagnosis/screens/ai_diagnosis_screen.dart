@@ -156,7 +156,7 @@ class _AiDiagnosisScreenState extends ConsumerState<AiDiagnosisScreen> {
           petName: widget.pet.name,
           species: widget.pet.species,
           breed: widget.pet.breed,
-          ageYears: widget.pet.ageYears,
+          ageYears: widget.pet.ageInYears,
           symptoms: text,
           photoFile: photos.first,
         );
@@ -166,7 +166,7 @@ class _AiDiagnosisScreenState extends ConsumerState<AiDiagnosisScreen> {
           petName: widget.pet.name,
           species: widget.pet.species,
           breed: widget.pet.breed,
-          ageYears: widget.pet.ageYears,
+          ageYears: widget.pet.ageInYears,
           symptoms: text,
         );
       } else {

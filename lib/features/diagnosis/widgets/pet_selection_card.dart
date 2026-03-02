@@ -105,7 +105,7 @@ class PetSelectionCard extends StatelessWidget {
                         Icon(Icons.cake, size: 16, color: Colors.grey[600]),
                         const SizedBox(width: 4),
                         Text(
-                          '${pet.ageYears} years old',
+                          '${pet.ageString} old',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],

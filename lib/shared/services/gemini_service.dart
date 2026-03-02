@@ -39,7 +39,7 @@ class GeminiService {
     required String petName,
     required String species,
     required String breed,
-    required int ageYears,
+    required int ageInYears,
     required String symptoms,
   }) async {
     final prompt = '''
@@ -49,7 +49,7 @@ Pet Information:
 - Name: $petName
 - Species: $species
 - Breed: $breed
-- Age: $ageYears years
+- Age: $ageInYears years
 
 Symptoms described by owner:
 $symptoms
@@ -86,7 +86,7 @@ Provide your analysis:
     required String petName,
     required String species,
     required String breed,
-    required int ageYears,
+    required int ageInYears,
     required String symptoms,
     required File photoFile,
   }) async {
@@ -97,7 +97,7 @@ Pet Information:
 - Name: $petName
 - Species: $species
 - Breed: $breed
-- Age: $ageYears years
+- Age: $ageInYears years
 
 Symptoms described: $symptoms
 
