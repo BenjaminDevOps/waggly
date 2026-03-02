@@ -11,15 +11,15 @@ class GeminiService {
     // Get API key from environment configuration
     final apiKey = EnvConfig.geminiApiKey;
 
-    // Text-only model for general queries
+    // Text-only model for general queries (Gemini 2.0 Flash)
     _model = GenerativeModel(
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.0-flash-exp',
       apiKey: apiKey,
       generationConfig: GenerationConfig(
         temperature: 0.7,
         topK: 40,
         topP: 0.95,
-        maxOutputTokens: 2048,
+        maxOutputTokens: 8192,  // Gemini 2.0 supports longer outputs
       ),
       safetySettings: [
         SafetySetting(HarmCategory.harassment, HarmBlockThreshold.medium),
@@ -27,9 +27,9 @@ class GeminiService {
       ],
     );
 
-    // Vision model for image analysis
+    // Vision model for image analysis (Gemini 2.0 Flash)
     _visionModel = GenerativeModel(
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.0-flash-exp',
       apiKey: apiKey,
     );
   }

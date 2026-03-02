@@ -150,14 +150,28 @@ service firebase.storage {
 
 ## 🔑 Step 7: Google AI (Gemini) API Key
 
-1. Go to [Google AI Studio](https://ai.google.dev/)
-2. Click **Get API Key**
-3. Create a new API key
-4. Copy the key
-5. Add to `.env` file:
+### Quick Setup:
+
+1. Go to [Google AI Studio](https://aistudio.google.com/apikey)
+2. Click **Get API Key** or **Create API Key**
+3. Copy the key (starts with `AIza...`)
+4. Add to `.env` file:
    ```env
-   GEMINI_API_KEY=your_actual_key_here
+   GEMINI_API_KEY=AIzaSy...your_actual_key_here
    ```
+
+### Model Used:
+```
+Gemini 2.0 Flash (Experimental)
+model: 'gemini-2.0-flash-exp'
+```
+
+📚 **For complete Gemini configuration, see:** [`GEMINI_CONFIG.md`](./GEMINI_CONFIG.md)
+- Model comparison (1.5 vs 2.0)
+- Configuration parameters
+- Usage examples
+- Cost estimation
+- Troubleshooting
 
 ---
 
