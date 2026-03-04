@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide Badge;
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/theme/app_theme.dart';
@@ -187,7 +187,7 @@ class _StatCard extends StatelessWidget {
 
 /// Badge card
 class _BadgeCard extends StatelessWidget {
-  final Badge badge;
+  final AchievementBadge badge;
   final bool isUnlocked;
 
   const _BadgeCard({

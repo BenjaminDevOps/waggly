@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Badge definition model
-class Badge {
+/// Achievement badge definition model
+class AchievementBadge {
   final String id;
   final String name;
   final String description;
@@ -9,7 +9,7 @@ class Badge {
   final Color color;
   final int requiredPoints;
 
-  const Badge({
+  const AchievementBadge({
     required this.id,
     required this.name,
     required this.description,
@@ -21,8 +21,8 @@ class Badge {
 
 /// Predefined badges
 class Badges {
-  static const List<Badge> all = [
-    Badge(
+  static const List<AchievementBadge> all = [
+    AchievementBadge(
       id: 'first_pet',
       name: 'Pet Parent',
       description: 'Added your first pet',
@@ -30,7 +30,7 @@ class Badges {
       color: Colors.blue,
       requiredPoints: 0,
     ),
-    Badge(
+    AchievementBadge(
       id: 'first_diagnosis',
       name: 'AI Explorer',
       description: 'Completed first AI diagnosis',
@@ -38,7 +38,7 @@ class Badges {
       color: Colors.purple,
       requiredPoints: 0,
     ),
-    Badge(
+    AchievementBadge(
       id: 'week_streak',
       name: 'Dedicated',
       description: '7 day streak',
@@ -46,7 +46,7 @@ class Badges {
       color: Colors.orange,
       requiredPoints: 0,
     ),
-    Badge(
+    AchievementBadge(
       id: 'health_tracker',
       name: 'Health Keeper',
       description: 'Added 5 health records',
@@ -54,7 +54,7 @@ class Badges {
       color: Colors.green,
       requiredPoints: 0,
     ),
-    Badge(
+    AchievementBadge(
       id: 'shopaholic',
       name: 'Shopaholic',
       description: 'Viewed 20 products',
@@ -62,7 +62,7 @@ class Badges {
       color: Colors.pink,
       requiredPoints: 0,
     ),
-    Badge(
+    AchievementBadge(
       id: 'points_100',
       name: 'Rising Star',
       description: 'Earned 100 points',
@@ -70,7 +70,7 @@ class Badges {
       color: Colors.amber,
       requiredPoints: 100,
     ),
-    Badge(
+    AchievementBadge(
       id: 'points_500',
       name: 'Champion',
       description: 'Earned 500 points',
@@ -78,7 +78,7 @@ class Badges {
       color: Colors.amber,
       requiredPoints: 500,
     ),
-    Badge(
+    AchievementBadge(
       id: 'points_1000',
       name: 'Legend',
       description: 'Earned 1000 points',
@@ -88,7 +88,7 @@ class Badges {
     ),
   ];
 
-  static Badge? getById(String id) {
+  static AchievementBadge? getById(String id) {
     try {
       return all.firstWhere((badge) => badge.id == id);
     } catch (e) {
