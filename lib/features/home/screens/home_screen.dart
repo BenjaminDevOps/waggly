@@ -14,6 +14,7 @@ import '../../pets/screens/pet_details_screen.dart';
 import '../../shop/screens/shop_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../health/screens/pet_health_dashboard.dart';
+import '../../gamification/screens/gamification_screen.dart';
 
 /// Main home screen with bottom navigation
 class HomeScreen extends ConsumerStatefulWidget {
@@ -333,6 +334,27 @@ class DashboardScreen extends ConsumerWidget {
                         },
                       ),
                     ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _QuickActionCard(
+                        icon: Icons.emoji_events,
+                        label: 'Achievements',
+                        color: Colors.amber,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const GamificationScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(child: SizedBox()),
                   ],
                 ),
               ],

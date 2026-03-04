@@ -9,6 +9,7 @@ import '../../../shared/services/diagnosis_service.dart';
 import '../../../shared/models/user_model.dart';
 import 'settings_screen.dart';
 import 'edit_profile_screen.dart';
+import '../../gamification/screens/gamification_screen.dart';
 
 /// User profile screen with stats and settings
 class ProfileScreen extends ConsumerWidget {
@@ -205,6 +206,20 @@ class ProfileScreen extends ConsumerWidget {
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (_) => EditProfileScreen(user: user),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 8),
+
+                      _ActionButton(
+                        icon: Icons.emoji_events,
+                        label: 'View Achievements',
+                        color: Colors.amber,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const GamificationScreen(),
                             ),
                           );
                         },
