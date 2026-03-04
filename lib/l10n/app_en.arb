@@ -1,0 +1,333 @@
+{
+  "@@locale": "en",
+
+  "appName": "Waggly",
+  "@appName": {
+    "description": "The name of the application"
+  },
+
+  "navHome": "Home",
+  "@navHome": {
+    "description": "Navigation label for home"
+  },
+
+  "navPets": "Pets",
+  "@navPets": {
+    "description": "Navigation label for pets"
+  },
+
+  "navDiagnosis": "AI Diagnosis",
+  "@navDiagnosis": {
+    "description": "Navigation label for AI diagnosis"
+  },
+
+  "navShop": "Shop",
+  "@navShop": {
+    "description": "Navigation label for shop"
+  },
+
+  "navProfile": "Profile",
+  "@navProfile": {
+    "description": "Navigation label for profile"
+  },
+
+  "welcomeBack": "Welcome back!",
+  "@welcomeBack": {
+    "description": "Welcome message"
+  },
+
+  "quickStats": "Quick Stats",
+  "@quickStats": {
+    "description": "Quick stats section title"
+  },
+
+  "points": "Points",
+  "@points": {
+    "description": "Points label"
+  },
+
+  "diagnoses": "Diagnoses",
+  "@diagnoses": {
+    "description": "Diagnoses label"
+  },
+
+  "dayStreak": "Day Streak",
+  "@dayStreak": {
+    "description": "Day streak label"
+  },
+
+  "myPets": "My Pets",
+  "@myPets": {
+    "description": "My pets section title"
+  },
+
+  "addPet": "Add Pet",
+  "@addPet": {
+    "description": "Add pet button label"
+  },
+
+  "addYourFirstPet": "Add Your First Pet",
+  "@addYourFirstPet": {
+    "description": "Add your first pet button label"
+  },
+
+  "noPetsYet": "No pets yet",
+  "@noPetsYet": {
+    "description": "No pets message"
+  },
+
+  "addFirstPetPrompt": "Add your first pet to get started!",
+  "@addFirstPetPrompt": {
+    "description": "Prompt to add first pet"
+  },
+
+  "quickActions": "Quick Actions",
+  "@quickActions": {
+    "description": "Quick actions section title"
+  },
+
+  "achievements": "Achievements",
+  "@achievements": {
+    "description": "Achievements label"
+  },
+
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings label"
+  },
+
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications section title"
+  },
+
+  "pushNotifications": "Push Notifications",
+  "@pushNotifications": {
+    "description": "Push notifications setting"
+  },
+
+  "receiveRemindersAndUpdates": "Receive reminders and updates",
+  "@receiveRemindersAndUpdates": {
+    "description": "Push notifications description"
+  },
+
+  "emailNotifications": "Email Notifications",
+  "@emailNotifications": {
+    "description": "Email notifications setting"
+  },
+
+  "receiveUpdatesViaEmail": "Receive updates via email",
+  "@receiveUpdatesViaEmail": {
+    "description": "Email notifications description"
+  },
+
+  "appearance": "Appearance",
+  "@appearance": {
+    "description": "Appearance section title"
+  },
+
+  "language": "Language",
+  "@language": {
+    "description": "Language setting"
+  },
+
+  "selectPet": "Select Pet",
+  "@selectPet": {
+    "description": "Select pet title"
+  },
+
+  "aiPetDiagnosis": "AI Pet Diagnosis",
+  "@aiPetDiagnosis": {
+    "description": "AI pet diagnosis title"
+  },
+
+  "createAccount": "Create Account",
+  "@createAccount": {
+    "description": "Create account title"
+  },
+
+  "login": "Login",
+  "@login": {
+    "description": "Login button"
+  },
+
+  "signUp": "Sign Up",
+  "@signUp": {
+    "description": "Sign up button"
+  },
+
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+
+  "confirmPassword": "Confirm Password",
+  "@confirmPassword": {
+    "description": "Confirm password field label"
+  },
+
+  "fullName": "Full Name",
+  "@fullName": {
+    "description": "Full name field label"
+  },
+
+  "forgotPassword": "Forgot Password?",
+  "@forgotPassword": {
+    "description": "Forgot password link"
+  },
+
+  "or": "or",
+  "@or": {
+    "description": "Or separator"
+  },
+
+  "continueWithGoogle": "Continue with Google",
+  "@continueWithGoogle": {
+    "description": "Google sign in button"
+  },
+
+  "dontHaveAccount": "Don't have an account?",
+  "@dontHaveAccount": {
+    "description": "Don't have account prompt"
+  },
+
+  "alreadyHaveAccount": "Already have an account?",
+  "@alreadyHaveAccount": {
+    "description": "Already have account prompt"
+  },
+
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+
+  "save": "Save",
+  "@save": {
+    "description": "Save button"
+  },
+
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button"
+  },
+
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button"
+  },
+
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button"
+  },
+
+  "close": "Close",
+  "@close": {
+    "description": "Close button"
+  },
+
+  "gamification": "Gamification",
+  "@gamification": {
+    "description": "Gamification screen title"
+  },
+
+  "badges": "Badges",
+  "@badges": {
+    "description": "Badges section"
+  },
+
+  "unlocked": "Unlocked",
+  "@unlocked": {
+    "description": "Unlocked badge status"
+  },
+
+  "locked": "Locked",
+  "@locked": {
+    "description": "Locked badge status"
+  },
+
+  "petParent": "Pet Parent",
+  "@petParent": {
+    "description": "Pet Parent badge name"
+  },
+
+  "petParentDescription": "Added your first pet",
+  "@petParentDescription": {
+    "description": "Pet Parent badge description"
+  },
+
+  "aiExplorer": "AI Explorer",
+  "@aiExplorer": {
+    "description": "AI Explorer badge name"
+  },
+
+  "aiExplorerDescription": "Completed first AI diagnosis",
+  "@aiExplorerDescription": {
+    "description": "AI Explorer badge description"
+  },
+
+  "dedicated": "Dedicated",
+  "@dedicated": {
+    "description": "Dedicated badge name"
+  },
+
+  "dedicatedDescription": "7 day streak",
+  "@dedicatedDescription": {
+    "description": "Dedicated badge description"
+  },
+
+  "healthKeeper": "Health Keeper",
+  "@healthKeeper": {
+    "description": "Health Keeper badge name"
+  },
+
+  "healthKeeperDescription": "Added 5 health records",
+  "@healthKeeperDescription": {
+    "description": "Health Keeper badge description"
+  },
+
+  "shopaholic": "Shopaholic",
+  "@shopaholic": {
+    "description": "Shopaholic badge name"
+  },
+
+  "shopaholicDescription": "Viewed 20 products",
+  "@shopaholicDescription": {
+    "description": "Shopaholic badge description"
+  },
+
+  "risingStar": "Rising Star",
+  "@risingStar": {
+    "description": "Rising Star badge name"
+  },
+
+  "risingStarDescription": "Earned 100 points",
+  "@risingStarDescription": {
+    "description": "Rising Star badge description"
+  },
+
+  "champion": "Champion",
+  "@champion": {
+    "description": "Champion badge name"
+  },
+
+  "championDescription": "Earned 500 points",
+  "@championDescription": {
+    "description": "Champion badge description"
+  },
+
+  "legend": "Legend",
+  "@legend": {
+    "description": "Legend badge name"
+  },
+
+  "legendDescription": "Earned 1000 points",
+  "@legendDescription": {
+    "description": "Legend badge description"
+  }
+}

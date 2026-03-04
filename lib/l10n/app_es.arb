@@ -1,0 +1,91 @@
+{
+  "@@locale": "es",
+
+  "appName": "Waggly",
+
+  "navHome": "Inicio",
+  "navPets": "Mascotas",
+  "navDiagnosis": "Diagnóstico IA",
+  "navShop": "Tienda",
+  "navProfile": "Perfil",
+
+  "welcomeBack": "¡Bienvenido de nuevo!",
+  "quickStats": "Estadísticas rápidas",
+  "points": "Puntos",
+  "diagnoses": "Diagnósticos",
+  "dayStreak": "Racha de días",
+
+  "myPets": "Mis mascotas",
+  "addPet": "Añadir mascota",
+  "addYourFirstPet": "Añade tu primera mascota",
+  "noPetsYet": "Aún no hay mascotas",
+  "addFirstPetPrompt": "¡Añade tu primera mascota para comenzar!",
+
+  "quickActions": "Acciones rápidas",
+  "achievements": "Logros",
+  "settings": "Configuración",
+
+  "notifications": "Notificaciones",
+  "pushNotifications": "Notificaciones push",
+  "receiveRemindersAndUpdates": "Recibir recordatorios y actualizaciones",
+  "emailNotifications": "Notificaciones por email",
+  "receiveUpdatesViaEmail": "Recibir actualizaciones por email",
+
+  "appearance": "Apariencia",
+  "language": "Idioma",
+
+  "selectPet": "Seleccionar mascota",
+  "aiPetDiagnosis": "Diagnóstico IA de mascotas",
+
+  "createAccount": "Crear cuenta",
+  "login": "Iniciar sesión",
+  "signUp": "Registrarse",
+
+  "email": "Correo electrónico",
+  "password": "Contraseña",
+  "confirmPassword": "Confirmar contraseña",
+  "fullName": "Nombre completo",
+
+  "forgotPassword": "¿Olvidaste tu contraseña?",
+  "or": "o",
+  "continueWithGoogle": "Continuar con Google",
+
+  "dontHaveAccount": "¿No tienes una cuenta?",
+  "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "delete": "Eliminar",
+  "edit": "Editar",
+  "confirm": "Confirmar",
+  "close": "Cerrar",
+
+  "gamification": "Gamificación",
+  "badges": "Insignias",
+  "unlocked": "Desbloqueado",
+  "locked": "Bloqueado",
+
+  "petParent": "Padre de mascota",
+  "petParentDescription": "Añadida tu primera mascota",
+
+  "aiExplorer": "Explorador IA",
+  "aiExplorerDescription": "Primer diagnóstico IA completado",
+
+  "dedicated": "Dedicado",
+  "dedicatedDescription": "Racha de 7 días",
+
+  "healthKeeper": "Guardián de salud",
+  "healthKeeperDescription": "Añadidos 5 registros de salud",
+
+  "shopaholic": "Adicto a las compras",
+  "shopaholicDescription": "Consultados 20 productos",
+
+  "risingStar": "Estrella en ascenso",
+  "risingStarDescription": "Ganados 100 puntos",
+
+  "champion": "Campeón",
+  "championDescription": "Ganados 500 puntos",
+
+  "legend": "Leyenda",
+  "legendDescription": "Ganados 1000 puntos"
+}
