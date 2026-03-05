@@ -67,6 +67,8 @@ class WagglyApp extends StatelessWidget {
         Locale('fr'), // French
         Locale('es'), // Spanish
       ],
+      // Uncomment to force French for testing:
+      // locale: const Locale('fr'),
       home: const SplashScreen(),
     );
   }
