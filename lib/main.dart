@@ -8,7 +8,7 @@ import 'core/theme/app_theme.dart';
 import 'core/config/firebase_config.dart';
 import 'core/config/env_config.dart';
 import 'features/auth/screens/splash_screen.dart';
-import 'package:waggly/l10n/generated/app_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
