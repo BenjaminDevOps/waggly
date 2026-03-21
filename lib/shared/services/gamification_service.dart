@@ -12,6 +12,9 @@ enum BadgeType {
   points1000,
   vetVisit5,
   healthChampion,
+  firstWalk,
+  walker5k,
+  marathonWalker,
 }
 
 /// Gamification service for points, badges, and streaks
@@ -197,6 +200,24 @@ class GamificationService {
           'name': 'Health Champion',
           'description': 'Maintained excellent pet health',
           'icon': '🏆',
+        };
+      case BadgeType.firstWalk:
+        return {
+          'name': 'First Walk',
+          'description': 'Completed your first walk with your pet',
+          'icon': '🏃',
+        };
+      case BadgeType.walker5k:
+        return {
+          'name': '5K Walker',
+          'description': 'Walked 5,000 steps in a single day',
+          'icon': '🎯',
+        };
+      case BadgeType.marathonWalker:
+        return {
+          'name': 'Marathon Walker',
+          'description': 'Walked a total of 42 km',
+          'icon': '🏅',
         };
     }
   }

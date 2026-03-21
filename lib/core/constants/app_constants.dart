@@ -14,6 +14,13 @@ class AppConstants {
   static const int pointsPerVetVisit = 50;
   static const int pointsPerDailyStreak = 5;
   static const int pointsPerWeeklyStreak = 25;
+  static const int pointsPerWalk = 10;
+  static const int pointsPerDiagnosis = 10;
+  static const int pointsPerShopPurchase = 15;
+
+  // Walk Goals
+  static const int defaultDailyStepGoal = 5000;
+  static const double averageStrideMeters = 0.7;
 
   // Affiliate
   static const String amazonAffiliateId = 'waggly-20';
@@ -33,4 +40,5 @@ class AppConstants {
   static const String collectionDiagnoses = 'diagnoses';
   static const String collectionBadges = 'badges';
   static const String collectionShopItems = 'shop_items';
+  static const String collectionWalks = 'walks';
 }
