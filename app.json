@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Waggly",
+    "slug": "waggly",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#6366F1"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.waggly.app",
+      "infoPlist": {
+        "NSMotionUsageDescription": "Waggly uses motion sensors to count your steps while walking with your pet."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#6366F1"
+      },
+      "package": "com.waggly.app",
+      "permissions": ["ACTIVITY_RECOGNITION"]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-sensors"
+    ]
+  }
+}
