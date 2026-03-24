@@ -1,39 +1,44 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle, TouchableOpacity } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { Colors } from '../theme/colors';
-import { BorderRadius, Spacing } from '../theme/spacing';
+import { Radius, Spacing, Shadow } from '../theme/spacing';
 
 interface Props {
   children: React.ReactNode;
   style?: ViewStyle;
   onPress?: () => void;
+  padded?: boolean;
 }
 
-export function Card({ children, style, onPress }: Props) {
+export function Card({ children, style, onPress, padded = true }: Props) {
+  const cardStyle = [styles.card, padded && styles.padded, style];
+
   if (onPress) {
     return (
       <TouchableOpacity
-        onPress={onPress}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          onPress();
+        }}
         activeOpacity={0.7}
-        style={[styles.card, style]}
+        style={cardStyle}
       >
         {children}
       </TouchableOpacity>
     );
   }
 
-  return <View style={[styles.card, style]}>{children}</View>;
+  return <View style={cardStyle}>{children}</View>;
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.card,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.lg,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
+    ...Shadow.soft,
+  },
+  padded: {
+    padding: Spacing.xl,
   },
 });

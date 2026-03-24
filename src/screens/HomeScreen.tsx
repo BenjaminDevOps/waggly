@@ -7,14 +7,16 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
 import { Colors, Gradients } from '../theme/colors';
-import { Spacing, BorderRadius, FontSize } from '../theme/spacing';
+import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { GradientCard } from '../components/GradientCard';
 import { Card } from '../components/Card';
 import { SectionHeader } from '../components/SectionHeader';
 import { StatusBadge } from '../components/Badge';
+import { IOSButton } from '../components/IOSButton';
 import { PET_EMOJI } from '../models/types';
 
 const DEMO_PETS = [
@@ -97,9 +99,12 @@ export function HomeScreen({ navigation: tabNav }: any) {
         ))}
         <TouchableOpacity
           style={styles.addPetCard}
-          onPress={() => navigation.navigate('AddPet')}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            navigation.navigate('AddPet');
+          }}
         >
-          <Ionicons name="add-circle-outline" size={32} color={Colors.textLight} />
+          <Ionicons name="add-circle-outline" size={32} color={Colors.inkTertiary} />
           <Text style={styles.addPetText}>Add</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -130,7 +135,7 @@ export function HomeScreen({ navigation: tabNav }: any) {
             <Text style={styles.reminderTitle}>Luna - Rabies Booster</Text>
             <Text style={styles.reminderSub}>Due in 25 days</Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color={Colors.textLight} />
+          <Ionicons name="chevron-forward" size={20} color={Colors.inkTertiary} />
         </View>
       </Card>
       <Card style={{ marginBottom: Spacing.lg }}>
@@ -140,7 +145,7 @@ export function HomeScreen({ navigation: tabNav }: any) {
             <Text style={styles.reminderTitle}>Milo - Deworming</Text>
             <Text style={styles.reminderSub}>Due in 41 days</Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color={Colors.textLight} />
+          <Ionicons name="chevron-forward" size={20} color={Colors.inkTertiary} />
         </View>
       </Card>
 
@@ -157,6 +162,7 @@ export function HomeScreen({ navigation: tabNav }: any) {
             key={action.label}
             style={styles.actionCard}
             onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               if (action.tab) tabNav.navigate(action.tab);
               else if (action.screen) navigation.navigate(action.screen);
             }}
@@ -212,73 +218,73 @@ const styles = StyleSheet.create({
   },
   logoRow: { flexDirection: 'row', alignItems: 'center' },
   logo: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+    width: 36,
+    height: 36,
+    borderRadius: Radius.sm,
     backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logoText: { color: '#fff', fontWeight: '800', fontSize: 18 },
-  appTitle: { fontSize: FontSize.xxl, fontWeight: '700', marginLeft: Spacing.sm, color: Colors.text },
+  logoText: { color: '#fff', fontWeight: Weight.heavy, fontSize: 18 },
+  appTitle: { fontSize: Font.title2, fontWeight: Weight.bold, marginLeft: Spacing.sm, color: Colors.ink },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   streakBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.error + '15',
+    backgroundColor: Colors.errorPale,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: BorderRadius.full,
+    borderRadius: Radius.pill,
     gap: 4,
   },
-  streakText: { fontWeight: '700', color: Colors.error, fontSize: FontSize.sm },
+  streakText: { fontWeight: Weight.bold, color: Colors.error, fontSize: Font.sm },
   pointsBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.secondary,
     paddingHorizontal: 12,
     paddingVertical: 5,
-    borderRadius: BorderRadius.full,
+    borderRadius: Radius.pill,
     gap: 4,
   },
-  pointsText: { fontWeight: '700', color: '#fff', fontSize: FontSize.sm },
+  pointsText: { fontWeight: Weight.bold, color: '#fff', fontSize: Font.sm },
   welcomeCard: { marginBottom: Spacing.xxl },
   welcomeRow: { flexDirection: 'row', alignItems: 'center' },
-  welcomeTitle: { color: '#fff', fontSize: FontSize.xxl, fontWeight: '700' },
-  welcomeSubtitle: { color: 'rgba(255,255,255,0.7)', fontSize: FontSize.md, marginTop: 4 },
+  welcomeTitle: { color: '#fff', fontSize: Font.title2, fontWeight: Weight.bold },
+  welcomeSubtitle: { color: 'rgba(255,255,255,0.7)', fontSize: Font.body, marginTop: 4 },
   tipBox: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: BorderRadius.md,
+    borderRadius: Radius.md,
     padding: Spacing.md,
     marginTop: Spacing.lg,
     gap: Spacing.sm,
   },
-  tipText: { color: '#fff', fontSize: FontSize.sm, flex: 1 },
+  tipText: { color: '#fff', fontSize: Font.sm, flex: 1 },
   petCarousel: { marginBottom: Spacing.xxl },
   petMiniCard: {
-    width: 90,
-    height: 110,
-    borderRadius: BorderRadius.lg,
+    width: 100,
+    height: 120,
+    borderRadius: Radius.lg,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: Spacing.md,
   },
-  petMiniName: { fontWeight: '700', fontSize: FontSize.sm, marginTop: 6, color: Colors.text },
-  petMiniStatus: { fontSize: FontSize.xs, fontWeight: '600', marginTop: 2 },
+  petMiniName: { fontWeight: Weight.bold, fontSize: Font.sm, marginTop: 6, color: Colors.ink },
+  petMiniStatus: { fontSize: Font.xs, fontWeight: Weight.semibold, marginTop: 2 },
   addPetCard: {
-    width: 90,
-    height: 110,
-    borderRadius: BorderRadius.lg,
-    backgroundColor: Colors.surfaceAlt,
+    width: 100,
+    height: 120,
+    borderRadius: Radius.lg,
+    backgroundColor: Colors.surfaceSecondary,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: Colors.hairline,
     borderStyle: 'dashed',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  addPetText: { color: Colors.textLight, fontSize: FontSize.xs, marginTop: 4 },
+  addPetText: { color: Colors.inkTertiary, fontSize: Font.xs, marginTop: 4 },
   walkCard: { marginBottom: Spacing.xxl },
   walkRow: { flexDirection: 'row', alignItems: 'center' },
   walkCircle: {
@@ -290,19 +296,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  walkPercent: { fontWeight: '700', fontSize: FontSize.sm },
-  walkSteps: { fontWeight: '700', fontSize: FontSize.base },
-  walkDist: { color: Colors.textSecondary, fontSize: FontSize.sm, marginTop: 2 },
+  walkPercent: { fontWeight: Weight.bold, fontSize: Font.sm },
+  walkSteps: { fontWeight: Weight.bold, fontSize: Font.body },
+  walkDist: { color: Colors.inkSecondary, fontSize: Font.sm, marginTop: 2 },
   walkNowBtn: {
     backgroundColor: Colors.success,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
-    borderRadius: BorderRadius.md,
+    borderRadius: Radius.md,
   },
-  walkNowText: { color: '#fff', fontWeight: '700', fontSize: FontSize.sm },
+  walkNowText: { color: '#fff', fontWeight: Weight.bold, fontSize: Font.sm },
   reminderRow: { flexDirection: 'row', alignItems: 'center' },
-  reminderTitle: { fontWeight: '600', fontSize: FontSize.md, color: Colors.text },
-  reminderSub: { color: Colors.textSecondary, fontSize: FontSize.sm, marginTop: 2 },
+  reminderTitle: { fontWeight: Weight.semibold, fontSize: Font.body, color: Colors.ink },
+  reminderSub: { color: Colors.inkSecondary, fontSize: Font.sm, marginTop: 2 },
   actionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -311,40 +317,32 @@ const styles = StyleSheet.create({
   },
   actionCard: {
     width: (Dimensions.get('window').width - Spacing.lg * 2 - Spacing.md) / 2,
-    backgroundColor: Colors.card,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.lg,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
+    padding: Spacing.xl,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    ...Shadow.soft,
   },
-  actionLabel: { fontWeight: '600', marginTop: Spacing.sm, color: Colors.text },
+  actionLabel: { fontWeight: Weight.semibold, marginTop: Spacing.sm, color: Colors.ink },
   featuredCard: {
-    width: 150,
-    backgroundColor: Colors.card,
-    borderRadius: BorderRadius.lg,
+    width: 155,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
     marginRight: Spacing.md,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    ...Shadow.soft,
   },
   featuredImg: {
     height: 80,
-    backgroundColor: Colors.primary + '10',
+    backgroundColor: Colors.primaryPale,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  featuredName: { fontWeight: '700', fontSize: FontSize.sm, color: Colors.text },
-  featuredPrice: { color: Colors.primary, fontWeight: '700', marginTop: 4 },
+  featuredName: { fontWeight: Weight.bold, fontSize: Font.sm, color: Colors.ink },
+  featuredPrice: { color: Colors.primary, fontWeight: Weight.bold, marginTop: 4 },
   featuredOldPrice: {
-    color: Colors.textLight,
-    fontSize: FontSize.xs,
+    color: Colors.inkTertiary,
+    fontSize: Font.xs,
     textDecorationLine: 'line-through',
     marginLeft: 6,
   },

@@ -1,15 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../theme/colors';
-import { BorderRadius, Spacing, FontSize } from '../theme/spacing';
+import { Radius, Spacing, Font, Weight } from '../theme/spacing';
 
 interface Props {
   label: string;
-  color?: string;
+  color: string;
   small?: boolean;
 }
 
-export function StatusBadge({ label, color = Colors.success, small = false }: Props) {
+export function StatusBadge({ label, color, small = false }: Props) {
   return (
     <View style={[styles.badge, { backgroundColor: color + '18' }, small && styles.small]}>
       <Text style={[styles.text, { color }, small && styles.smallText]}>{label}</Text>
@@ -20,18 +19,18 @@ export function StatusBadge({ label, color = Colors.success, small = false }: Pr
 const styles = StyleSheet.create({
   badge: {
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    borderRadius: BorderRadius.full,
+    paddingVertical: Spacing.xs + 1,
+    borderRadius: Radius.pill,
   },
   small: {
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 2,
+    paddingHorizontal: Spacing.sm + 2,
+    paddingVertical: 3,
   },
   text: {
-    fontSize: FontSize.sm,
-    fontWeight: '700',
+    fontSize: Font.sm,
+    fontWeight: Weight.bold,
   },
   smallText: {
-    fontSize: FontSize.xs,
+    fontSize: Font.xs,
   },
 });

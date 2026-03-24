@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Colors } from '../theme/colors';
-import { FontSize, Spacing } from '../theme/spacing';
+import { Font, Weight, Spacing } from '../theme/spacing';
 
 interface Props {
   title: string;
@@ -27,16 +27,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.lg,
+    marginTop: Spacing.sm,
   },
   title: {
-    fontSize: FontSize.xl,
-    fontWeight: '700',
-    color: Colors.text,
+    fontSize: Font.title2,
+    fontWeight: Weight.bold,
+    color: Colors.ink,
+    letterSpacing: -0.3,
   },
   action: {
-    fontSize: FontSize.md,
+    fontSize: Font.body,
     color: Colors.primary,
-    fontWeight: '600',
+    fontWeight: Weight.semibold,
   },
 });

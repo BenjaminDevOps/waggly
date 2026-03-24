@@ -1,50 +1,78 @@
+/**
+ * Waggly iOS Design System
+ * Inspired by Headspace & Calm: warm, organic, calming palette
+ * with generous whitespace and soft shapes.
+ */
+
 export const Colors = {
-  primary: '#6366F1',
-  primaryDark: '#4F46E5',
-  primaryLight: '#8B5CF6',
-  secondary: '#F59E0B',
-  secondaryDark: '#D97706',
-  accent: '#EC4899',
-  success: '#10B981',
-  successDark: '#059669',
-  warning: '#F59E0B',
-  error: '#EF4444',
-  errorDark: '#DC2626',
+  // Core brand - warm, friendly, not corporate
+  primary: '#5B5EA6',       // Soft indigo (Calm-like)
+  primaryLight: '#7B7FCC',
+  primaryPale: '#EDEDF7',
+  primaryDark: '#44478A',
 
-  background: '#F8FAFC',
+  secondary: '#E8985E',     // Warm terracotta
+  secondaryLight: '#F2B886',
+  secondaryPale: '#FDF2E9',
+
+  accent: '#D4726A',        // Dusty rose
+  accentPale: '#FBEAE9',
+
+  // Nature-inspired palette (Headspace feel)
+  mint: '#7EC8B0',
+  mintPale: '#E8F5F0',
+  sky: '#7DB8D4',
+  skyPale: '#E5F1F7',
+  lavender: '#A594C9',
+  lavenderPale: '#EDE8F5',
+  sand: '#D4C5A9',
+  sandPale: '#F5F0E6',
+  coral: '#E8836E',
+  coralPale: '#FDE9E5',
+
+  // Semantic
+  success: '#6EAF7B',
+  successPale: '#E7F4EA',
+  warning: '#E5A84B',
+  warningPale: '#FDF3E1',
+  error: '#D4605A',
+  errorPale: '#FBEAE9',
+
+  // Surfaces - warm cream tones (not cold gray)
+  background: '#FAF8F5',      // Warm cream (Calm's signature)
   surface: '#FFFFFF',
-  surfaceAlt: '#F1F5F9',
-  card: '#FFFFFF',
+  surfaceElevated: '#FFFFFF',
+  surfaceSecondary: '#F3F0EB', // Warm off-white
 
-  text: '#1E293B',
-  textSecondary: '#64748B',
-  textLight: '#94A3B8',
-  textWhite: '#FFFFFF',
+  // Text
+  ink: '#2D2D3A',             // Soft black
+  inkSecondary: '#6B6B80',
+  inkTertiary: '#9D9DAF',
+  inkInverse: '#FFFFFF',
 
-  border: '#E2E8F0',
-  borderLight: '#F1F5F9',
-  divider: '#E2E8F0',
+  // Borders
+  hairline: '#E8E4DF',
+  hairlineLight: '#F0EDE8',
 
-  overlay: 'rgba(0,0,0,0.5)',
+  // Overlay
+  overlay: 'rgba(45, 45, 58, 0.4)',
+  overlayLight: 'rgba(45, 45, 58, 0.08)',
 
-  // Pet type colors
-  dog: '#6366F1',
-  cat: '#EC4899',
-  bird: '#10B981',
-  rabbit: '#F59E0B',
-  other: '#8B5CF6',
-
-  // Severity colors
-  severityLow: '#10B981',
-  severityMedium: '#F59E0B',
-  severityHigh: '#EF4444',
-  severityEmergency: '#DC2626',
+  // Pet type organic colors
+  dog: '#5B5EA6',
+  cat: '#D4726A',
+  bird: '#6EAF7B',
+  rabbit: '#E8985E',
+  other: '#A594C9',
 };
 
 export const Gradients = {
-  primary: ['#6366F1', '#8B5CF6'] as const,
-  gold: ['#FBBF24', '#F59E0B'] as const,
-  success: ['#10B981', '#059669'] as const,
-  danger: ['#EF4444', '#DC2626'] as const,
-  sunset: ['#F59E0B', '#D97706'] as const,
+  // Soft, Headspace-like gradients
+  primary: ['#5B5EA6', '#7B7FCC'] as const,
+  warmSunset: ['#E8985E', '#D4726A'] as const,
+  calmSky: ['#7DB8D4', '#5B5EA6'] as const,
+  forest: ['#6EAF7B', '#7EC8B0'] as const,
+  dawn: ['#F2B886', '#D4726A'] as const,
+  night: ['#44478A', '#2D2D3A'] as const,
+  gold: ['#E5A84B', '#E8985E'] as const,
 };

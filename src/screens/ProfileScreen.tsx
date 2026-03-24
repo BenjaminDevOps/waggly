@@ -9,8 +9,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import { Colors, Gradients } from '../theme/colors';
-import { Spacing, BorderRadius, FontSize } from '../theme/spacing';
+import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { Card } from '../components/Card';
 import { SectionHeader } from '../components/SectionHeader';
 import { BADGES, BadgeId } from '../models/types';
@@ -59,7 +60,7 @@ export function ProfileScreen() {
         </Card>
 
         {/* Premium */}
-        <LinearGradient colors={Gradients.sunset} style={styles.premiumCard}>
+        <LinearGradient colors={Gradients.warmSunset} style={styles.premiumCard}>
           <View style={styles.premiumIcon}>
             <Ionicons name="diamond" size={28} color="#fff" />
           </View>
@@ -79,13 +80,16 @@ export function ProfileScreen() {
               <TouchableOpacity
                 key={badge.id}
                 style={[styles.badgeCard, earned && styles.badgeCardEarned]}
-                onPress={() => Alert.alert(badge.name, `${badge.icon} ${badge.description}`)}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  Alert.alert(badge.name, `${badge.icon} ${badge.description}`);
+                }}
               >
                 <Text style={{ fontSize: 28, opacity: earned ? 1 : 0.3 }}>{badge.icon}</Text>
-                <Text style={[styles.badgeName, !earned && { color: Colors.textLight }]}>
+                <Text style={[styles.badgeName, !earned && { color: Colors.inkTertiary }]}>
                   {badge.name}
                 </Text>
-                {!earned && <Ionicons name="lock-closed" size={12} color={Colors.textLight} />}
+                {!earned && <Ionicons name="lock-closed" size={12} color={Colors.inkTertiary} />}
               </TouchableOpacity>
             );
           })}
@@ -97,13 +101,13 @@ export function ProfileScreen() {
           {LEADERBOARD.map((l) => {
             const isYou = l.name === 'You';
             return (
-              <View key={l.rank} style={[styles.leaderRow, isYou && { backgroundColor: Colors.primary + '08' }]}>
+              <View key={l.rank} style={[styles.leaderRow, isYou && { backgroundColor: Colors.primaryPale }]}>
                 <View style={styles.leaderRank}>
-                  <Text style={{ fontSize: l.icon ? 18 : 14, fontWeight: '700' }}>
+                  <Text style={{ fontSize: l.icon ? 18 : 14, fontWeight: Weight.bold }}>
                     {l.icon || `#${l.rank}`}
                   </Text>
                 </View>
-                <Text style={[styles.leaderName, isYou && { color: Colors.primary, fontWeight: '700' }]}>
+                <Text style={[styles.leaderName, isYou && { color: Colors.primary, fontWeight: Weight.bold }]}>
                   {l.name}
                 </Text>
                 <Text style={[styles.leaderPts, isYou && { color: Colors.primary }]}>
@@ -135,14 +139,14 @@ export function ProfileScreen() {
             { icon: 'shield-outline', label: 'Privacy & Data' },
             { icon: 'help-circle-outline', label: 'Help & Support' },
           ].map((item, i) => (
-            <TouchableOpacity key={item.label} style={[styles.accountRow, i > 0 && { borderTopWidth: 1, borderTopColor: Colors.borderLight }]}>
-              <Ionicons name={item.icon as any} size={22} color={Colors.textSecondary} />
+            <TouchableOpacity key={item.label} style={[styles.accountRow, i > 0 && { borderTopWidth: 1, borderTopColor: Colors.hairlineLight }]}>
+              <Ionicons name={item.icon as any} size={22} color={Colors.inkSecondary} />
               <Text style={styles.accountLabel}>{item.label}</Text>
-              <Ionicons name="chevron-forward" size={18} color={Colors.textLight} />
+              <Ionicons name="chevron-forward" size={18} color={Colors.inkTertiary} />
             </TouchableOpacity>
           ))}
           <TouchableOpacity
-            style={[styles.accountRow, { borderTopWidth: 1, borderTopColor: Colors.borderLight }]}
+            style={[styles.accountRow, { borderTopWidth: 1, borderTopColor: Colors.hairlineLight }]}
             onPress={() => Alert.alert('Sign Out', 'Are you sure you want to sign out?')}
           >
             <Ionicons name="log-out-outline" size={22} color={Colors.error} />
@@ -160,8 +164,8 @@ export function ProfileScreen() {
 function HeaderStat({ value, label }: { value: string; label: string }) {
   return (
     <View style={{ alignItems: 'center' }}>
-      <Text style={{ color: '#fff', fontSize: FontSize.xl, fontWeight: '700' }}>{value}</Text>
-      <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: FontSize.xs }}>{label}</Text>
+      <Text style={{ color: '#fff', fontSize: Font.title3, fontWeight: Weight.bold }}>{value}</Text>
+      <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.xs }}>{label}</Text>
     </View>
   );
 }
@@ -184,17 +188,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
     backgroundColor: 'rgba(255,255,255,0.2)',
     borderWidth: 3,
     borderColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  name: { color: '#fff', fontSize: FontSize.xxl, fontWeight: '700', marginTop: Spacing.md },
-  level: { color: 'rgba(255,255,255,0.7)', fontSize: FontSize.md, marginTop: 4 },
+  name: { color: '#fff', fontSize: Font.title2, fontWeight: Weight.bold, marginTop: Spacing.md },
+  level: { color: 'rgba(255,255,255,0.7)', fontSize: Font.body, marginTop: 4 },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
@@ -204,11 +208,11 @@ const styles = StyleSheet.create({
   content: { padding: Spacing.lg },
   levelCard: { marginBottom: Spacing.xxl },
   levelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: Spacing.md },
-  levelTitle: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.text },
-  levelXP: { color: Colors.textSecondary, fontSize: FontSize.md },
+  levelTitle: { fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink },
+  levelXP: { color: Colors.inkSecondary, fontSize: Font.body },
   progressBg: {
     height: 10,
-    backgroundColor: Colors.surfaceAlt,
+    backgroundColor: Colors.surfaceSecondary,
     borderRadius: 5,
     overflow: 'hidden',
   },
@@ -217,12 +221,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderRadius: 5,
   },
-  levelHint: { color: Colors.textLight, fontSize: FontSize.sm, marginTop: Spacing.sm },
+  levelHint: { color: Colors.inkTertiary, fontSize: Font.sm, marginTop: Spacing.sm },
   premiumCard: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: Spacing.xl,
-    borderRadius: BorderRadius.lg,
+    borderRadius: Radius.lg,
     marginBottom: Spacing.xxl,
   },
   premiumIcon: {
@@ -233,8 +237,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  premiumTitle: { color: '#fff', fontSize: FontSize.xl, fontWeight: '700' },
-  premiumSub: { color: 'rgba(255,255,255,0.7)', fontSize: FontSize.sm, marginTop: 4 },
+  premiumTitle: { color: '#fff', fontSize: Font.title3, fontWeight: Weight.bold },
+  premiumSub: { color: 'rgba(255,255,255,0.7)', fontSize: Font.sm, marginTop: 4 },
   badgesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -244,21 +248,21 @@ const styles = StyleSheet.create({
   badgeCard: {
     width: '30%',
     aspectRatio: 0.85,
-    backgroundColor: Colors.surfaceAlt,
-    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: Radius.lg,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: Colors.hairline,
   },
   badgeCardEarned: {
-    backgroundColor: Colors.primary + '10',
+    backgroundColor: Colors.primaryPale,
     borderColor: Colors.primary + '30',
   },
   badgeName: {
-    fontSize: FontSize.xs,
-    fontWeight: '600',
-    color: Colors.text,
+    fontSize: Font.xs,
+    fontWeight: Weight.semibold,
+    color: Colors.ink,
     textAlign: 'center',
     marginTop: Spacing.sm,
   },
@@ -269,17 +273,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
   },
   leaderRank: { width: 40, alignItems: 'center' },
-  leaderName: { flex: 1, fontSize: FontSize.base, color: Colors.text },
-  leaderPts: { fontWeight: '700', color: Colors.textSecondary },
-  divider: { height: 1, backgroundColor: Colors.borderLight },
+  leaderName: { flex: 1, fontSize: Font.body, color: Colors.ink },
+  leaderPts: { fontWeight: Weight.bold, color: Colors.inkSecondary },
+  divider: { height: 1, backgroundColor: Colors.hairlineLight },
   activityRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: Spacing.sm,
     gap: Spacing.md,
   },
-  activityLabel: { flex: 1, fontSize: FontSize.base, color: Colors.text },
-  activityValue: { fontSize: FontSize.base, fontWeight: '700', color: Colors.text },
+  activityLabel: { flex: 1, fontSize: Font.body, color: Colors.ink },
+  activityValue: { fontSize: Font.body, fontWeight: Weight.bold, color: Colors.ink },
   accountRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -287,5 +291,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     gap: Spacing.md,
   },
-  accountLabel: { flex: 1, fontSize: FontSize.base, color: Colors.text },
+  accountLabel: { flex: 1, fontSize: Font.body, color: Colors.ink },
 });

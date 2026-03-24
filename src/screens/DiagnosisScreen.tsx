@@ -9,11 +9,13 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { Colors, Gradients } from '../theme/colors';
-import { Spacing, BorderRadius, FontSize } from '../theme/spacing';
+import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
 import { StatusBadge } from '../components/Badge';
+import { IOSButton } from '../components/IOSButton';
 import { PET_EMOJI, PetType } from '../models/types';
 
 const SYMPTOM_CHIPS = [
@@ -56,7 +58,7 @@ export function DiagnosisScreen() {
         </View>
 
         {/* Severity Banner */}
-        <GradientCard colors={Gradients.sunset} style={{ marginBottom: Spacing.xxl }}>
+        <GradientCard colors={Gradients.warmSunset} style={{ marginBottom: Spacing.xxl }}>
           <View style={styles.severityRow}>
             <View style={styles.severityIcon}>
               <Ionicons name="warning" size={28} color="#fff" />
@@ -93,8 +95,8 @@ export function DiagnosisScreen() {
             { name: 'Bacterial Skin Infection', prob: 30, desc: 'Secondary infection from scratching' },
           ].map((c) => (
             <View key={c.name} style={styles.conditionRow}>
-              <View style={[styles.conditionCircle, { borderColor: c.prob > 50 ? Colors.warning : Colors.textLight }]}>
-                <Text style={[styles.conditionProb, { color: c.prob > 50 ? Colors.warning : Colors.textSecondary }]}>
+              <View style={[styles.conditionCircle, { borderColor: c.prob > 50 ? Colors.warning : Colors.inkTertiary }]}>
+                <Text style={[styles.conditionProb, { color: c.prob > 50 ? Colors.warning : Colors.inkSecondary }]}>
                   {c.prob}%
                 </Text>
               </View>
@@ -143,15 +145,17 @@ export function DiagnosisScreen() {
 
         {/* Actions */}
         <View style={styles.actionRow}>
-          <TouchableOpacity
-            style={styles.outlineBtn}
+          <IOSButton
+            label="New Diagnosis"
+            variant="ghost"
             onPress={() => { setShowResults(false); setSymptoms(''); }}
-          >
-            <Text style={styles.outlineBtnText}>New Diagnosis</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.primaryBtn}>
-            <Text style={styles.primaryBtnText}>Save Result</Text>
-          </TouchableOpacity>
+            style={{ flex: 1 }}
+          />
+          <IOSButton
+            label="Save Result"
+            onPress={() => {}}
+            style={{ flex: 1 }}
+          />
         </View>
 
         {/* Points */}
@@ -177,7 +181,7 @@ export function DiagnosisScreen() {
 
       {/* Info banner */}
       <View style={styles.infoBanner}>
-        <Ionicons name="information-circle-outline" size={20} color="#1D4ED8" />
+        <Ionicons name="information-circle-outline" size={20} color={Colors.primary} />
         <Text style={styles.infoText}>
           AI diagnosis is not a substitute for professional veterinary care.
           Always consult a vet for serious symptoms.
@@ -191,7 +195,10 @@ export function DiagnosisScreen() {
           <TouchableOpacity
             key={pet.name}
             style={[styles.petChip, selectedPet === pet.name && styles.petChipActive]}
-            onPress={() => setSelectedPet(pet.name)}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setSelectedPet(pet.name);
+            }}
           >
             <Text style={{ fontSize: 24 }}>{PET_EMOJI[pet.type]}</Text>
             <Text style={[styles.petChipText, selectedPet === pet.name && { color: Colors.primary }]}>
@@ -209,6 +216,7 @@ export function DiagnosisScreen() {
             key={s}
             style={styles.symptomChip}
             onPress={() => {
+              Haptics.selectionAsync();
               setSymptoms((prev) => (prev ? `${prev}, ${s}` : s));
             }}
           >
@@ -222,7 +230,7 @@ export function DiagnosisScreen() {
       <TextInput
         style={styles.textArea}
         placeholder={'Describe what you\'ve observed...\n\ne.g., "My dog has been scratching a lot, has red patches on belly"'}
-        placeholderTextColor={Colors.textLight}
+        placeholderTextColor={Colors.inkTertiary}
         multiline
         numberOfLines={5}
         value={symptoms}
@@ -232,22 +240,20 @@ export function DiagnosisScreen() {
 
       {/* Photo upload placeholder */}
       <TouchableOpacity style={styles.photoBox}>
-        <Ionicons name="camera-outline" size={36} color={Colors.textLight} />
+        <Ionicons name="camera-outline" size={36} color={Colors.inkTertiary} />
         <Text style={styles.photoLabel}>Add a photo (optional)</Text>
         <Text style={styles.photoHint}>Photos help improve diagnosis accuracy</Text>
       </TouchableOpacity>
 
       {/* Analyze button */}
-      <TouchableOpacity
-        style={[styles.analyzeBtn, analyzing && { opacity: 0.7 }]}
+      <IOSButton
+        label={analyzing ? 'Analyzing with Gemini AI...' : 'Analyze Symptoms'}
         onPress={startAnalysis}
+        loading={analyzing}
         disabled={analyzing}
-      >
-        <Ionicons name="sparkles" size={22} color="#fff" />
-        <Text style={styles.analyzeBtnText}>
-          {analyzing ? 'Analyzing with Gemini AI...' : 'Analyze Symptoms'}
-        </Text>
-      </TouchableOpacity>
+        icon={<Ionicons name="sparkles" size={22} color="#fff" />}
+        size="large"
+      />
 
       {/* History */}
       <Text style={[styles.label, { marginTop: Spacing.xxl }]}>Recent Diagnoses</Text>
@@ -259,8 +265,8 @@ export function DiagnosisScreen() {
           <View style={styles.historyRow}>
             <Text style={{ fontSize: 24 }}>{h.pet.split(' ')[0]}</Text>
             <View style={{ flex: 1, marginLeft: Spacing.md }}>
-              <Text style={{ fontWeight: '600', color: Colors.text }}>{h.symptoms}</Text>
-              <Text style={{ color: Colors.textSecondary, fontSize: FontSize.sm }}>{h.date}</Text>
+              <Text style={{ fontWeight: Weight.semibold, color: Colors.ink }}>{h.symptoms}</Text>
+              <Text style={{ color: Colors.inkSecondary, fontSize: Font.sm }}>{h.date}</Text>
             </View>
             <StatusBadge label={h.severity} color={h.color} small />
           </View>
@@ -275,71 +281,61 @@ export function DiagnosisScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background, padding: Spacing.lg },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.lg },
-  headerTitle: { fontSize: FontSize.xxxl, fontWeight: '700', color: Colors.text },
+  headerTitle: { fontSize: Font.largeTitle, fontWeight: Weight.bold, color: Colors.ink },
   infoBanner: {
     flexDirection: 'row',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: Colors.primaryPale,
     borderWidth: 1,
-    borderColor: '#BFDBFE',
-    borderRadius: BorderRadius.md,
+    borderColor: Colors.primaryLight + '40',
+    borderRadius: Radius.md,
     padding: Spacing.lg,
     gap: Spacing.md,
     marginBottom: Spacing.xxl,
   },
-  infoText: { flex: 1, fontSize: FontSize.sm, color: '#1E40AF' },
-  label: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.text, marginBottom: Spacing.md },
+  infoText: { flex: 1, fontSize: Font.sm, color: Colors.primaryDark },
+  label: { fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink, marginBottom: Spacing.md },
   petChip: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing.xl,
     paddingVertical: Spacing.md,
-    backgroundColor: Colors.surfaceAlt,
-    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: Radius.lg,
     marginRight: Spacing.md,
     borderWidth: 2,
     borderColor: 'transparent',
     gap: Spacing.sm,
   },
-  petChipActive: { backgroundColor: Colors.primary + '15', borderColor: Colors.primary },
-  petChipText: { fontWeight: '700', color: Colors.textSecondary },
+  petChipActive: { backgroundColor: Colors.primaryPale, borderColor: Colors.primary },
+  petChipText: { fontWeight: Weight.bold, color: Colors.inkSecondary },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.xxl },
   symptomChip: {
-    backgroundColor: Colors.surfaceAlt,
+    backgroundColor: Colors.surfaceSecondary,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
-    borderRadius: BorderRadius.full,
+    borderRadius: Radius.pill,
   },
-  symptomChipText: { fontSize: FontSize.sm, color: Colors.text },
+  symptomChipText: { fontSize: Font.sm, color: Colors.ink },
   textArea: {
-    backgroundColor: Colors.surfaceAlt,
-    borderRadius: BorderRadius.md,
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: Radius.md,
     padding: Spacing.lg,
-    fontSize: FontSize.base,
-    color: Colors.text,
+    fontSize: Font.body,
+    color: Colors.ink,
     minHeight: 120,
     marginBottom: Spacing.lg,
   },
   photoBox: {
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: Colors.hairline,
     borderStyle: 'dashed',
-    borderRadius: BorderRadius.md,
+    borderRadius: Radius.md,
     padding: Spacing.xxl,
     alignItems: 'center',
     marginBottom: Spacing.xxl,
   },
-  photoLabel: { color: Colors.textSecondary, fontWeight: '600', marginTop: Spacing.sm },
-  photoHint: { color: Colors.textLight, fontSize: FontSize.xs, marginTop: 4 },
-  analyzeBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.primary,
-    paddingVertical: Spacing.lg,
-    borderRadius: BorderRadius.lg,
-    gap: Spacing.sm,
-  },
-  analyzeBtnText: { color: '#fff', fontSize: FontSize.lg, fontWeight: '700' },
+  photoLabel: { color: Colors.inkSecondary, fontWeight: Weight.semibold, marginTop: Spacing.sm },
+  photoHint: { color: Colors.inkTertiary, fontSize: Font.xs, marginTop: 4 },
   historyRow: { flexDirection: 'row', alignItems: 'center' },
   // Results styles
   severityRow: { flexDirection: 'row', alignItems: 'center' },
@@ -351,12 +347,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  severityTitle: { color: '#fff', fontSize: FontSize.xl, fontWeight: '700' },
-  severitySub: { color: 'rgba(255,255,255,0.7)', fontSize: FontSize.md, marginTop: 2 },
+  severityTitle: { color: '#fff', fontSize: Font.title3, fontWeight: Weight.bold },
+  severitySub: { color: 'rgba(255,255,255,0.7)', fontSize: Font.body, marginTop: 2 },
   section: { marginBottom: Spacing.lg },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.md },
-  sectionTitle: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.text },
-  sectionText: { fontSize: FontSize.md, color: Colors.textSecondary, lineHeight: 22 },
+  sectionTitle: { fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink },
+  sectionText: { fontSize: Font.body, color: Colors.inkSecondary, lineHeight: 22 },
   conditionRow: { flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.md },
   conditionCircle: {
     width: 44,
@@ -366,39 +362,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  conditionProb: { fontSize: FontSize.xs, fontWeight: '700' },
-  conditionName: { fontWeight: '600', color: Colors.text },
-  conditionDesc: { fontSize: FontSize.xs, color: Colors.textSecondary },
+  conditionProb: { fontSize: Font.xs, fontWeight: Weight.bold },
+  conditionName: { fontWeight: Weight.semibold, color: Colors.ink },
+  conditionDesc: { fontSize: Font.xs, color: Colors.inkSecondary },
   recRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.sm },
-  recText: { flex: 1, fontSize: FontSize.md, color: Colors.text },
+  recText: { flex: 1, fontSize: Font.body, color: Colors.ink },
   emergencyBox: {
-    backgroundColor: Colors.error + '08',
+    backgroundColor: Colors.errorPale,
     borderWidth: 1,
     borderColor: Colors.error + '30',
-    borderRadius: BorderRadius.md,
+    borderRadius: Radius.md,
     padding: Spacing.lg,
     marginBottom: Spacing.xxl,
   },
   emergencyItem: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: 6 },
   emergencyDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.error },
-  emergencyText: { fontSize: FontSize.md, color: Colors.text },
+  emergencyText: { fontSize: Font.body, color: Colors.ink },
   actionRow: { flexDirection: 'row', gap: Spacing.md, marginBottom: Spacing.lg },
-  outlineBtn: {
-    flex: 1,
-    paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.md,
-    borderWidth: 2,
-    borderColor: Colors.primary,
-    alignItems: 'center',
-  },
-  outlineBtnText: { color: Colors.primary, fontWeight: '700' },
-  primaryBtn: {
-    flex: 1,
-    paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.md,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-  },
-  primaryBtnText: { color: '#fff', fontWeight: '700' },
-  pointsText: { color: '#fff', fontWeight: '700', fontSize: FontSize.base, marginLeft: Spacing.sm },
+  pointsText: { color: '#fff', fontWeight: Weight.bold, fontSize: Font.body, marginLeft: Spacing.sm },
 });

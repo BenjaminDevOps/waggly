@@ -6,14 +6,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
-  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { Colors, Gradients } from '../theme/colors';
-import { Spacing, BorderRadius, FontSize } from '../theme/spacing';
+import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
 import { SectionHeader } from '../components/SectionHeader';
+import { IOSButton } from '../components/IOSButton';
 import { calculatePoints, estimateCalories, estimateDistanceKm } from '../services/walkService';
 import { PET_EMOJI } from '../models/types';
 
@@ -25,7 +26,7 @@ export function WalkScreen() {
   const [steps, setSteps] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [selectedPet, setSelectedPet] = useState<string | null>(null);
-  const [dailyGoal, setDailyGoal] = useState(5000);
+  const [dailyGoal] = useState(5000);
   const [todaySteps, setTodaySteps] = useState(2340);
   const [showSummary, setShowSummary] = useState(false);
 
@@ -44,6 +45,7 @@ export function WalkScreen() {
   }, []);
 
   const toggleWalk = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     if (isWalking) {
       clearInterval(timerRef.current);
       clearInterval(stepsRef.current);
@@ -104,7 +106,10 @@ export function WalkScreen() {
           <TouchableOpacity
             key={pet.name}
             style={[styles.petChip, selectedPet === pet.name && styles.petChipActive]}
-            onPress={() => setSelectedPet(selectedPet === pet.name ? null : pet.name)}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setSelectedPet(selectedPet === pet.name ? null : pet.name);
+            }}
           >
             <Text style={{ fontSize: 20 }}>{PET_EMOJI[pet.type]}</Text>
             <Text style={[styles.petChipText, selectedPet === pet.name && { color: Colors.primary }]}>
@@ -118,6 +123,7 @@ export function WalkScreen() {
       <TouchableOpacity
         style={[styles.walkBtn, { backgroundColor: isWalking ? Colors.error : Colors.success }]}
         onPress={toggleWalk}
+        activeOpacity={0.85}
       >
         <Ionicons name={isWalking ? 'stop' : 'play'} size={28} color="#fff" />
         <Text style={styles.walkBtnText}>{isWalking ? 'Stop Walk' : 'Start Walk'}</Text>
@@ -181,13 +187,13 @@ export function WalkScreen() {
           <View style={styles.achieveRow}>
             <Text style={{ fontSize: 28, opacity: a.done ? 1 : 0.4 }}>{a.icon}</Text>
             <View style={{ flex: 1, marginLeft: Spacing.md }}>
-              <Text style={[styles.achieveTitle, !a.done && { color: Colors.textLight }]}>{a.title}</Text>
+              <Text style={[styles.achieveTitle, !a.done && { color: Colors.inkTertiary }]}>{a.title}</Text>
               <Text style={styles.achieveDesc}>{a.desc}</Text>
             </View>
             <Ionicons
               name={a.done ? 'checkmark-circle' : 'ellipse-outline'}
               size={28}
-              color={a.done ? Colors.success : Colors.border}
+              color={a.done ? Colors.success : Colors.hairline}
             />
           </View>
         </Card>
@@ -209,14 +215,12 @@ export function WalkScreen() {
             <GradientCard colors={Gradients.gold} style={{ width: '100%', marginVertical: Spacing.lg }}>
               <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                 <Ionicons name="star" size={20} color="#fff" />
-                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16, marginLeft: 8 }}>
+                <Text style={{ color: '#fff', fontWeight: Weight.bold, fontSize: 16, marginLeft: 8 }}>
                   +{calculatePoints(steps, mins)} points earned!
                 </Text>
               </View>
             </GradientCard>
-            <TouchableOpacity style={styles.modalBtn} onPress={finishWalk}>
-              <Text style={styles.modalBtnText}>Done</Text>
-            </TouchableOpacity>
+            <IOSButton label="Done" onPress={finishWalk} size="large" style={{ width: '100%' }} />
           </View>
         </View>
       </Modal>
@@ -228,8 +232,8 @@ function CurStat({ icon, value, label }: { icon: string; value: string; label: s
   return (
     <View style={{ alignItems: 'center' }}>
       <Ionicons name={icon as any} size={18} color="rgba(255,255,255,0.7)" />
-      <Text style={{ color: '#fff', fontSize: FontSize.xl, fontWeight: '700' }}>{value}</Text>
-      <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: FontSize.xs }}>{label}</Text>
+      <Text style={{ color: '#fff', fontSize: Font.title3, fontWeight: Weight.bold }}>{value}</Text>
+      <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.xs }}>{label}</Text>
     </View>
   );
 }
@@ -247,65 +251,61 @@ function MiniStat({ icon, value, label, color }: { icon: string; value: string; 
 function SummaryStat({ value, label }: { value: string; label: string }) {
   return (
     <View style={{ alignItems: 'center' }}>
-      <Text style={{ fontSize: FontSize.xl, fontWeight: '700', color: Colors.text }}>{value}</Text>
-      <Text style={{ color: Colors.textSecondary }}>{label}</Text>
+      <Text style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink }}>{value}</Text>
+      <Text style={{ color: Colors.inkSecondary }}>{label}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background, padding: Spacing.lg },
-  headerTitle: { fontSize: FontSize.xxxl, fontWeight: '700', color: Colors.text, marginBottom: Spacing.lg },
+  headerTitle: { fontSize: Font.largeTitle, fontWeight: Weight.bold, color: Colors.ink, marginBottom: Spacing.lg },
   counterWrap: { alignItems: 'center', marginBottom: Spacing.xxl },
   counterOuter: {
     width: 200,
     height: 200,
     borderRadius: 100,
     borderWidth: 10,
-    borderColor: Colors.border,
+    borderColor: Colors.hairline,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
   },
   counterProgress: { position: 'absolute', width: '100%', height: '100%' },
   counterInner: { alignItems: 'center' },
-  counterSteps: { fontSize: FontSize.hero, fontWeight: '700', color: Colors.text },
-  counterGoal: { fontSize: FontSize.md, color: Colors.textSecondary },
-  goalReached: { color: Colors.success, fontWeight: '700', fontSize: FontSize.xs, marginTop: 4 },
-  sectionLabel: { fontSize: FontSize.base, fontWeight: '600', color: Colors.text, marginBottom: Spacing.sm },
+  counterSteps: { fontSize: Font.hero, fontWeight: Weight.bold, color: Colors.ink },
+  counterGoal: { fontSize: Font.body, color: Colors.inkSecondary },
+  goalReached: { color: Colors.success, fontWeight: Weight.bold, fontSize: Font.xs, marginTop: 4 },
+  sectionLabel: { fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink, marginBottom: Spacing.sm },
   petChip: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
-    backgroundColor: Colors.surfaceAlt,
-    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: Radius.pill,
     marginRight: Spacing.sm,
     borderWidth: 2,
     borderColor: 'transparent',
     gap: Spacing.sm,
   },
-  petChipActive: { backgroundColor: Colors.primary + '15', borderColor: Colors.primary },
-  petChipText: { fontWeight: '700', color: Colors.textSecondary },
+  petChipActive: { backgroundColor: Colors.primaryPale, borderColor: Colors.primary },
+  petChipText: { fontWeight: Weight.bold, color: Colors.inkSecondary },
   walkBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: Spacing.lg,
-    borderRadius: BorderRadius.xl,
+    paddingVertical: Spacing.xl,
+    borderRadius: Radius.xl,
     gap: Spacing.md,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
+    ...Shadow.medium,
   },
-  walkBtnText: { color: '#fff', fontSize: FontSize.xxl, fontWeight: '700' },
-  curWalkLabel: { color: 'rgba(255,255,255,0.7)', fontSize: FontSize.md, textAlign: 'center' },
+  walkBtnText: { color: '#fff', fontSize: Font.title2, fontWeight: Weight.bold },
+  curWalkLabel: { color: 'rgba(255,255,255,0.7)', fontSize: Font.body, textAlign: 'center' },
   curWalkTimer: {
     color: '#fff',
     fontSize: 32,
-    fontWeight: '700',
+    fontWeight: Weight.bold,
     fontVariant: ['tabular-nums'],
     textAlign: 'center',
     marginVertical: Spacing.sm,
@@ -313,38 +313,30 @@ const styles = StyleSheet.create({
   curStatsRow: { flexDirection: 'row', justifyContent: 'space-evenly', marginTop: Spacing.md },
   miniStatsRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.xxl },
   miniStatCard: { flex: 1, alignItems: 'center', padding: Spacing.md },
-  miniStatValue: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.text, marginTop: 4 },
-  miniStatLabel: { fontSize: FontSize.xs, color: Colors.textSecondary, textAlign: 'center' },
+  miniStatValue: { fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink, marginTop: 4 },
+  miniStatLabel: { fontSize: Font.xs, color: Colors.inkSecondary, textAlign: 'center' },
   chartCard: { marginBottom: Spacing.xxl },
   barsRow: { flexDirection: 'row', justifyContent: 'space-between', height: 120, alignItems: 'flex-end' },
   barCol: { alignItems: 'center', flex: 1 },
-  barBg: { width: 20, height: 100, backgroundColor: Colors.surfaceAlt, borderRadius: 6, justifyContent: 'flex-end', overflow: 'hidden' },
+  barBg: { width: 20, height: 100, backgroundColor: Colors.surfaceSecondary, borderRadius: 6, justifyContent: 'flex-end', overflow: 'hidden' },
   barFill: { width: '100%', borderRadius: 6 },
-  barLabel: { fontSize: FontSize.xs, color: Colors.textSecondary, marginTop: 4 },
+  barLabel: { fontSize: Font.xs, color: Colors.inkSecondary, marginTop: 4 },
   achieveCard: { marginBottom: Spacing.sm },
   achieveRow: { flexDirection: 'row', alignItems: 'center' },
-  achieveTitle: { fontWeight: '700', color: Colors.text },
-  achieveDesc: { color: Colors.textSecondary, fontSize: FontSize.sm },
+  achieveTitle: { fontWeight: Weight.bold, color: Colors.ink },
+  achieveDesc: { color: Colors.inkSecondary, fontSize: Font.sm },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: Colors.overlay,
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: Colors.card,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: Colors.surface,
+    borderTopLeftRadius: Radius.xxl,
+    borderTopRightRadius: Radius.xxl,
     padding: Spacing.xxl,
     alignItems: 'center',
   },
-  modalTitle: { fontSize: FontSize.xxl, fontWeight: '700', color: Colors.text, marginVertical: Spacing.md },
+  modalTitle: { fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.ink, marginVertical: Spacing.md },
   modalStatsRow: { flexDirection: 'row', justifyContent: 'space-evenly', width: '100%', marginVertical: Spacing.lg },
-  modalBtn: {
-    width: '100%',
-    backgroundColor: Colors.primary,
-    paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.md,
-    alignItems: 'center',
-  },
-  modalBtnText: { color: '#fff', fontWeight: '700', fontSize: FontSize.base },
 });

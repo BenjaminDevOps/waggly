@@ -10,8 +10,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
 import { Colors } from '../theme/colors';
-import { Spacing, BorderRadius, FontSize } from '../theme/spacing';
+import { Spacing, Radius, Font, Weight } from '../theme/spacing';
+import { IOSButton } from '../components/IOSButton';
 import { PetType, PetGender, PET_EMOJI } from '../models/types';
 
 const PET_TYPES: { type: PetType; label: string }[] = [
@@ -63,13 +65,16 @@ export function AddPetScreen() {
               styles.typeCard,
               selectedType === pt.type && styles.typeCardActive,
             ]}
-            onPress={() => setSelectedType(pt.type)}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setSelectedType(pt.type);
+            }}
           >
             <Text style={{ fontSize: 28 }}>{PET_EMOJI[pt.type]}</Text>
             <Text
               style={[
                 styles.typeLabel,
-                selectedType === pt.type && { color: Colors.primary, fontWeight: '700' },
+                selectedType === pt.type && { color: Colors.primary, fontWeight: Weight.bold },
               ]}
             >
               {pt.label}
@@ -89,7 +94,7 @@ export function AddPetScreen() {
       <TextInput
         style={styles.input}
         placeholder="Enter your pet's name"
-        placeholderTextColor={Colors.textLight}
+        placeholderTextColor={Colors.inkTertiary}
         value={name}
         onChangeText={setName}
       />
@@ -98,7 +103,7 @@ export function AddPetScreen() {
       <TextInput
         style={styles.input}
         placeholder="e.g., Golden Retriever"
-        placeholderTextColor={Colors.textLight}
+        placeholderTextColor={Colors.inkTertiary}
         value={breed}
         onChangeText={setBreed}
       />
@@ -115,17 +120,20 @@ export function AddPetScreen() {
                 borderColor: g.color,
               },
             ]}
-            onPress={() => setSelectedGender(g.value)}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setSelectedGender(g.value);
+            }}
           >
             <Ionicons
               name={g.icon as any}
               size={24}
-              color={selectedGender === g.value ? g.color : Colors.textLight}
+              color={selectedGender === g.value ? g.color : Colors.inkTertiary}
             />
             <Text
               style={[
                 styles.genderText,
-                selectedGender === g.value && { color: g.color, fontWeight: '700' },
+                selectedGender === g.value && { color: g.color, fontWeight: Weight.bold },
               ]}
             >
               {g.label}
@@ -138,7 +146,7 @@ export function AddPetScreen() {
       <TextInput
         style={styles.input}
         placeholder="e.g., 25.5"
-        placeholderTextColor={Colors.textLight}
+        placeholderTextColor={Colors.inkTertiary}
         keyboardType="numeric"
         value={weight}
         onChangeText={setWeight}
@@ -148,20 +156,21 @@ export function AddPetScreen() {
       <TextInput
         style={styles.input}
         placeholder="e.g., 250269606..."
-        placeholderTextColor={Colors.textLight}
+        placeholderTextColor={Colors.inkTertiary}
         value={microchip}
         onChangeText={setMicrochip}
       />
 
       {/* Save button */}
-      <TouchableOpacity
-        style={[styles.saveBtn, loading && { opacity: 0.7 }]}
+      <IOSButton
+        label={loading ? 'Saving...' : 'Add Pet'}
         onPress={handleSave}
+        loading={loading}
         disabled={loading}
-      >
-        <Ionicons name="checkmark-circle-outline" size={22} color="#fff" />
-        <Text style={styles.saveBtnText}>{loading ? 'Saving...' : 'Add Pet'}</Text>
-      </TouchableOpacity>
+        icon={<Ionicons name="checkmark-circle-outline" size={22} color="#fff" />}
+        size="large"
+        style={{ marginTop: Spacing.lg }}
+      />
 
       <View style={{ height: 40 }} />
     </ScrollView>
@@ -170,24 +179,24 @@ export function AddPetScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background, padding: Spacing.lg },
-  sectionTitle: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.text, marginBottom: Spacing.md },
+  sectionTitle: { fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink, marginBottom: Spacing.md },
   typeRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: Spacing.xxl },
   typeCard: {
     alignItems: 'center',
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.lg,
-    backgroundColor: Colors.surfaceAlt,
+    borderRadius: Radius.lg,
+    backgroundColor: Colors.surfaceSecondary,
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  typeCardActive: { backgroundColor: Colors.primary + '15', borderColor: Colors.primary },
-  typeLabel: { fontSize: FontSize.xs, color: Colors.textSecondary, marginTop: 4 },
+  typeCardActive: { backgroundColor: Colors.primaryPale, borderColor: Colors.primary },
+  typeLabel: { fontSize: Font.xs, color: Colors.inkSecondary, marginTop: 4 },
   photoCircle: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: Colors.primary + '10',
+    backgroundColor: Colors.primaryPale,
     borderWidth: 2,
     borderColor: Colors.primary + '30',
     justifyContent: 'center',
@@ -195,14 +204,14 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: Spacing.xxl,
   },
-  photoText: { fontSize: FontSize.xs, color: Colors.primary + '80', marginTop: 4 },
-  label: { fontSize: FontSize.base, fontWeight: '600', color: Colors.text, marginBottom: Spacing.sm },
+  photoText: { fontSize: Font.xs, color: Colors.primary + '80', marginTop: 4 },
+  label: { fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink, marginBottom: Spacing.sm },
   input: {
-    backgroundColor: Colors.surfaceAlt,
-    borderRadius: BorderRadius.md,
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: Radius.md,
     padding: Spacing.lg,
-    fontSize: FontSize.base,
-    color: Colors.text,
+    fontSize: Font.body,
+    color: Colors.ink,
     marginBottom: Spacing.lg,
   },
   genderRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.lg },
@@ -210,21 +219,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.md,
-    backgroundColor: Colors.surfaceAlt,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.surfaceSecondary,
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  genderText: { fontSize: FontSize.xs, color: Colors.textSecondary, marginTop: 4 },
-  saveBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.primary,
-    paddingVertical: Spacing.lg,
-    borderRadius: BorderRadius.lg,
-    gap: Spacing.sm,
-    marginTop: Spacing.lg,
-  },
-  saveBtnText: { color: '#fff', fontSize: FontSize.lg, fontWeight: '700' },
+  genderText: { fontSize: Font.xs, color: Colors.inkSecondary, marginTop: 4 },
 });

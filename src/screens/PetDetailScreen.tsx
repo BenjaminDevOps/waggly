@@ -5,19 +5,17 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import { Colors, Gradients } from '../theme/colors';
-import { Spacing, BorderRadius, FontSize } from '../theme/spacing';
+import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { Card } from '../components/Card';
 import { StatusBadge } from '../components/Badge';
 import { SectionHeader } from '../components/SectionHeader';
 import { Pet, PET_EMOJI } from '../models/types';
-
-const { width } = Dimensions.get('window');
 
 function getAge(birthDate?: string): string {
   if (!birthDate) return 'N/A';
@@ -58,7 +56,7 @@ export function PetDetailScreen() {
         </View>
 
         {/* Health Score */}
-        <LinearGradient colors={Gradients.success} style={styles.healthScore}>
+        <LinearGradient colors={Gradients.forest} style={styles.healthScore}>
           <View style={styles.healthCircle}>
             <Text style={styles.healthValue}>92</Text>
           </View>
@@ -77,7 +75,11 @@ export function PetDetailScreen() {
             { icon: 'add-circle-outline', label: 'Add\nRecord', color: Colors.success },
             { icon: 'shield-checkmark', label: 'Vaccine', color: Colors.accent },
           ].map((a) => (
-            <TouchableOpacity key={a.label} style={[styles.actionBtn, { backgroundColor: a.color + '12' }]}>
+            <TouchableOpacity
+              key={a.label}
+              style={[styles.actionBtn, { backgroundColor: a.color + '12' }]}
+              onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+            >
               <Ionicons name={a.icon as any} size={28} color={a.color} />
               <Text style={[styles.actionLabel, { color: a.color }]}>{a.label}</Text>
             </TouchableOpacity>
@@ -151,36 +153,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   heroAvatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  heroName: { color: '#fff', fontSize: FontSize.xxxl, fontWeight: '700', marginTop: Spacing.md },
-  heroBreed: { color: 'rgba(255,255,255,0.7)', fontSize: FontSize.base },
+  heroName: { color: '#fff', fontSize: Font.title1, fontWeight: Weight.bold, marginTop: Spacing.md },
+  heroBreed: { color: 'rgba(255,255,255,0.7)', fontSize: Font.body },
   content: { padding: Spacing.lg },
   statsRow: { flexDirection: 'row', gap: Spacing.md, marginBottom: Spacing.xxl },
   statCard: {
     flex: 1,
-    backgroundColor: Colors.card,
-    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
     padding: Spacing.lg,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    ...Shadow.soft,
   },
-  statValue: { fontSize: FontSize.lg, fontWeight: '700', marginTop: Spacing.sm, color: Colors.text },
-  statLabel: { fontSize: FontSize.xs, color: Colors.textSecondary, marginTop: 2 },
+  statValue: { fontSize: Font.bodyLarge, fontWeight: Weight.bold, marginTop: Spacing.sm, color: Colors.ink },
+  statLabel: { fontSize: Font.xs, color: Colors.inkSecondary, marginTop: 2 },
   healthScore: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: Spacing.xl,
-    borderRadius: BorderRadius.lg,
+    borderRadius: Radius.lg,
     marginBottom: Spacing.xxl,
   },
   healthCircle: {
@@ -191,19 +189,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  healthValue: { color: '#fff', fontSize: FontSize.xxl, fontWeight: '700' },
-  healthTitle: { color: '#fff', fontSize: FontSize.lg, fontWeight: '700' },
-  healthSub: { color: 'rgba(255,255,255,0.7)', fontSize: FontSize.md, marginTop: 4 },
+  healthValue: { color: '#fff', fontSize: Font.title2, fontWeight: Weight.bold },
+  healthTitle: { color: '#fff', fontSize: Font.bodyLarge, fontWeight: Weight.bold },
+  healthSub: { color: 'rgba(255,255,255,0.7)', fontSize: Font.body, marginTop: 4 },
   actionsRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.xxl },
   actionBtn: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: Spacing.lg,
-    borderRadius: BorderRadius.md,
+    borderRadius: Radius.md,
   },
-  actionLabel: { fontSize: FontSize.xs, fontWeight: '600', textAlign: 'center', marginTop: Spacing.sm },
+  actionLabel: { fontSize: Font.xs, fontWeight: Weight.semibold, textAlign: 'center', marginTop: Spacing.sm },
   recordCard: { marginBottom: Spacing.sm },
   recordRow: { flexDirection: 'row', alignItems: 'center' },
-  recordTitle: { fontWeight: '600', fontSize: FontSize.md, color: Colors.text },
-  recordDate: { color: Colors.textSecondary, fontSize: FontSize.sm, marginTop: 2 },
+  recordTitle: { fontWeight: Weight.semibold, fontSize: Font.body, color: Colors.ink },
+  recordDate: { color: Colors.inkSecondary, fontSize: Font.sm, marginTop: 2 },
 });

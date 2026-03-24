@@ -12,10 +12,12 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { Colors } from '../theme/colors';
-import { Spacing, BorderRadius, FontSize } from '../theme/spacing';
+import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { ShopCategory, SHOP_EMOJI } from '../models/types';
 import { StatusBadge } from '../components/Badge';
+import { IOSButton } from '../components/IOSButton';
 
 type PetFilter = 'all' | 'dog' | 'cat' | 'nac';
 
@@ -78,17 +80,17 @@ export function ShopScreen() {
 
       {/* Search */}
       <View style={styles.searchBox}>
-        <Ionicons name="search" size={20} color={Colors.textLight} />
+        <Ionicons name="search" size={20} color={Colors.inkTertiary} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search products..."
-          placeholderTextColor={Colors.textLight}
+          placeholderTextColor={Colors.inkTertiary}
           value={search}
           onChangeText={setSearch}
         />
         {search.length > 0 && (
           <TouchableOpacity onPress={() => setSearch('')}>
-            <Ionicons name="close-circle" size={20} color={Colors.textLight} />
+            <Ionicons name="close-circle" size={20} color={Colors.inkTertiary} />
           </TouchableOpacity>
         )}
       </View>
@@ -130,7 +132,7 @@ export function ShopScreen() {
         contentContainerStyle={{ padding: Spacing.lg, gap: Spacing.md }}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Ionicons name="search-outline" size={64} color={Colors.border} />
+            <Ionicons name="search-outline" size={64} color={Colors.hairline} />
             <Text style={styles.emptyText}>No products found</Text>
           </View>
         }
@@ -173,16 +175,16 @@ export function ShopScreen() {
                 </View>
                 <Text style={styles.modalDesc}>{selectedProduct.desc}</Text>
 
-                <TouchableOpacity
-                  style={styles.buyBtn}
+                <IOSButton
+                  label="Buy Now"
                   onPress={() => {
                     setSelectedProduct(null);
                     Alert.alert('Purchase', 'Redirecting to purchase...');
                   }}
-                >
-                  <Ionicons name="cart" size={22} color="#fff" />
-                  <Text style={styles.buyBtnText}>Buy Now</Text>
-                </TouchableOpacity>
+                  icon={<Ionicons name="cart" size={22} color="#fff" />}
+                  size="large"
+                  style={{ marginTop: Spacing.xxl }}
+                />
 
                 <View style={styles.pointsInfo}>
                   <Ionicons name="star" size={16} color={Colors.secondary} />
@@ -207,9 +209,12 @@ function FilterChip({ label, active, onPress }: { label: string; active: boolean
   return (
     <TouchableOpacity
       style={[styles.chip, active && styles.chipActive]}
-      onPress={onPress}
+      onPress={() => {
+        Haptics.selectionAsync();
+        onPress();
+      }}
     >
-      <Text style={[styles.chipText, active && { color: Colors.primary, fontWeight: '700' }]}>
+      <Text style={[styles.chipText, active && { color: Colors.primary, fontWeight: Weight.bold }]}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -262,47 +267,43 @@ function ProductCard({ product, onPress }: { product: Product; onPress: () => vo
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
-  headerTitle: { fontSize: FontSize.xxxl, fontWeight: '700', color: Colors.text, paddingHorizontal: Spacing.lg, marginBottom: Spacing.sm },
+  headerTitle: { fontSize: Font.largeTitle, fontWeight: Weight.bold, color: Colors.ink, paddingHorizontal: Spacing.lg, marginBottom: Spacing.sm },
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surfaceAlt,
+    backgroundColor: Colors.surfaceSecondary,
     marginHorizontal: Spacing.lg,
-    borderRadius: BorderRadius.md,
+    borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
     marginBottom: Spacing.sm,
     gap: Spacing.sm,
   },
-  searchInput: { flex: 1, fontSize: FontSize.base, color: Colors.text },
+  searchInput: { flex: 1, fontSize: Font.body, color: Colors.ink },
   filterRow: { paddingHorizontal: Spacing.lg, marginBottom: Spacing.sm },
   chip: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
-    backgroundColor: Colors.surfaceAlt,
-    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: Radius.pill,
     marginRight: Spacing.sm,
     borderWidth: 1.5,
     borderColor: 'transparent',
   },
-  chipActive: { backgroundColor: Colors.primary + '15', borderColor: Colors.primary },
-  chipText: { fontSize: FontSize.sm, color: Colors.textSecondary },
+  chipActive: { backgroundColor: Colors.primaryPale, borderColor: Colors.primary },
+  chipText: { fontSize: Font.sm, color: Colors.inkSecondary },
   empty: { alignItems: 'center', paddingTop: 60 },
-  emptyText: { fontSize: FontSize.lg, color: Colors.textLight, marginTop: Spacing.lg },
+  emptyText: { fontSize: Font.bodyLarge, color: Colors.inkTertiary, marginTop: Spacing.lg },
   productCard: {
     width: CARD_W,
-    backgroundColor: Colors.card,
-    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    ...Shadow.soft,
   },
   productImg: {
     height: 110,
-    backgroundColor: Colors.primary + '0A',
+    backgroundColor: Colors.primaryPale,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -312,76 +313,65 @@ const styles = StyleSheet.create({
     left: Spacing.sm,
     paddingHorizontal: Spacing.sm,
     paddingVertical: 2,
-    borderRadius: BorderRadius.sm,
+    borderRadius: Radius.sm,
   },
-  badgeText: { color: '#fff', fontSize: FontSize.xs, fontWeight: '700' },
-  productName: { fontWeight: '700', fontSize: FontSize.md, color: Colors.text },
-  productDesc: { fontSize: FontSize.xs, color: Colors.textSecondary, marginTop: 2 },
-  productRating: { fontSize: FontSize.xs, fontWeight: '700', color: Colors.text },
-  productReviews: { fontSize: FontSize.xs, color: Colors.textLight },
-  productPrice: { fontSize: FontSize.base, fontWeight: '700', color: Colors.primary },
+  badgeText: { color: '#fff', fontSize: Font.xs, fontWeight: Weight.bold },
+  productName: { fontWeight: Weight.bold, fontSize: Font.body, color: Colors.ink },
+  productDesc: { fontSize: Font.xs, color: Colors.inkSecondary, marginTop: 2 },
+  productRating: { fontSize: Font.xs, fontWeight: Weight.bold, color: Colors.ink },
+  productReviews: { fontSize: Font.xs, color: Colors.inkTertiary },
+  productPrice: { fontSize: Font.body, fontWeight: Weight.bold, color: Colors.primary },
   productOldPrice: {
-    fontSize: FontSize.xs,
-    color: Colors.textLight,
+    fontSize: Font.xs,
+    color: Colors.inkTertiary,
     textDecorationLine: 'line-through',
     marginLeft: 6,
   },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  modalOverlay: { flex: 1, backgroundColor: Colors.overlay, justifyContent: 'flex-end' },
   modalContent: {
-    backgroundColor: Colors.card,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: Colors.surface,
+    borderTopLeftRadius: Radius.xxl,
+    borderTopRightRadius: Radius.xxl,
     padding: Spacing.xxl,
     maxHeight: '80%',
   },
   modalHandle: {
     width: 40,
     height: 4,
-    backgroundColor: Colors.border,
+    backgroundColor: Colors.hairline,
     borderRadius: 2,
     alignSelf: 'center',
     marginBottom: Spacing.lg,
   },
   modalImg: {
     height: 160,
-    backgroundColor: Colors.primary + '0A',
-    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.primaryPale,
+    borderRadius: Radius.lg,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: Spacing.lg,
   },
-  modalName: { fontSize: FontSize.xxl, fontWeight: '700', color: Colors.text },
-  modalPrice: { fontSize: FontSize.xxxl, fontWeight: '700', color: Colors.primary },
+  modalName: { fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.ink },
+  modalPrice: { fontSize: Font.title1, fontWeight: Weight.bold, color: Colors.primary },
   modalOldPrice: {
-    fontSize: FontSize.lg,
-    color: Colors.textLight,
+    fontSize: Font.bodyLarge,
+    color: Colors.inkTertiary,
     textDecorationLine: 'line-through',
     marginLeft: Spacing.md,
   },
-  modalReviews: { color: Colors.textSecondary, marginLeft: Spacing.sm },
-  modalDesc: { fontSize: FontSize.base, color: Colors.textSecondary, lineHeight: 24, marginTop: Spacing.lg },
-  buyBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.primary,
-    paddingVertical: Spacing.lg,
-    borderRadius: BorderRadius.lg,
-    gap: Spacing.sm,
-    marginTop: Spacing.xxl,
-  },
-  buyBtnText: { color: '#fff', fontSize: FontSize.lg, fontWeight: '700' },
+  modalReviews: { color: Colors.inkSecondary, marginLeft: Spacing.sm },
+  modalDesc: { fontSize: Font.body, color: Colors.inkSecondary, lineHeight: 24, marginTop: Spacing.lg },
   pointsInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.secondary + '15',
-    borderRadius: BorderRadius.md,
+    backgroundColor: Colors.secondaryPale,
+    borderRadius: Radius.md,
     padding: Spacing.md,
     marginTop: Spacing.md,
     gap: Spacing.sm,
   },
-  pointsInfoText: { color: Colors.secondary, fontWeight: '600', fontSize: FontSize.sm },
+  pointsInfoText: { color: Colors.secondary, fontWeight: Weight.semibold, fontSize: Font.sm },
   closeBtn: { alignItems: 'center', paddingVertical: Spacing.lg },
-  closeBtnText: { color: Colors.textSecondary, fontWeight: '600' },
+  closeBtnText: { color: Colors.inkSecondary, fontWeight: Weight.semibold },
 });
