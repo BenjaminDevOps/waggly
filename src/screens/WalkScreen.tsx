@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   Modal,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { Card } from '../components/Card';
@@ -45,7 +45,7 @@ export function WalkScreen() {
   }, []);
 
   const toggleWalk = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    ReactNativeHapticFeedback.trigger('impactHeavy');
     if (isWalking) {
       clearInterval(timerRef.current);
       clearInterval(stepsRef.current);
@@ -107,7 +107,7 @@ export function WalkScreen() {
             key={pet.name}
             style={[styles.petChip, selectedPet === pet.name && styles.petChipActive]}
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              ReactNativeHapticFeedback.trigger('impactLight');
               setSelectedPet(selectedPet === pet.name ? null : pet.name);
             }}
           >

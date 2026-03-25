@@ -6,9 +6,9 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { Pet, PET_EMOJI, PET_COLORS } from '../models/types';
@@ -43,7 +43,7 @@ function PetCard({ pet }: { pet: Pet }) {
     <TouchableOpacity
       style={styles.card}
       onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        ReactNativeHapticFeedback.trigger('impactLight');
         navigation.navigate('PetDetail', { pet });
       }}
       activeOpacity={0.7}
@@ -94,7 +94,7 @@ export function PetsScreen() {
       <TouchableOpacity
         style={styles.fab}
         onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          ReactNativeHapticFeedback.trigger('impactMedium');
           navigation.navigate('AddPet');
         }}
       >

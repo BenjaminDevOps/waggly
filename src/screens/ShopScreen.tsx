@@ -11,8 +11,8 @@ import {
   Modal,
   Alert,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { ShopCategory, SHOP_EMOJI } from '../models/types';
@@ -210,7 +210,7 @@ function FilterChip({ label, active, onPress }: { label: string; active: boolean
     <TouchableOpacity
       style={[styles.chip, active && styles.chipActive]}
       onPress={() => {
-        Haptics.selectionAsync();
+        ReactNativeHapticFeedback.trigger('selection');
         onPress();
       }}
     >

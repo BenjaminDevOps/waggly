@@ -2,10 +2,18 @@
 node_modules/
 package-lock.json
 
-# Expo
-.expo/
-dist/
-web-build/
+# iOS
+ios/build/
+ios/Pods/
+ios/*.xcworkspace
+ios/*.xcodeproj/xcuserdata/
+ios/DerivedData/
+
+# Android
+android/app/build/
+android/build/
+android/.gradle/
+*.apk
 
 # Native builds
 *.jks

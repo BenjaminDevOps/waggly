@@ -8,9 +8,9 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { IOSButton } from '../components/IOSButton';
@@ -66,7 +66,7 @@ export function AddPetScreen() {
               selectedType === pt.type && styles.typeCardActive,
             ]}
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              ReactNativeHapticFeedback.trigger('impactLight');
               setSelectedType(pt.type);
             }}
           >
@@ -121,7 +121,7 @@ export function AddPetScreen() {
               },
             ]}
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              ReactNativeHapticFeedback.trigger('impactLight');
               setSelectedGender(g.value);
             }}
           >

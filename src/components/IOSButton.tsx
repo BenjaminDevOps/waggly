@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, TouchableOpacity, StyleSheet, ViewStyle, ActivityIndicator } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import LinearGradient from 'react-native-linear-gradient';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { Colors, Gradients } from '../theme/colors';
 import { Radius, Spacing, Font, Weight, Shadow } from '../theme/spacing';
 
@@ -27,7 +27,7 @@ export function IOSButton({
   size = 'default',
 }: Props) {
   const handlePress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    ReactNativeHapticFeedback.trigger('impactMedium');
     onPress();
   };
 
@@ -40,7 +40,7 @@ export function IOSButton({
         style={[style, (disabled || loading) && { opacity: 0.6 }]}
       >
         <LinearGradient
-          colors={Gradients.primary}
+          colors={[...Gradients.primary]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={[styles.btn, size === 'large' && styles.btnLarge, Shadow.glow(Colors.primary)]}

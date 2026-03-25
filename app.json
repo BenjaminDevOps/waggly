@@ -1,43 +1,4 @@
 {
-  "expo": {
-    "name": "Waggly",
-    "slug": "waggly",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#FAF8F5"
-    },
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.waggly.app",
-      "usesAppleSignIn": true,
-      "config": {
-        "usesNonExemptEncryption": false
-      },
-      "infoPlist": {
-        "NSMotionUsageDescription": "Waggly uses motion sensors to count your steps while walking with your pet.",
-        "NSCameraUsageDescription": "Take photos of your pet's symptoms for AI diagnosis.",
-        "NSPhotoLibraryUsageDescription": "Select photos of your pet for their profile."
-      }
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#6366F1"
-      },
-      "package": "com.waggly.app",
-      "permissions": ["ACTIVITY_RECOGNITION"]
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "newArchEnabled": true,
-    "plugins": [
-      "expo-sensors"
-    ]
-  }
+  "name": "waggly",
+  "displayName": "Waggly"
 }

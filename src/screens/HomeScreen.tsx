@@ -7,9 +7,9 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import * as Haptics from 'expo-haptics';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { GradientCard } from '../components/GradientCard';
@@ -100,7 +100,7 @@ export function HomeScreen({ navigation: tabNav }: any) {
         <TouchableOpacity
           style={styles.addPetCard}
           onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            ReactNativeHapticFeedback.trigger('impactLight');
             navigation.navigate('AddPet');
           }}
         >
@@ -162,7 +162,7 @@ export function HomeScreen({ navigation: tabNav }: any) {
             key={action.label}
             style={styles.actionCard}
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              ReactNativeHapticFeedback.trigger('impactLight');
               if (action.tab) tabNav.navigate(action.tab);
               else if (action.screen) navigation.navigate(action.screen);
             }}

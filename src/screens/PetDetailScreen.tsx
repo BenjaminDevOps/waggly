@@ -6,10 +6,10 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import LinearGradient from 'react-native-linear-gradient';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { Card } from '../components/Card';
@@ -78,7 +78,7 @@ export function PetDetailScreen() {
             <TouchableOpacity
               key={a.label}
               style={[styles.actionBtn, { backgroundColor: a.color + '12' }]}
-              onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+              onPress={() => ReactNativeHapticFeedback.trigger('impactLight')}
             >
               <Ionicons name={a.icon as any} size={28} color={a.color} />
               <Text style={[styles.actionLabel, { color: a.color }]}>{a.label}</Text>

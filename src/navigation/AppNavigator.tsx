@@ -3,8 +3,8 @@ import { Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { BlurView } from '@react-native-community/blur';
 import { Colors } from '../theme/colors';
 import { Font, Weight } from '../theme/spacing';
 
@@ -38,8 +38,8 @@ function TabNavigator() {
         tabBarBackground: () =>
           Platform.OS === 'ios' ? (
             <BlurView
-              tint="systemChromeMaterialLight"
-              intensity={100}
+              blurType="xlight"
+              blurAmount={20}
               style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
             />
           ) : null,
@@ -47,7 +47,7 @@ function TabNavigator() {
           fontSize: Font.xs,
           fontWeight: Weight.semibold,
         },
-        tabBarIcon: ({ focused, color }) => {
+        tabBarIcon: ({ focused, color }: { focused: boolean; color: string }) => {
           const icons: Record<string, string> = {
             Home: focused ? 'home' : 'home-outline',
             Pets: focused ? 'paw' : 'paw-outline',
@@ -56,7 +56,7 @@ function TabNavigator() {
             Shop: focused ? 'bag-handle' : 'bag-handle-outline',
             Profile: focused ? 'person' : 'person-outline',
           };
-          return <Ionicons name={icons[route.name] as any} size={24} color={color} />;
+          return <Ionicons name={icons[route.name]} size={24} color={color} />;
         },
       })}
     >

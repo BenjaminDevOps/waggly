@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { Card } from '../components/Card';
@@ -196,7 +196,7 @@ export function DiagnosisScreen() {
             key={pet.name}
             style={[styles.petChip, selectedPet === pet.name && styles.petChipActive]}
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              ReactNativeHapticFeedback.trigger('impactLight');
               setSelectedPet(pet.name);
             }}
           >
@@ -216,7 +216,7 @@ export function DiagnosisScreen() {
             key={s}
             style={styles.symptomChip}
             onPress={() => {
-              Haptics.selectionAsync();
+              ReactNativeHapticFeedback.trigger('selection');
               setSymptoms((prev) => (prev ? `${prev}, ${s}` : s));
             }}
           >

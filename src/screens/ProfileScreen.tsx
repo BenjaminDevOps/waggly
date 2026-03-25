@@ -7,9 +7,9 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import LinearGradient from 'react-native-linear-gradient';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { Card } from '../components/Card';
@@ -81,7 +81,7 @@ export function ProfileScreen() {
                 key={badge.id}
                 style={[styles.badgeCard, earned && styles.badgeCardEarned]}
                 onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  ReactNativeHapticFeedback.trigger('impactLight');
                   Alert.alert(badge.name, `${badge.icon} ${badge.description}`);
                 }}
               >

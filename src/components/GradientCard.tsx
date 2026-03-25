@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, ViewStyle } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+import LinearGradient from 'react-native-linear-gradient';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { Radius, Spacing } from '../theme/spacing';
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
 export function GradientCard({ colors, children, style, onPress }: Props) {
   const content = (
     <LinearGradient
-      colors={colors}
+      colors={[...colors]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={[{ borderRadius: Radius.xl, padding: Spacing.xxl }, style]}
@@ -27,7 +27,7 @@ export function GradientCard({ colors, children, style, onPress }: Props) {
     return (
       <TouchableOpacity
         onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          ReactNativeHapticFeedback.trigger('impactLight');
           onPress();
         }}
         activeOpacity={0.85}

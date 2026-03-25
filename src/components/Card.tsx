@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle, TouchableOpacity } from 'react-native';
-import * as Haptics from 'expo-haptics';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { Colors } from '../theme/colors';
 import { Radius, Spacing, Shadow } from '../theme/spacing';
 
@@ -18,7 +18,7 @@ export function Card({ children, style, onPress, padded = true }: Props) {
     return (
       <TouchableOpacity
         onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          ReactNativeHapticFeedback.trigger('impactLight');
           onPress();
         }}
         activeOpacity={0.7}
