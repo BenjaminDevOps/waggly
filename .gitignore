@@ -54,3 +54,6 @@ coverage/
 
 # Build
 /build/
+
+dist/
+tsconfig.tsbuildinfo

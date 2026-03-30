@@ -51,7 +51,7 @@ const quickActions = [
   { icon: <Syringe size={22} color={COLORS.success} />, label: 'Vaccine', bg: COLORS.successPale },
 ];
 
-export default function PetDetail() {
+export function PetDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const pet = petData;

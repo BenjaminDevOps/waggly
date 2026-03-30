@@ -46,7 +46,7 @@ const demoRecommendations = [
 ];
 
 /* ── main component ────────────────────────────────────────── */
-export default function Diagnosis() {
+export function DiagnosisPage() {
   const navigate = useNavigate();
   const [selectedPet, setSelectedPet] = useState('1');
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
