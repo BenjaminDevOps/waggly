@@ -1,40 +1,26 @@
 import React from 'react';
-import { TouchableOpacity, ViewStyle } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
-import { Radius, Spacing } from '../theme/spacing';
 
 interface Props {
   colors: readonly [string, string, ...string[]];
   children: React.ReactNode;
-  style?: ViewStyle;
-  onPress?: () => void;
+  style?: React.CSSProperties;
+  onClick?: () => void;
 }
 
-export function GradientCard({ colors, children, style, onPress }: Props) {
-  const content = (
-    <LinearGradient
-      colors={[...colors]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={[{ borderRadius: Radius.xl, padding: Spacing.xxl }, style]}
-    >
-      {children}
-    </LinearGradient>
-  );
+export function GradientCard({ colors, children, style, onClick }: Props) {
+  const base: React.CSSProperties = {
+    background: `linear-gradient(135deg, ${colors.join(', ')})`,
+    borderRadius: 24,
+    padding: 28,
+    ...style,
+  };
 
-  if (onPress) {
+  if (onClick) {
     return (
-      <TouchableOpacity
-        onPress={() => {
-          ReactNativeHapticFeedback.trigger('impactLight');
-          onPress();
-        }}
-        activeOpacity={0.85}
-      >
-        {content}
-      </TouchableOpacity>
+      <button onClick={onClick} style={{ ...base, cursor: 'pointer', width: '100%', textAlign: 'left', border: 'none' }}>
+        {children}
+      </button>
     );
   }
-  return content;
+  return <div style={base}>{children}</div>;
 }

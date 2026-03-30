@@ -18,11 +18,11 @@ export interface Pet {
 }
 
 export const PET_EMOJI: Record<PetType, string> = {
-  dog: '🐕',
-  cat: '🐈',
-  bird: '🐦',
-  rabbit: '🐰',
-  other: '🐾',
+  dog: '\u{1F415}',
+  cat: '\u{1F408}',
+  bird: '\u{1F426}',
+  rabbit: '\u{1F430}',
+  other: '\u{1F43E}',
 };
 
 export const PET_COLORS: Record<PetType, string> = {
@@ -59,14 +59,14 @@ export interface HealthRecord {
 }
 
 export const RECORD_EMOJI: Record<RecordType, string> = {
-  vaccination: '💉',
-  deworming: '💊',
-  vetVisit: '🏥',
-  weight: '⚖️',
-  medication: '💊',
-  surgery: '🔬',
-  allergy: '⚠️',
-  note: '📝',
+  vaccination: '\u{1F489}',
+  deworming: '\u{1F48A}',
+  vetVisit: '\u{1F3E5}',
+  weight: '\u2696\uFE0F',
+  medication: '\u{1F48A}',
+  surgery: '\u{1F52C}',
+  allergy: '\u26A0\uFE0F',
+  note: '\u{1F4DD}',
 };
 
 export const RECORD_LABELS: Record<RecordType, string> = {
@@ -136,12 +136,12 @@ export interface ShopItem {
 }
 
 export const SHOP_EMOJI: Record<ShopCategory, string> = {
-  food: '🍖',
-  toys: '🧸',
-  health: '💊',
-  accessories: '🎀',
-  grooming: '✂️',
-  training: '🎯',
+  food: '\u{1F356}',
+  toys: '\u{1F9F8}',
+  health: '\u{1F48A}',
+  accessories: '\u{1F380}',
+  grooming: '\u2702\uFE0F',
+  training: '\u{1F3AF}',
 };
 
 // ==================== USER & GAMIFICATION ====================
@@ -180,16 +180,16 @@ export interface Badge {
 }
 
 export const BADGES: Badge[] = [
-  { id: 'firstPet', name: 'First Pet', description: 'Added your first pet', icon: '🐾' },
-  { id: 'firstDiagnosis', name: 'First Diagnosis', description: 'Used AI diagnosis for the first time', icon: '🔬' },
-  { id: 'streak7Days', name: '7 Day Streak', description: 'Logged in for 7 consecutive days', icon: '🔥' },
-  { id: 'streak30Days', name: '30 Day Streak', description: 'Logged in for 30 consecutive days', icon: '⭐' },
-  { id: 'points100', name: '100 Points', description: 'Earned 100 points', icon: '💯' },
-  { id: 'points500', name: '500 Points', description: 'Earned 500 points', icon: '💎' },
-  { id: 'points1000', name: '1000 Points', description: 'Earned 1000 points', icon: '👑' },
-  { id: 'vetVisit5', name: '5 Vet Visits', description: 'Recorded 5 vet visits', icon: '🏥' },
-  { id: 'healthChampion', name: 'Health Champion', description: 'Maintained excellent pet health', icon: '🏆' },
-  { id: 'firstWalk', name: 'First Walk', description: 'Completed your first walk with your pet', icon: '🏃' },
-  { id: 'walker5k', name: '5K Walker', description: 'Walked 5,000 steps in a single day', icon: '🎯' },
-  { id: 'marathonWalker', name: 'Marathon Walker', description: 'Walked a total of 42 km', icon: '🏅' },
+  { id: 'firstPet', name: 'First Pet', description: 'Added your first pet', icon: '\u{1F43E}' },
+  { id: 'firstDiagnosis', name: 'First Diagnosis', description: 'Used AI diagnosis for the first time', icon: '\u{1F52C}' },
+  { id: 'streak7Days', name: '7 Day Streak', description: 'Logged in for 7 consecutive days', icon: '\u{1F525}' },
+  { id: 'streak30Days', name: '30 Day Streak', description: 'Logged in for 30 consecutive days', icon: '\u2B50' },
+  { id: 'points100', name: '100 Points', description: 'Earned 100 points', icon: '\u{1F4AF}' },
+  { id: 'points500', name: '500 Points', description: 'Earned 500 points', icon: '\u{1F48E}' },
+  { id: 'points1000', name: '1000 Points', description: 'Earned 1000 points', icon: '\u{1F451}' },
+  { id: 'vetVisit5', name: '5 Vet Visits', description: 'Recorded 5 vet visits', icon: '\u{1F3E5}' },
+  { id: 'healthChampion', name: 'Health Champion', description: 'Maintained excellent pet health', icon: '\u{1F3C6}' },
+  { id: 'firstWalk', name: 'First Walk', description: 'Completed your first walk with your pet', icon: '\u{1F3C3}' },
+  { id: 'walker5k', name: '5K Walker', description: 'Walked 5,000 steps in a single day', icon: '\u{1F3AF}' },
+  { id: 'marathonWalker', name: 'Marathon Walker', description: 'Walked a total of 42 km', icon: '\u{1F3C5}' },
 ];

@@ -1,0 +1,78 @@
+:root {
+  --primary: #5B5EA6;
+  --primary-light: #7B7FCC;
+  --primary-pale: #EDEDF7;
+  --primary-dark: #44478A;
+  --secondary: #E8985E;
+  --secondary-pale: #FDF2E9;
+  --accent: #D4726A;
+  --accent-pale: #FBEAE9;
+  --success: #6EAF7B;
+  --success-pale: #E7F4EA;
+  --warning: #E5A84B;
+  --error: #D4605A;
+  --error-pale: #FBEAE9;
+  --background: #FAF8F5;
+  --surface: #FFFFFF;
+  --surface-secondary: #F3F0EB;
+  --ink: #2D2D3A;
+  --ink-secondary: #6B6B80;
+  --ink-tertiary: #9D9DAF;
+  --hairline: #E8E4DF;
+  --hairline-light: #F0EDE8;
+  --overlay: rgba(45, 45, 58, 0.4);
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+  --font-xs: 11px;
+  --font-sm: 13px;
+  --font-body: 15px;
+  --font-body-lg: 17px;
+  --font-title3: 20px;
+  --font-title2: 22px;
+  --font-title1: 28px;
+  --font-large-title: 34px;
+  --font-hero: 48px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  background-color: var(--background);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+input, textarea {
+  font-family: inherit;
+  border: none;
+  outline: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}

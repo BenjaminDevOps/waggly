@@ -1,7 +1,4 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors } from '../theme/colors';
-import { Font, Weight, Spacing } from '../theme/spacing';
 
 interface Props {
   title: string;
@@ -11,34 +8,13 @@ interface Props {
 
 export function SectionHeader({ title, actionLabel, onAction }: Props) {
   return (
-    <View style={styles.row}>
-      <Text style={styles.title}>{title}</Text>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, marginTop: 8 }}>
+      <h3 style={{ fontSize: 22, fontWeight: 700, color: '#2D2D3A', letterSpacing: -0.3, margin: 0 }}>{title}</h3>
       {actionLabel && onAction && (
-        <TouchableOpacity onPress={onAction}>
-          <Text style={styles.action}>{actionLabel}</Text>
-        </TouchableOpacity>
+        <button onClick={onAction} style={{ fontSize: 15, color: '#5B5EA6', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer' }}>
+          {actionLabel}
+        </button>
       )}
-    </View>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.lg,
-    marginTop: Spacing.sm,
-  },
-  title: {
-    fontSize: Font.title2,
-    fontWeight: Weight.bold,
-    color: Colors.ink,
-    letterSpacing: -0.3,
-  },
-  action: {
-    fontSize: Font.body,
-    color: Colors.primary,
-    fontWeight: Weight.semibold,
-  },
-});

@@ -1,44 +1,27 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle, TouchableOpacity } from 'react-native';
-import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
-import { Colors } from '../theme/colors';
-import { Radius, Spacing, Shadow } from '../theme/spacing';
 
 interface Props {
   children: React.ReactNode;
-  style?: ViewStyle;
-  onPress?: () => void;
+  style?: React.CSSProperties;
+  onClick?: () => void;
   padded?: boolean;
 }
 
-export function Card({ children, style, onPress, padded = true }: Props) {
-  const cardStyle = [styles.card, padded && styles.padded, style];
+export function Card({ children, style, onClick, padded = true }: Props) {
+  const base: React.CSSProperties = {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    boxShadow: '0 4px 12px rgba(45, 45, 58, 0.06)',
+    ...(padded ? { padding: 20 } : {}),
+    ...style,
+  };
 
-  if (onPress) {
+  if (onClick) {
     return (
-      <TouchableOpacity
-        onPress={() => {
-          ReactNativeHapticFeedback.trigger('impactLight');
-          onPress();
-        }}
-        activeOpacity={0.7}
-        style={cardStyle}
-      >
+      <button onClick={onClick} style={{ ...base, cursor: 'pointer', width: '100%', textAlign: 'left' }}>
         {children}
-      </TouchableOpacity>
+      </button>
     );
   }
-
-  return <View style={cardStyle}>{children}</View>;
+  return <div style={base}>{children}</div>;
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.lg,
-    ...Shadow.soft,
-  },
-  padded: {
-    padding: Spacing.xl,
-  },
-});

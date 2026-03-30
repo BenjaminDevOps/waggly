@@ -1,8 +1,7 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import Config from 'react-native-config';
 import { DiagnosisSeverity } from '../models/types';
 
-const API_KEY = Config.GEMINI_API_KEY ?? '';
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY ?? '';
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 const SYSTEM_PROMPT = `You are an expert veterinary AI assistant for the Waggly app. Your role is to:
