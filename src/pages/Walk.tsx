@@ -114,29 +114,29 @@ export function WalkPage() {
 
       {/* Today's Summary */}
       <SectionHeader title="Today's Summary" />
-      <div style={{ display: 'flex', gap: 8, marginBottom: 28 }}>
-        {[{ icon: '👟', val: totalSteps, lbl: 'Total Steps', color: '#5B5EA6' },
-          { icon: '📍', val: estimateDistanceKm(totalSteps).toFixed(1), lbl: 'km walked', color: '#6EAF7B' },
-          { icon: '🔥', val: estimateCalories(totalSteps), lbl: 'Calories', color: '#D4726A' },
+      <div style={{ display: 'flex', gap: Spacing.sm, marginBottom: Spacing.xxl }}>
+        {[{ icon: '👟', val: totalSteps, lbl: 'Total Steps', color: Colors.primary },
+          { icon: '📍', val: estimateDistanceKm(totalSteps).toFixed(1), lbl: 'km walked', color: Colors.success },
+          { icon: '🔥', val: estimateCalories(totalSteps), lbl: 'Calories', color: Colors.accent },
         ].map(s => (
-          <Card key={s.lbl} style={{ flex: 1, textAlign: 'center' as const, padding: 12 }}>
+          <Card key={s.lbl} style={{ flex: 1, textAlign: 'center' as const, padding: Spacing.md }}>
             <div style={{ fontSize: 18 }}>{s.icon}</div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: '#2D2D3A', marginTop: 4 }}>{s.val}</div>
-            <div style={{ fontSize: 11, color: '#6B6B80', textAlign: 'center' }}>{s.lbl}</div>
+            <div style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink, marginTop: Spacing.xs }}>{s.val}</div>
+            <div style={{ fontSize: Font.xs, color: Colors.inkSecondary, textAlign: 'center' }}>{s.lbl}</div>
           </Card>
         ))}
       </div>
 
       {/* Weekly Chart */}
       <SectionHeader title="This Week" />
-      <Card style={{ marginBottom: 28 }}>
+      <Card style={{ marginBottom: Spacing.xxl }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', height: 120, alignItems: 'flex-end' }}>
           {WEEKLY_STEPS.map((s, i) => (
             <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: 20, height: 100, backgroundColor: '#F3F0EB', borderRadius: 6, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden' }}>
-                <div style={{ width: '100%', height: `${(s / maxWeekly) * 100}%`, backgroundColor: i === 6 ? '#5B5EA6' : '#5B5EA660', borderRadius: 6 }} />
+              <div style={{ width: 20, height: 100, backgroundColor: Colors.surfaceSecondary, borderRadius: 6, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden' }}>
+                <div style={{ width: '100%', height: `${(s / maxWeekly) * 100}%`, backgroundColor: i === 6 ? Colors.primary : `${Colors.primary}60`, borderRadius: 6 }} />
               </div>
-              <span style={{ fontSize: 11, color: '#6B6B80', marginTop: 4 }}>{DAYS[i]}</span>
+              <span style={{ fontSize: Font.xs, color: Colors.inkSecondary, marginTop: Spacing.xs }}>{DAYS[i]}</span>
             </div>
           ))}
         </div>
@@ -149,33 +149,33 @@ export function WalkPage() {
         { icon: '🔥', title: '7 Day Streak', desc: 'Walk every day for a week', done: false },
         { icon: '🏆', title: 'Marathon Walker', desc: 'Walk 42 km total', done: false },
       ].map(a => (
-        <Card key={a.title} style={{ marginBottom: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <Card key={a.title} style={{ marginBottom: Spacing.sm }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.md }}>
             <span style={{ fontSize: 28, opacity: a.done ? 1 : 0.4 }}>{a.icon}</span>
             <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 700, color: a.done ? '#2D2D3A' : '#9D9DAF' }}>{a.title}</div>
-              <div style={{ color: '#6B6B80', fontSize: 13 }}>{a.desc}</div>
+              <div style={{ fontWeight: Weight.bold, color: a.done ? Colors.ink : Colors.inkTertiary }}>{a.title}</div>
+              <div style={{ color: Colors.inkSecondary, fontSize: Font.sm }}>{a.desc}</div>
             </div>
-            {a.done ? <CheckCircle size={28} color="#6EAF7B" /> : <Circle size={28} color="#E8E4DF" />}
+            {a.done ? <CheckCircle size={28} color={Colors.success} /> : <Circle size={28} color={Colors.hairline} />}
           </div>
         </Card>
       ))}
 
       {/* Walk Summary Modal */}
       {showSummary && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(45,45,58,0.4)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 100 }}>
-          <div style={{ backgroundColor: '#fff', borderRadius: '32px 32px 0 0', padding: 28, width: '100%', maxWidth: 430, textAlign: 'center' }}>
-            <span style={{ fontSize: 48 }}>🎉</span>
-            <h2 style={{ fontSize: 22, fontWeight: 700, color: '#2D2D3A', margin: '12px 0' }}>Great Walk!</h2>
-            <div style={{ display: 'flex', justifyContent: 'space-evenly', margin: '16px 0' }}>
+        <div className="modal-backdrop" style={{ position: 'fixed', inset: 0, backgroundColor: Colors.overlay, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 100 }}>
+          <div className="modal-sheet" style={{ backgroundColor: Colors.surface, borderRadius: `${Radius.xxl}px ${Radius.xxl}px 0 0`, padding: Spacing.xxl, width: '100%', maxWidth: 430, textAlign: 'center' }}>
+            <span style={{ fontSize: Font.hero }}>🎉</span>
+            <h2 style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.ink, margin: `${Spacing.md}px 0` }}>Great Walk!</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-evenly', margin: `${Spacing.lg}px 0` }}>
               {[{ val: steps, lbl: 'Steps' }, { val: `${estimateDistanceKm(steps).toFixed(2)} km`, lbl: 'Distance' }, { val: `${mins} min`, lbl: 'Time' }].map(s => (
-                <div key={s.lbl}><div style={{ fontSize: 20, fontWeight: 700, color: '#2D2D3A' }}>{s.val}</div><div style={{ color: '#6B6B80' }}>{s.lbl}</div></div>
+                <div key={s.lbl}><div style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink }}>{s.val}</div><div style={{ color: Colors.inkSecondary }}>{s.lbl}</div></div>
               ))}
             </div>
-            <GradientCard colors={['#E5A84B', '#E8985E']} style={{ margin: '16px 0', textAlign: 'center' as const }}>
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}>
-                <Star size={20} color="#fff" />
-                <span style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>+{calculatePoints(steps, mins)} points earned!</span>
+            <GradientCard colors={[Colors.warning, Colors.secondary]} style={{ margin: `${Spacing.lg}px 0`, textAlign: 'center' as const }}>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: Spacing.sm }}>
+                <Star size={20} color={Colors.inkInverse} />
+                <span style={{ color: Colors.inkInverse, fontWeight: Weight.bold, fontSize: Font.body }}>+{calculatePoints(steps, mins)} points earned!</span>
               </div>
             </GradientCard>
             <Button label="Done" onPress={finishWalk} size="large" />
