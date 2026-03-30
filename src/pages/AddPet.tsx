@@ -1,16 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Camera } from 'lucide-react';
+import { Colors } from '../theme/colors';
+import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { Button } from '../components/Button';
-
-const C = {
-  primary: '#5B5EA6', primaryPale: '#EDEDF7',
-  secondary: '#E8985E', secondaryPale: '#FDF2E9',
-  accent: '#D4726A', success: '#6EAF7B', warning: '#E5A84B',
-  background: '#FAF8F5', surface: '#FFFFFF', surfaceSecondary: '#F3F0EB',
-  ink: '#2D2D3A', inkSecondary: '#6B6B80', inkTertiary: '#9D9DAF',
-  hairline: '#E8E4DF',
-};
 
 const petTypes = [
   { key: 'dog', label: 'Dog', emoji: '🐕' },
@@ -24,23 +17,23 @@ const genderOptions = ['Male', 'Female'];
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  padding: '16px 18px',
-  fontSize: 16,
-  fontWeight: 500,
-  color: C.ink,
-  backgroundColor: C.surface,
-  border: `1.5px solid ${C.hairline}`,
-  borderRadius: 14,
+  padding: `${Spacing.lg}px 18px`,
+  fontSize: Font.body + 1,
+  fontWeight: Weight.medium,
+  color: Colors.ink,
+  backgroundColor: Colors.surface,
+  border: `1.5px solid ${Colors.hairline}`,
+  borderRadius: Radius.sm + 2,
   outline: 'none',
-  transition: 'border-color 0.2s ease',
-  boxSizing: 'border-box',
+  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+  boxSizing: 'border-box' as const,
 };
 
 const labelStyle: React.CSSProperties = {
   fontSize: 14,
-  fontWeight: 600,
-  color: C.inkSecondary,
-  marginBottom: 8,
+  fontWeight: Weight.semibold,
+  color: Colors.inkSecondary,
+  marginBottom: Spacing.sm,
   display: 'block',
 };
 
@@ -58,58 +51,61 @@ export function AddPetPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: C.background }}>
+    <div style={{ minHeight: '100vh', backgroundColor: Colors.background }}>
       {/* Header */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           gap: 14,
-          padding: '16px 20px 12px',
+          padding: `${Spacing.lg}px ${Spacing.xl}px ${Spacing.md}px`,
         }}
       >
         <button
+          className="btn-press"
           onClick={() => navigate(-1)}
           style={{
             width: 40,
             height: 40,
-            borderRadius: 12,
-            backgroundColor: C.surfaceSecondary,
+            borderRadius: Radius.sm,
+            backgroundColor: Colors.surfaceSecondary,
             border: 'none',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
+            transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
-          <ArrowLeft size={20} color={C.ink} />
+          <ArrowLeft size={20} color={Colors.ink} />
         </button>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: C.ink, margin: 0, letterSpacing: -0.3 }}>
+        <h1 style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.ink, margin: 0, letterSpacing: -0.3 }}>
           Add New Pet
         </h1>
       </div>
 
-      <div style={{ padding: '0 20px 40px', display: 'flex', flexDirection: 'column', gap: 28 }}>
+      <div className="slide-up" style={{ padding: `0 ${Spacing.xl}px 40px`, display: 'flex', flexDirection: 'column', gap: Spacing.xxl }}>
         {/* Photo Placeholder */}
-        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: Spacing.sm }}>
           <div
             style={{
               width: 110,
               height: 110,
-              borderRadius: 36,
-              backgroundColor: C.surfaceSecondary,
-              border: `2px dashed ${C.hairline}`,
+              borderRadius: Radius.xxl + 4,
+              backgroundColor: Colors.surfaceSecondary,
+              border: `2px dashed ${Colors.hairline}`,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               gap: 6,
               cursor: 'pointer',
+              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           >
-            <Camera size={28} color={C.inkTertiary} />
-            <span style={{ fontSize: 12, fontWeight: 600, color: C.inkTertiary }}>Add Photo</span>
+            <Camera size={28} color={Colors.inkTertiary} />
+            <span style={{ fontSize: Font.xs + 1, fontWeight: Weight.semibold, color: Colors.inkTertiary }}>Add Photo</span>
           </div>
         </div>
 
@@ -122,6 +118,7 @@ export function AddPetPage() {
               return (
                 <button
                   key={type.key}
+                  className="btn-press"
                   onClick={() => setSelectedType(type.key)}
                   style={{
                     flex: 1,
@@ -129,20 +126,20 @@ export function AddPetPage() {
                     flexDirection: 'column',
                     alignItems: 'center',
                     gap: 6,
-                    padding: '14px 4px',
-                    borderRadius: 16,
-                    backgroundColor: isActive ? C.primaryPale : C.surface,
-                    border: isActive ? `2px solid ${C.primary}` : `1.5px solid ${C.hairline}`,
+                    padding: `14px ${Spacing.xs}px`,
+                    borderRadius: Radius.md,
+                    backgroundColor: isActive ? Colors.primaryPale : Colors.surface,
+                    border: isActive ? `2px solid ${Colors.primary}` : `1.5px solid ${Colors.hairline}`,
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
                 >
                   <span style={{ fontSize: 28 }}>{type.emoji}</span>
                   <span
                     style={{
-                      fontSize: 12,
-                      fontWeight: isActive ? 700 : 500,
-                      color: isActive ? C.primary : C.inkSecondary,
+                      fontSize: Font.xs + 1,
+                      fontWeight: isActive ? Weight.bold : Weight.medium,
+                      color: isActive ? Colors.primary : Colors.inkSecondary,
                     }}
                   >
                     {type.label}
@@ -180,24 +177,25 @@ export function AddPetPage() {
         {/* Gender */}
         <div>
           <span style={labelStyle}>Gender</span>
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div style={{ display: 'flex', gap: Spacing.md }}>
             {genderOptions.map((g) => {
               const isActive = selectedGender === g;
               return (
                 <button
                   key={g}
+                  className="btn-press"
                   onClick={() => setSelectedGender(g)}
                   style={{
                     flex: 1,
                     padding: '14px 0',
-                    borderRadius: 14,
-                    fontSize: 15,
-                    fontWeight: isActive ? 700 : 500,
-                    backgroundColor: isActive ? C.primaryPale : C.surface,
-                    color: isActive ? C.primary : C.inkSecondary,
-                    border: isActive ? `2px solid ${C.primary}` : `1.5px solid ${C.hairline}`,
+                    borderRadius: Radius.sm + 2,
+                    fontSize: Font.body,
+                    fontWeight: isActive ? Weight.bold : Weight.medium,
+                    backgroundColor: isActive ? Colors.primaryPale : Colors.surface,
+                    color: isActive ? Colors.primary : Colors.inkSecondary,
+                    border: isActive ? `2px solid ${Colors.primary}` : `1.5px solid ${Colors.hairline}`,
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
                 >
                   {g === 'Male' ? '\u2642 ' : '\u2640 '}{g}
@@ -232,7 +230,7 @@ export function AddPetPage() {
         </div>
 
         {/* Save Button */}
-        <div style={{ paddingTop: 8 }}>
+        <div style={{ paddingTop: Spacing.sm }}>
           <Button
             label="Save Pet"
             onPress={handleSave}

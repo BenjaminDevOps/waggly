@@ -5,6 +5,8 @@ import { GradientCard } from '../components/GradientCard';
 import { SectionHeader } from '../components/SectionHeader';
 import { Button } from '../components/Button';
 import { calculatePoints, estimateCalories, estimateDistanceKm } from '../services/walkService';
+import { Colors, Gradients } from '../theme/colors';
+import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 
 const WEEKLY_STEPS = [3200, 4100, 2800, 5200, 3900, 4500, 2340];
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -42,66 +44,68 @@ export function WalkPage() {
   const secs = seconds % 60;
 
   return (
-    <div style={{ padding: 16, backgroundColor: '#FAF8F5', minHeight: '100vh' }}>
-      <h1 style={{ fontSize: 34, fontWeight: 700, color: '#2D2D3A', marginBottom: 16 }}>Walk</h1>
+    <div className="fade-in" style={{ padding: Spacing.lg, backgroundColor: Colors.background, minHeight: '100vh' }}>
+      <h1 style={{ fontSize: Font.largeTitle, fontWeight: Weight.bold, color: Colors.ink, marginBottom: Spacing.lg }}>Walk</h1>
 
       {/* Step Counter */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28 }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: Spacing.xxl }}>
         <div style={{
           width: 200, height: 200, borderRadius: 100,
-          border: `10px solid #E8E4DF`,
-          background: `conic-gradient(#5B5EA6 ${progress * 360}deg, transparent 0deg)`,
+          border: `10px solid ${Colors.hairline}`,
+          background: `conic-gradient(${Colors.primary} ${progress * 360}deg, transparent 0deg)`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           position: 'relative',
         }}>
-          <div style={{ width: 170, height: 170, borderRadius: 85, backgroundColor: '#FAF8F5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <PawPrint size={28} color="#5B5EA6" />
-            <span style={{ fontSize: 48, fontWeight: 700, color: '#2D2D3A' }}>{totalSteps}</span>
-            <span style={{ fontSize: 15, color: '#6B6B80' }}>of {dailyGoal} steps</span>
-            {progress >= 1 && <span style={{ color: '#6EAF7B', fontWeight: 700, fontSize: 11, marginTop: 4 }}>Goal reached! 🎉</span>}
+          <div style={{ width: 170, height: 170, borderRadius: 85, backgroundColor: Colors.background, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <PawPrint size={28} color={Colors.primary} />
+            <span style={{ fontSize: Font.hero, fontWeight: Weight.bold, color: Colors.ink }}>{totalSteps}</span>
+            <span style={{ fontSize: Font.body, color: Colors.inkSecondary }}>of {dailyGoal} steps</span>
+            {progress >= 1 && <span style={{ color: Colors.success, fontWeight: Weight.bold, fontSize: Font.xs, marginTop: Spacing.xs }}>Goal reached! 🎉</span>}
           </div>
         </div>
       </div>
 
       {/* Pet selector */}
-      <div style={{ fontSize: 15, fontWeight: 600, color: '#2D2D3A', marginBottom: 8 }}>Walking with</div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 28, overflowX: 'auto' }}>
+      <div style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink, marginBottom: Spacing.sm }}>Walking with</div>
+      <div style={{ display: 'flex', gap: Spacing.sm, marginBottom: Spacing.xxl, overflowX: 'auto' }}>
         {Object.entries(PET_EMOJI).map(([name, emoji]) => (
-          <button key={name} onClick={() => setSelectedPet(selectedPet === name ? null : name)} style={{
-            display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', borderRadius: 999,
-            backgroundColor: selectedPet === name ? '#EDEDF7' : '#F3F0EB',
-            border: `2px solid ${selectedPet === name ? '#5B5EA6' : 'transparent'}`, cursor: 'pointer',
+          <button className="btn-press" key={name} onClick={() => setSelectedPet(selectedPet === name ? null : name)} style={{
+            display: 'flex', alignItems: 'center', gap: Spacing.sm, padding: `${Spacing.sm}px ${Spacing.lg}px`, borderRadius: Radius.pill,
+            backgroundColor: selectedPet === name ? Colors.primaryPale : Colors.surfaceSecondary,
+            border: `2px solid ${selectedPet === name ? Colors.primary : 'transparent'}`, cursor: 'pointer',
+            transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
           }}>
             <span style={{ fontSize: 20 }}>{emoji}</span>
-            <span style={{ fontWeight: 700, color: selectedPet === name ? '#5B5EA6' : '#6B6B80' }}>{name}</span>
+            <span style={{ fontWeight: Weight.bold, color: selectedPet === name ? Colors.primary : Colors.inkSecondary }}>{name}</span>
           </button>
         ))}
       </div>
 
       {/* Start/Stop */}
-      <button onClick={toggleWalk} style={{
-        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
-        padding: 20, borderRadius: 24, fontSize: 22, fontWeight: 700, color: '#fff', cursor: 'pointer',
-        backgroundColor: isWalking ? '#D4605A' : '#6EAF7B',
+      <button className="btn-press" onClick={toggleWalk} style={{
+        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: Spacing.md,
+        padding: Spacing.xl, borderRadius: Radius.xl, fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.inkInverse, cursor: 'pointer',
+        backgroundColor: isWalking ? Colors.error : Colors.success,
         boxShadow: `0 8px 24px ${isWalking ? 'rgba(212,96,90,0.3)' : 'rgba(110,175,123,0.3)'}`,
+        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
       }}>
-        {isWalking ? <Square size={28} color="#fff" /> : <Play size={28} color="#fff" />}
+        {isWalking ? <Square size={28} color={Colors.inkInverse} /> : <Play size={28} color={Colors.inkInverse} />}
         {isWalking ? 'Stop Walk' : 'Start Walk'}
       </button>
 
       {/* Current Walk Stats */}
       {isWalking && (
-        <GradientCard colors={['#5B5EA6', '#7B7FCC']} style={{ marginTop: 28, textAlign: 'center' as const }}>
-          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 15 }}>Current Walk</div>
-          <div style={{ color: '#fff', fontSize: 32, fontWeight: 700, fontVariantNumeric: 'tabular-nums', margin: '8px 0' }}>
+        <GradientCard colors={[Colors.primary, Colors.primaryLight]} style={{ marginTop: Spacing.xxl, textAlign: 'center' as const }}>
+          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.body }}>Current Walk</div>
+          <div style={{ color: Colors.inkInverse, fontSize: 32, fontWeight: Weight.bold, fontVariantNumeric: 'tabular-nums', margin: `${Spacing.sm}px 0` }}>
             {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: Spacing.md }}>
             {[{ icon: '👟', val: steps, lbl: 'Steps' }, { icon: '📍', val: estimateDistanceKm(steps).toFixed(2), lbl: 'km' }, { icon: '🔥', val: estimateCalories(steps), lbl: 'cal' }].map(s => (
               <div key={s.lbl} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 16 }}>{s.icon}</div>
-                <div style={{ color: '#fff', fontSize: 20, fontWeight: 700 }}>{s.val}</div>
-                <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11 }}>{s.lbl}</div>
+                <div style={{ fontSize: Font.body }}>{s.icon}</div>
+                <div style={{ color: Colors.inkInverse, fontSize: Font.title3, fontWeight: Weight.bold }}>{s.val}</div>
+                <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.xs }}>{s.lbl}</div>
               </div>
             ))}
           </div>

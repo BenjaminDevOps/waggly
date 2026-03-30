@@ -1,4 +1,5 @@
 import React from 'react';
+import { Font, Weight, Radius } from '../theme/spacing';
 
 interface Props {
   label: string;
@@ -13,9 +14,10 @@ export function StatusBadge({ label, color, small = false }: Props) {
       backgroundColor: color + '18',
       color,
       padding: small ? '3px 10px' : '5px 12px',
-      borderRadius: 999,
-      fontSize: small ? 11 : 13,
-      fontWeight: 700,
+      borderRadius: Radius.pill,
+      fontSize: small ? Font.xs : Font.sm,
+      fontWeight: Weight.bold,
+      letterSpacing: 0.3,
     }}>
       {label}
     </span>

@@ -1,27 +1,41 @@
 import React from 'react';
+import { Colors } from '../theme/colors';
+import { Radius, Spacing, Shadow } from '../theme/spacing';
 
 interface Props {
   children: React.ReactNode;
   style?: React.CSSProperties;
   onClick?: () => void;
   padded?: boolean;
+  className?: string;
 }
 
-export function Card({ children, style, onClick, padded = true }: Props) {
+export function Card({ children, style, onClick, padded = true, className }: Props) {
   const base: React.CSSProperties = {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    boxShadow: '0 4px 12px rgba(45, 45, 58, 0.06)',
-    ...(padded ? { padding: 20 } : {}),
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
+    boxShadow: Shadow.soft,
+    ...(padded ? { padding: Spacing.xl } : {}),
     ...style,
   };
 
+  const classes = [className, onClick ? 'card-interactive' : ''].filter(Boolean).join(' ') || undefined;
+
   if (onClick) {
     return (
-      <button onClick={onClick} style={{ ...base, cursor: 'pointer', width: '100%', textAlign: 'left' }}>
+      <button
+        onClick={onClick}
+        className={classes}
+        style={{ ...base, cursor: 'pointer', width: '100%', textAlign: 'left' as const }}
+      >
         {children}
       </button>
     );
   }
-  return <div style={base}>{children}</div>;
+
+  return (
+    <div className={classes} style={base}>
+      {children}
+    </div>
+  );
 }

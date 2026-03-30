@@ -6,26 +6,8 @@ import { GradientCard } from '../components/GradientCard';
 import { SectionHeader } from '../components/SectionHeader';
 import { StatusBadge } from '../components/Badge';
 import { Button } from '../components/Button';
-
-const COLORS = {
-  primary: '#5B5EA6',
-  primaryPale: '#EDEDF7',
-  primaryDark: '#44478A',
-  secondary: '#E8985E',
-  secondaryPale: '#FDF2E9',
-  accent: '#D4726A',
-  success: '#6EAF7B',
-  successPale: '#E7F4EA',
-  warning: '#E5A84B',
-  error: '#D4605A',
-  background: '#FAF8F5',
-  surface: '#FFFFFF',
-  surfaceSecondary: '#F3F0EB',
-  ink: '#2D2D3A',
-  inkSecondary: '#6B6B80',
-  inkTertiary: '#9D9DAF',
-  hairline: '#E8E4DF',
-};
+import { Colors, Gradients } from '../theme/colors';
+import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 
 const petData = {
   id: '1',
@@ -46,9 +28,9 @@ const healthRecords = [
 ];
 
 const quickActions = [
-  { icon: <Heart size={22} color={COLORS.accent} />, label: 'Health Record', bg: '#FBEAE9' },
-  { icon: <Plus size={22} color={COLORS.primary} />, label: 'Add Record', bg: COLORS.primaryPale },
-  { icon: <Syringe size={22} color={COLORS.success} />, label: 'Vaccine', bg: COLORS.successPale },
+  { icon: <Heart size={22} color={Colors.accent} />, label: 'Health Record', bg: Colors.accentPale },
+  { icon: <Plus size={22} color={Colors.primary} />, label: 'Add Record', bg: Colors.primaryPale },
+  { icon: <Syringe size={22} color={Colors.success} />, label: 'Vaccine', bg: Colors.successPale },
 ];
 
 export function PetDetailPage() {
@@ -63,33 +45,35 @@ export function PetDetailPage() {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: COLORS.background }}>
+    <div className="fade-in" style={{ minHeight: '100vh', backgroundColor: Colors.background }}>
       {/* Hero Header */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #5B5EA6, #7B7FCC, #9B9EE6)',
-          padding: '20px 20px 40px',
-          borderRadius: '0 0 32px 32px',
+          background: `linear-gradient(135deg, ${Gradients.primary[0]}, ${Gradients.primary[1]}, #9B9EE6)`,
+          padding: `${Spacing.xl}px ${Spacing.xl}px ${Spacing.xxxl + 4}px`,
+          borderRadius: `0 0 ${Radius.xxl}px ${Radius.xxl}px`,
           position: 'relative',
         }}
       >
         <button
+          className="btn-press"
           onClick={() => navigate(-1)}
           style={{
             background: 'rgba(255,255,255,0.2)',
             border: 'none',
-            borderRadius: 12,
-            padding: 10,
+            borderRadius: Radius.sm,
+            padding: Spacing.sm + 2,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
-          <ArrowLeft size={22} color="#fff" />
+          <ArrowLeft size={22} color={Colors.inkInverse} />
         </button>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: Spacing.lg }}>
           <div
             style={{
               width: 88,
@@ -100,40 +84,40 @@ export function PetDetailPage() {
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: 44,
-              marginBottom: 12,
+              marginBottom: Spacing.md,
             }}
           >
             {pet.emoji}
           </div>
-          <span style={{ fontSize: 28, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{pet.name}</span>
-          <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.8)', fontWeight: 500 }}>{pet.breed}</span>
+          <span style={{ fontSize: Font.title1, fontWeight: Weight.bold, color: Colors.inkInverse, marginBottom: Spacing.xs }}>{pet.name}</span>
+          <span style={{ fontSize: Font.body, color: 'rgba(255,255,255,0.8)', fontWeight: Weight.medium }}>{pet.breed}</span>
         </div>
       </div>
 
-      <div style={{ padding: '0 20px', marginTop: -20 }}>
+      <div style={{ padding: `0 ${Spacing.xl}px`, marginTop: -20 }}>
         {/* Stats Row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: Spacing.md, marginBottom: Spacing.xl + 4 }}>
           {statsData.map((stat) => (
-            <Card key={stat.label} style={{ textAlign: 'center', padding: 16 }}>
+            <Card key={stat.label} style={{ textAlign: 'center', padding: Spacing.lg }}>
               <div style={{ fontSize: 24, marginBottom: 6 }}>{stat.emoji}</div>
-              <div style={{ fontSize: 17, fontWeight: 700, color: COLORS.ink, marginBottom: 2 }}>{stat.value}</div>
-              <div style={{ fontSize: 12, color: COLORS.inkTertiary, fontWeight: 500 }}>{stat.label}</div>
+              <div style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink, marginBottom: 2 }}>{stat.value}</div>
+              <div style={{ fontSize: Font.xs + 1, color: Colors.inkTertiary, fontWeight: Weight.medium }}>{stat.label}</div>
             </Card>
           ))}
         </div>
 
         {/* Health Score */}
         <SectionHeader title="Health Score" />
-        <Card style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <span style={{ fontSize: 15, fontWeight: 600, color: COLORS.ink }}>Overall Health</span>
-            <span style={{ fontSize: 28, fontWeight: 800, color: COLORS.success }}>{pet.healthScore}</span>
+        <Card style={{ marginBottom: Spacing.xl + 4 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.md }}>
+            <span style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink }}>Overall Health</span>
+            <span style={{ fontSize: Font.title1, fontWeight: Weight.heavy, color: Colors.success }}>{pet.healthScore}</span>
           </div>
           <div
             style={{
               height: 12,
               borderRadius: 6,
-              background: COLORS.surfaceSecondary,
+              background: Colors.surfaceSecondary,
               overflow: 'hidden',
             }}
           >
@@ -142,36 +126,38 @@ export function PetDetailPage() {
                 width: `${pet.healthScore}%`,
                 height: '100%',
                 borderRadius: 6,
-                background: 'linear-gradient(90deg, #6EAF7B, #4A9E5C, #3D8B4F)',
+                background: `linear-gradient(90deg, ${Colors.success}, #4A9E5C, #3D8B4F)`,
                 transition: 'width 0.8s ease',
               }}
             />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-            <span style={{ fontSize: 12, color: COLORS.inkTertiary }}>Poor</span>
-            <span style={{ fontSize: 12, color: COLORS.inkTertiary }}>Excellent</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: Spacing.sm }}>
+            <span style={{ fontSize: Font.xs + 1, color: Colors.inkTertiary }}>Poor</span>
+            <span style={{ fontSize: Font.xs + 1, color: Colors.inkTertiary }}>Excellent</span>
           </div>
         </Card>
 
         {/* Quick Actions */}
         <SectionHeader title="Quick Actions" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: Spacing.md, marginBottom: Spacing.xl + 4 }}>
           {quickActions.map((action) => (
             <Card
               key={action.label}
+              className="card-interactive"
               onClick={() => {}}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 10,
-                padding: 16,
+                gap: Spacing.sm + 2,
+                padding: Spacing.lg,
+                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
               <div
                 style={{
-                  width: 48,
-                  height: 48,
+                  width: Spacing.huge,
+                  height: Spacing.huge,
                   borderRadius: 14,
                   backgroundColor: action.bg,
                   display: 'flex',
@@ -181,7 +167,7 @@ export function PetDetailPage() {
               >
                 {action.icon}
               </div>
-              <span style={{ fontSize: 13, fontWeight: 600, color: COLORS.ink, textAlign: 'center' }}>
+              <span style={{ fontSize: Font.sm, fontWeight: Weight.semibold, color: Colors.ink, textAlign: 'center' }}>
                 {action.label}
               </span>
             </Card>
@@ -190,25 +176,27 @@ export function PetDetailPage() {
 
         {/* Health Records */}
         <SectionHeader title="Health Records" actionLabel="See All" onAction={() => {}} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 40 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: Spacing.md, paddingBottom: Spacing.xxxl + 4 }}>
           {healthRecords.map((record) => (
             <Card
               key={record.id}
+              className="card-interactive"
               onClick={() => {}}
               style={{
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
                 gap: 14,
-                padding: 16,
+                padding: Spacing.lg,
+                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
               <div
                 style={{
-                  width: 48,
-                  height: 48,
+                  width: Spacing.huge,
+                  height: Spacing.huge,
                   borderRadius: 14,
-                  backgroundColor: COLORS.primaryPale,
+                  backgroundColor: Colors.primaryPale,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -219,17 +207,17 @@ export function PetDetailPage() {
                 {record.emoji}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 15, fontWeight: 600, color: COLORS.ink, marginBottom: 4 }}>
+                <div style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink, marginBottom: Spacing.xs }}>
                   {record.title}
                 </div>
-                <div style={{ fontSize: 13, color: COLORS.inkTertiary }}>{record.date}</div>
+                <div style={{ fontSize: Font.sm, color: Colors.inkTertiary }}>{record.date}</div>
               </div>
               <StatusBadge
                 label={record.status}
-                color={record.status === 'Completed' ? COLORS.success : COLORS.warning}
+                color={record.status === 'Completed' ? Colors.success : Colors.warning}
                 small
               />
-              <ChevronRight size={18} color={COLORS.inkTertiary} />
+              <ChevronRight size={18} color={Colors.inkTertiary} />
             </Card>
           ))}
         </div>

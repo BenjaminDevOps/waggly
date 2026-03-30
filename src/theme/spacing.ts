@@ -17,5 +17,14 @@ export const Weight = {
 export const Shadow = {
   soft: '0 4px 12px rgba(45, 45, 58, 0.06)',
   medium: '0 8px 24px rgba(45, 45, 58, 0.1)',
+  strong: '0 12px 32px rgba(45, 45, 58, 0.16)',
+  elevated: '0 16px 40px rgba(45, 45, 58, 0.2)',
   glow: (color: string) => `0 6px 16px ${color}40`,
+};
+
+export const Transition = {
+  fast: '150ms ease',
+  normal: '250ms ease',
+  slow: '400ms ease',
+  spring: '350ms cubic-bezier(0.34, 1.56, 0.64, 1)',
 };

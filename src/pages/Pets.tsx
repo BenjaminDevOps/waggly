@@ -1,17 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, ChevronRight } from 'lucide-react';
-
-const C = {
-  primary: '#5B5EA6', primaryPale: '#EDEDF7',
-  secondary: '#E8985E', secondaryPale: '#FDF2E9',
-  accent: '#D4726A', success: '#6EAF7B', warning: '#E5A84B',
-  background: '#FAF8F5', surface: '#FFFFFF', surfaceSecondary: '#F3F0EB',
-  ink: '#2D2D3A', inkSecondary: '#6B6B80', inkTertiary: '#9D9DAF',
-  hairline: '#E8E4DF',
-};
-
-const shadow = '0 4px 12px rgba(45,45,58,0.06)';
+import { Colors, Gradients } from '../theme/colors';
+import { Spacing, Shadow, Font, Weight, Radius } from '../theme/spacing';
+import { Card } from '../components/Card';
 
 const pets = [
   {
@@ -32,41 +24,38 @@ export function PetsPage() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: C.background }}>
+    <div className="fade-in" style={{ minHeight: '100vh', backgroundColor: Colors.background }}>
       {/* Header */}
-      <div style={{ padding: '20px 20px 12px' }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: C.ink, margin: 0, letterSpacing: -0.3 }}>
+      <div style={{ padding: `${Spacing.xl}px ${Spacing.xl}px ${Spacing.md}px` }}>
+        <h1 style={{ fontSize: Font.title1, fontWeight: Weight.bold, color: Colors.ink, margin: 0, letterSpacing: -0.3 }}>
           My Pets
         </h1>
-        <p style={{ fontSize: 15, color: C.inkSecondary, margin: '6px 0 0', lineHeight: 1.4 }}>
+        <p style={{ fontSize: Font.body, color: Colors.inkSecondary, margin: '6px 0 0', lineHeight: 1.4 }}>
           {pets.length} furry {pets.length === 1 ? 'friend' : 'friends'} in your family
         </p>
       </div>
 
       {/* Pet Cards */}
-      <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ padding: `0 ${Spacing.xl}px`, display: 'flex', flexDirection: 'column', gap: 14 }}>
         {pets.map((pet) => (
-          <div
+          <Card
             key={pet.id}
+            className="card-interactive"
             onClick={() => navigate(`/pet/${pet.id}`)}
             style={{
-              backgroundColor: C.surface,
-              borderRadius: 20,
-              boxShadow: shadow,
-              padding: 20,
               display: 'flex',
+              flexDirection: 'row',
               alignItems: 'center',
-              gap: 16,
-              cursor: 'pointer',
-              transition: 'transform 0.15s ease',
+              gap: Spacing.lg,
+              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           >
             {/* Avatar */}
             <div
               style={{
-                width: 64,
-                height: 64,
-                borderRadius: 20,
+                width: Spacing.massive,
+                height: Spacing.massive,
+                borderRadius: Radius.lg,
                 backgroundColor: pet.color + '18',
                 display: 'flex',
                 alignItems: 'center',
@@ -80,18 +69,18 @@ export function PetsPage() {
 
             {/* Info */}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                <span style={{ fontSize: 18, fontWeight: 700, color: C.ink }}>{pet.name}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.sm, marginBottom: 6 }}>
+                <span style={{ fontSize: 18, fontWeight: Weight.bold, color: Colors.ink }}>{pet.name}</span>
               </div>
-              <span style={{ fontSize: 14, color: C.inkSecondary, display: 'block', marginBottom: 10 }}>
+              <span style={{ fontSize: 14, color: Colors.inkSecondary, display: 'block', marginBottom: 10 }}>
                 {pet.breed}
               </span>
               {/* Chips */}
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {[
-                  { label: pet.age, color: C.primary },
-                  { label: pet.weight, color: C.secondary },
-                  { label: pet.gender, color: C.accent },
+                  { label: pet.age, color: Colors.primary },
+                  { label: pet.weight, color: Colors.secondary },
+                  { label: pet.gender, color: Colors.accent },
                 ].map((chip) => (
                   <span
                     key={chip.label}
@@ -99,10 +88,10 @@ export function PetsPage() {
                       display: 'inline-block',
                       backgroundColor: chip.color + '14',
                       color: chip.color,
-                      fontSize: 12,
-                      fontWeight: 600,
-                      padding: '4px 10px',
-                      borderRadius: 999,
+                      fontSize: Font.xs + 1,
+                      fontWeight: Weight.semibold,
+                      padding: `${Spacing.xs}px 10px`,
+                      borderRadius: Radius.pill,
                     }}
                   >
                     {chip.label}
@@ -111,13 +100,14 @@ export function PetsPage() {
               </div>
             </div>
 
-            <ChevronRight size={20} color={C.inkTertiary} style={{ flexShrink: 0 }} />
-          </div>
+            <ChevronRight size={20} color={Colors.inkTertiary} style={{ flexShrink: 0 }} />
+          </Card>
         ))}
       </div>
 
       {/* FAB - Add Pet */}
       <button
+        className="btn-press"
         onClick={() => navigate('/add-pet')}
         style={{
           position: 'fixed',
@@ -125,19 +115,19 @@ export function PetsPage() {
           right: 24,
           width: 60,
           height: 60,
-          borderRadius: 20,
-          background: 'linear-gradient(135deg, #5B5EA6, #7B7FCC)',
-          boxShadow: '0 8px 24px rgba(91, 94, 166, 0.35)',
+          borderRadius: Radius.lg,
+          background: `linear-gradient(135deg, ${Gradients.primary[0]}, ${Gradients.primary[1]})`,
+          boxShadow: Shadow.glow(Colors.primary),
           border: 'none',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 50,
-          transition: 'transform 0.15s ease',
+          transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
-        <Plus size={28} color="#fff" strokeWidth={2.5} />
+        <Plus size={28} color={Colors.inkInverse} strokeWidth={2.5} />
       </button>
     </div>
   );
