@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, AlertTriangle, Camera, Sparkles, Info, CheckCircle, Phone, Star,
+  Dog, Cat, Rabbit, Trophy,
 } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
@@ -13,9 +14,9 @@ import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 
 /* ── demo data ─────────────────────────────────────────────── */
 const pets = [
-  { id: '1', name: 'Luna', emoji: '🐕', color: Colors.primary },
-  { id: '2', name: 'Milo', emoji: '🐈', color: Colors.accent },
-  { id: '3', name: 'Coco', emoji: '🐰', color: Colors.secondary },
+  { id: '1', name: 'Luna', Icon: Dog, color: Colors.primary },
+  { id: '2', name: 'Milo', Icon: Cat, color: Colors.accent },
+  { id: '3', name: 'Coco', Icon: Rabbit, color: Colors.secondary },
 ];
 
 const symptomChips = [
@@ -171,7 +172,7 @@ export function DiagnosisPage() {
 
           {/* points earned */}
           <Card style={{ backgroundColor: Colors.successPale, textAlign: 'center' as const }}>
-            <span style={{ fontSize: Font.title1, display: 'block', marginBottom: Spacing.xs }}>🎉</span>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: Spacing.xs }}><Trophy size={28} color={Colors.success} /></div>
             <span style={{ fontSize: Font.body + 1, fontWeight: Weight.bold, color: Colors.success, display: 'block' }}>+25 Points Earned!</span>
             <span style={{ fontSize: Font.sm, color: Colors.inkSecondary, marginTop: Spacing.xs, display: 'block' }}>For using AI Diagnosis</span>
           </Card>
@@ -233,7 +234,7 @@ export function DiagnosisPage() {
                     transition: 'all 0.2s',
                   }}
                 >
-                  <span style={{ fontSize: Font.title1 }}>{p.emoji}</span>
+                  <p.Icon size={28} color={active ? p.color : Colors.inkTertiary} />
                   <span style={{ fontSize: Font.sm, fontWeight: Weight.semibold, color: active ? p.color : Colors.ink }}>{p.name}</span>
                 </button>
               );

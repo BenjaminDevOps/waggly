@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Plus, Syringe, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Heart, Plus, Syringe, ChevronRight, PawPrint, Cake, Scale, User, Building2, Pill } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
 import { SectionHeader } from '../components/SectionHeader';
@@ -14,7 +14,7 @@ const petData = {
   name: 'Luna',
   type: 'dog' as const,
   breed: 'Golden Retriever',
-  emoji: '🐕',
+  Icon: PawPrint,
   age: '5 yrs',
   weight: '28.5 kg',
   gender: 'Female',
@@ -22,9 +22,9 @@ const petData = {
 };
 
 const healthRecords = [
-  { id: '1', emoji: '💉', title: 'Rabies Vaccination', date: 'Mar 15, 2026', type: 'vaccination', status: 'Completed' },
-  { id: '2', emoji: '🏥', title: 'Annual Checkup', date: 'Feb 28, 2026', type: 'vetVisit', status: 'Completed' },
-  { id: '3', emoji: '💊', title: 'Deworming Treatment', date: 'Jan 10, 2026', type: 'deworming', status: 'Upcoming' },
+  { id: '1', Icon: Syringe, title: 'Rabies Vaccination', date: 'Mar 15, 2026', type: 'vaccination', status: 'Completed' },
+  { id: '2', Icon: Building2, title: 'Annual Checkup', date: 'Feb 28, 2026', type: 'vetVisit', status: 'Completed' },
+  { id: '3', Icon: Pill, title: 'Deworming Treatment', date: 'Jan 10, 2026', type: 'deworming', status: 'Upcoming' },
 ];
 
 const quickActions = [
@@ -39,9 +39,9 @@ export function PetDetailPage() {
   const pet = petData;
 
   const statsData = [
-    { label: 'Age', value: pet.age, emoji: '🎂' },
-    { label: 'Weight', value: pet.weight, emoji: '⚖️' },
-    { label: 'Gender', value: pet.gender, emoji: '♀️' },
+    { label: 'Age', value: pet.age, Icon: Cake },
+    { label: 'Weight', value: pet.weight, Icon: Scale },
+    { label: 'Gender', value: pet.gender, Icon: User },
   ];
 
   return (
@@ -83,11 +83,10 @@ export function PetDetailPage() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 44,
               marginBottom: Spacing.md,
             }}
           >
-            {pet.emoji}
+            <pet.Icon size={44} color="#fff" />
           </div>
           <span style={{ fontSize: Font.title1, fontWeight: Weight.bold, color: Colors.inkInverse, marginBottom: Spacing.xs }}>{pet.name}</span>
           <span style={{ fontSize: Font.body, color: 'rgba(255,255,255,0.8)', fontWeight: Weight.medium }}>{pet.breed}</span>
@@ -99,7 +98,7 @@ export function PetDetailPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: Spacing.md, marginBottom: Spacing.xl + 4 }}>
           {statsData.map((stat) => (
             <Card key={stat.label} style={{ textAlign: 'center', padding: Spacing.lg }}>
-              <div style={{ fontSize: 24, marginBottom: 6 }}>{stat.emoji}</div>
+              <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'center' }}><stat.Icon size={24} color={Colors.primary} /></div>
               <div style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink, marginBottom: 2 }}>{stat.value}</div>
               <div style={{ fontSize: Font.xs + 1, color: Colors.inkTertiary, fontWeight: Weight.medium }}>{stat.label}</div>
             </Card>
@@ -200,11 +199,10 @@ export function PetDetailPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 24,
                   flexShrink: 0,
                 }}
               >
-                {record.emoji}
+                <record.Icon size={24} color={Colors.primary} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink, marginBottom: Spacing.xs }}>

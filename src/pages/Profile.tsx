@@ -1,5 +1,6 @@
 import React from 'react';
-import { User, Diamond, ChevronRight, Bell, Shield, HelpCircle, LogOut, Lock, Stethoscope, Footprints, ShoppingBag } from 'lucide-react';
+import { User, Diamond, ChevronRight, Bell, Shield, HelpCircle, LogOut, Lock, Stethoscope, Footprints, ShoppingBag, Crown, Medal, PawPrint, Flame, Star as StarIcon, Award, Building2, Trophy, Target } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
 import { SectionHeader } from '../components/SectionHeader';
@@ -8,12 +9,16 @@ import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 
 const EARNED_BADGES: BadgeId[] = ['firstPet', 'firstDiagnosis', 'streak7Days', 'points100', 'points500', 'vetVisit5'];
+
+const BADGE_ICON_MAP: Record<string, LucideIcon> = {
+  PawPrint, Stethoscope, Flame, 'Star': StarIcon, Award, Diamond, Crown, Building2, Trophy, Footprints, Target, Medal,
+};
 const LEADERBOARD = [
-  { rank: 1, name: 'Sophie M.', points: 3450, icon: '👑' },
-  { rank: 2, name: 'Lucas D.', points: 2890, icon: '🥈' },
-  { rank: 3, name: 'Emma R.', points: 2340, icon: '🥉' },
-  { rank: 4, name: 'You', points: 1250, icon: '🐾' },
-  { rank: 5, name: 'Pierre L.', points: 980, icon: '' },
+  { rank: 1, name: 'Sophie M.', points: 3450, Icon: Crown, color: '#E5A84B' },
+  { rank: 2, name: 'Lucas D.', points: 2890, Icon: Medal, color: '#9D9DAF' },
+  { rank: 3, name: 'Emma R.', points: 2340, Icon: Medal, color: '#D4726A' },
+  { rank: 4, name: 'You', points: 1250, Icon: PawPrint, color: '#5B5EA6' },
+  { rank: 5, name: 'Pierre L.', points: 980, Icon: null as any, color: '#6B6B80' },
 ];
 
 export function ProfilePage() {
@@ -66,13 +71,14 @@ export function ProfilePage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
           {BADGES.map(badge => {
             const earned = EARNED_BADGES.includes(badge.id);
+            const BadgeIcon = BADGE_ICON_MAP[badge.icon] || PawPrint;
             return (
-              <button className="btn-press" key={badge.id} onClick={() => alert(`${badge.icon} ${badge.name}\n${badge.description}`)} style={{
+              <button className="btn-press" key={badge.id} onClick={() => alert(`${badge.name}\n${badge.description}`)} style={{
                 aspectRatio: '0.85', borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                 backgroundColor: earned ? Colors.primaryPale : Colors.surfaceSecondary,
                 border: `1px solid ${earned ? Colors.primary + '30' : Colors.hairline}`, cursor: 'pointer',
               }}>
-                <span style={{ fontSize: 28, opacity: earned ? 1 : 0.3 }}>{badge.icon}</span>
+                <BadgeIcon size={28} color={earned ? Colors.primary : Colors.inkTertiary} style={{ opacity: earned ? 1 : 0.3 }} />
                 <span style={{ fontSize: Font.xs, fontWeight: Weight.semibold, color: earned ? Colors.ink : Colors.inkTertiary, textAlign: 'center', marginTop: 8 }}>{badge.name}</span>
                 {!earned && <Lock size={12} color={Colors.inkTertiary} style={{ marginTop: 4 }} />}
               </button>
@@ -87,7 +93,7 @@ export function ProfilePage() {
             const isYou = l.name === 'You';
             return (
               <div key={l.rank} style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', backgroundColor: isYou ? Colors.primaryPale : 'transparent' }}>
-                <span style={{ width: 40, textAlign: 'center', fontSize: l.icon ? 18 : 14, fontWeight: Weight.bold }}>{l.icon || `#${l.rank}`}</span>
+                <span style={{ width: 40, display: 'flex', justifyContent: 'center' }}>{l.Icon ? <l.Icon size={18} color={l.color} /> : <span style={{ fontWeight: Weight.bold, fontSize: 14 }}>#{l.rank}</span>}</span>
                 <span style={{ flex: 1, fontSize: Font.body, color: isYou ? Colors.primary : Colors.ink, fontWeight: isYou ? Weight.bold : Weight.regular }}>{l.name}</span>
                 <span style={{ fontWeight: Weight.bold, color: isYou ? Colors.primary : Colors.inkSecondary }}>{l.points} pts</span>
               </div>

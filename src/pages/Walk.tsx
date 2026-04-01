@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { PawPrint, Play, Square, Navigation, Flame, Star, CheckCircle, Circle } from 'lucide-react';
+import { PawPrint, Play, Square, Navigation, Flame, Star, CheckCircle, Circle, Footprints, MapPin, Dog, Cat, Rabbit, Target, Trophy } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
 import { SectionHeader } from '../components/SectionHeader';
@@ -10,7 +11,7 @@ import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 
 const WEEKLY_STEPS = [3200, 4100, 2800, 5200, 3900, 4500, 2340];
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const PET_EMOJI: Record<string, string> = { Luna: '🐕', Milo: '🐈', Coco: '🐰' };
+const PET_ICONS: Record<string, LucideIcon> = { Luna: Dog, Milo: Cat, Coco: Rabbit };
 
 export function WalkPage() {
   const [isWalking, setIsWalking] = useState(false);
@@ -60,7 +61,7 @@ export function WalkPage() {
             <PawPrint size={28} color={Colors.primary} />
             <span style={{ fontSize: Font.hero, fontWeight: Weight.bold, color: Colors.ink }}>{totalSteps}</span>
             <span style={{ fontSize: Font.body, color: Colors.inkSecondary }}>of {dailyGoal} steps</span>
-            {progress >= 1 && <span style={{ color: Colors.success, fontWeight: Weight.bold, fontSize: Font.xs, marginTop: Spacing.xs }}>Goal reached! 🎉</span>}
+            {progress >= 1 && <span style={{ color: Colors.success, fontWeight: Weight.bold, fontSize: Font.xs, marginTop: Spacing.xs }}>Goal reached!</span>}
           </div>
         </div>
       </div>
@@ -68,14 +69,14 @@ export function WalkPage() {
       {/* Pet selector */}
       <div style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink, marginBottom: Spacing.sm }}>Walking with</div>
       <div style={{ display: 'flex', gap: Spacing.sm, marginBottom: Spacing.xxl, overflowX: 'auto' }}>
-        {Object.entries(PET_EMOJI).map(([name, emoji]) => (
+        {Object.entries(PET_ICONS).map(([name, Icon]) => (
           <button className="btn-press" key={name} onClick={() => setSelectedPet(selectedPet === name ? null : name)} style={{
             display: 'flex', alignItems: 'center', gap: Spacing.sm, padding: `${Spacing.sm}px ${Spacing.lg}px`, borderRadius: Radius.pill,
             backgroundColor: selectedPet === name ? Colors.primaryPale : Colors.surfaceSecondary,
             border: `2px solid ${selectedPet === name ? Colors.primary : 'transparent'}`, cursor: 'pointer',
             transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
           }}>
-            <span style={{ fontSize: 20 }}>{emoji}</span>
+            <Icon size={20} color={selectedPet === name ? Colors.primary : Colors.inkSecondary} />
             <span style={{ fontWeight: Weight.bold, color: selectedPet === name ? Colors.primary : Colors.inkSecondary }}>{name}</span>
           </button>
         ))}
@@ -101,9 +102,9 @@ export function WalkPage() {
             {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: Spacing.md }}>
-            {[{ icon: '👟', val: steps, lbl: 'Steps' }, { icon: '📍', val: estimateDistanceKm(steps).toFixed(2), lbl: 'km' }, { icon: '🔥', val: estimateCalories(steps), lbl: 'cal' }].map(s => (
+            {[{ Icon: Footprints, val: steps, lbl: 'Steps' }, { Icon: MapPin, val: estimateDistanceKm(steps).toFixed(2), lbl: 'km' }, { Icon: Flame, val: estimateCalories(steps), lbl: 'cal' }].map(s => (
               <div key={s.lbl} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: Font.body }}>{s.icon}</div>
+                <div style={{ display: 'flex', justifyContent: 'center' }}><s.Icon size={16} color="rgba(255,255,255,0.7)" /></div>
                 <div style={{ color: Colors.inkInverse, fontSize: Font.title3, fontWeight: Weight.bold }}>{s.val}</div>
                 <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.xs }}>{s.lbl}</div>
               </div>
@@ -115,12 +116,12 @@ export function WalkPage() {
       {/* Today's Summary */}
       <SectionHeader title="Today's Summary" />
       <div style={{ display: 'flex', gap: Spacing.sm, marginBottom: Spacing.xxl }}>
-        {[{ icon: '👟', val: totalSteps, lbl: 'Total Steps', color: Colors.primary },
-          { icon: '📍', val: estimateDistanceKm(totalSteps).toFixed(1), lbl: 'km walked', color: Colors.success },
-          { icon: '🔥', val: estimateCalories(totalSteps), lbl: 'Calories', color: Colors.accent },
+        {[{ Icon: Footprints, val: totalSteps, lbl: 'Total Steps', color: Colors.primary },
+          { Icon: MapPin, val: estimateDistanceKm(totalSteps).toFixed(1), lbl: 'km walked', color: Colors.success },
+          { Icon: Flame, val: estimateCalories(totalSteps), lbl: 'Calories', color: Colors.accent },
         ].map(s => (
           <Card key={s.lbl} style={{ flex: 1, textAlign: 'center' as const, padding: Spacing.md }}>
-            <div style={{ fontSize: 18 }}>{s.icon}</div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}><s.Icon size={18} color={s.color} /></div>
             <div style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink, marginTop: Spacing.xs }}>{s.val}</div>
             <div style={{ fontSize: Font.xs, color: Colors.inkSecondary, textAlign: 'center' }}>{s.lbl}</div>
           </Card>
@@ -144,14 +145,14 @@ export function WalkPage() {
 
       {/* Achievements */}
       <SectionHeader title="Walk Achievements" />
-      {[{ icon: '🏃', title: 'First Walk', desc: 'Complete your first walk', done: true },
-        { icon: '🎯', title: '5K Steps', desc: 'Walk 5,000 steps in a day', done: true },
-        { icon: '🔥', title: '7 Day Streak', desc: 'Walk every day for a week', done: false },
-        { icon: '🏆', title: 'Marathon Walker', desc: 'Walk 42 km total', done: false },
+      {[{ Icon: Footprints, title: 'First Walk', desc: 'Complete your first walk', done: true, color: Colors.primary },
+        { Icon: Target, title: '5K Steps', desc: 'Walk 5,000 steps in a day', done: true, color: Colors.success },
+        { Icon: Flame, title: '7 Day Streak', desc: 'Walk every day for a week', done: false, color: Colors.secondary },
+        { Icon: Trophy, title: 'Marathon Walker', desc: 'Walk 42 km total', done: false, color: Colors.warning },
       ].map(a => (
         <Card key={a.title} style={{ marginBottom: Spacing.sm }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.md }}>
-            <span style={{ fontSize: 28, opacity: a.done ? 1 : 0.4 }}>{a.icon}</span>
+            <a.Icon size={28} color={a.done ? a.color : Colors.hairline} />
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: Weight.bold, color: a.done ? Colors.ink : Colors.inkTertiary }}>{a.title}</div>
               <div style={{ color: Colors.inkSecondary, fontSize: Font.sm }}>{a.desc}</div>
@@ -165,7 +166,7 @@ export function WalkPage() {
       {showSummary && (
         <div className="modal-backdrop" style={{ position: 'fixed', inset: 0, backgroundColor: Colors.overlay, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 100 }}>
           <div className="modal-sheet" style={{ backgroundColor: Colors.surface, borderRadius: `${Radius.xxl}px ${Radius.xxl}px 0 0`, padding: Spacing.xxl, width: '100%', maxWidth: 430, textAlign: 'center' }}>
-            <span style={{ fontSize: Font.hero }}>🎉</span>
+            <Trophy size={48} color={Colors.warning} />
             <h2 style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.ink, margin: `${Spacing.md}px 0` }}>Great Walk!</h2>
             <div style={{ display: 'flex', justifyContent: 'space-evenly', margin: `${Spacing.lg}px 0` }}>
               {[{ val: steps, lbl: 'Steps' }, { val: `${estimateDistanceKm(steps).toFixed(2)} km`, lbl: 'Distance' }, { val: `${mins} min`, lbl: 'Time' }].map(s => (

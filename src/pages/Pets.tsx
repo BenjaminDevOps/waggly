@@ -1,21 +1,21 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, ChevronRight } from 'lucide-react';
+import { Plus, ChevronRight, Dog, Cat, Rabbit } from 'lucide-react';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Shadow, Font, Weight, Radius } from '../theme/spacing';
 import { Card } from '../components/Card';
 
 const pets = [
   {
-    id: '1', name: 'Luna', type: 'dog', breed: 'Golden Retriever', emoji: '🐕',
+    id: '1', name: 'Luna', type: 'dog', breed: 'Golden Retriever', Icon: Dog,
     age: '5 yrs', weight: '28.5 kg', gender: 'Female', color: '#5B5EA6',
   },
   {
-    id: '2', name: 'Milo', type: 'cat', breed: 'British Shorthair', emoji: '🐈',
+    id: '2', name: 'Milo', type: 'cat', breed: 'British Shorthair', Icon: Cat,
     age: '3 yrs', weight: '5.2 kg', gender: 'Male', color: '#D4726A',
   },
   {
-    id: '3', name: 'Coco', type: 'rabbit', breed: 'Holland Lop', emoji: '🐰',
+    id: '3', name: 'Coco', type: 'rabbit', breed: 'Holland Lop', Icon: Rabbit,
     age: '2 yrs', weight: '1.8 kg', gender: 'Female', color: '#E8985E',
   },
 ];
@@ -60,11 +60,10 @@ export function PetsPage() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 32,
                 flexShrink: 0,
               }}
             >
-              {pet.emoji}
+              <pet.Icon size={32} color={pet.color} />
             </div>
 
             {/* Info */}

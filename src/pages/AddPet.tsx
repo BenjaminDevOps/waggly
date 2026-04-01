@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Camera } from 'lucide-react';
+import { ArrowLeft, Camera, Dog, Cat, Bird, Rabbit, PawPrint } from 'lucide-react';
 import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { Button } from '../components/Button';
 
 const petTypes = [
-  { key: 'dog', label: 'Dog', emoji: '🐕' },
-  { key: 'cat', label: 'Cat', emoji: '🐈' },
-  { key: 'bird', label: 'Bird', emoji: '🐦' },
-  { key: 'rabbit', label: 'Rabbit', emoji: '🐰' },
-  { key: 'other', label: 'Other', emoji: '🐾' },
+  { key: 'dog', label: 'Dog', Icon: Dog },
+  { key: 'cat', label: 'Cat', Icon: Cat },
+  { key: 'bird', label: 'Bird', Icon: Bird },
+  { key: 'rabbit', label: 'Rabbit', Icon: Rabbit },
+  { key: 'other', label: 'Other', Icon: PawPrint },
 ];
 
 const genderOptions = ['Male', 'Female'];
@@ -134,7 +134,7 @@ export function AddPetPage() {
                     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
                 >
-                  <span style={{ fontSize: 28 }}>{type.emoji}</span>
+                  <type.Icon size={28} color={isActive ? Colors.primary : Colors.inkTertiary} />
                   <span
                     style={{
                       fontSize: Font.xs + 1,

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   PawPrint, Stethoscope, ShoppingBag, Trophy, ChevronRight,
   Plus, Star, Flame, Footprints, Bell, Sparkles,
+  Dog, Cat, Rabbit, Bone, Bed, Gift,
 } from 'lucide-react';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Shadow, Font, Weight } from '../theme/spacing';
@@ -12,9 +13,9 @@ import { SectionHeader } from '../components/SectionHeader';
 
 /* ── demo data ──────────────────────────────────────────────── */
 const pets = [
-  { id: '1', name: 'Luna', type: 'dog', breed: 'Golden Retriever', emoji: '🐕', color: '#5B5EA6' },
-  { id: '2', name: 'Milo', type: 'cat', breed: 'British Shorthair', emoji: '🐈', color: '#D4726A' },
-  { id: '3', name: 'Coco', type: 'rabbit', breed: 'Holland Lop', emoji: '🐰', color: '#E8985E' },
+  { id: '1', name: 'Luna', type: 'dog', breed: 'Golden Retriever', Icon: Dog, color: '#5B5EA6' },
+  { id: '2', name: 'Milo', type: 'cat', breed: 'British Shorthair', Icon: Cat, color: '#D4726A' },
+  { id: '3', name: 'Coco', type: 'rabbit', breed: 'Holland Lop', Icon: Rabbit, color: '#E8985E' },
 ];
 
 const reminders = [
@@ -23,10 +24,10 @@ const reminders = [
 ];
 
 const products = [
-  { id: '1', name: 'Organic Treats', price: '$12.99', emoji: '🦴' },
-  { id: '2', name: 'Cozy Bed', price: '$34.99', emoji: '🛏️' },
-  { id: '3', name: 'Rope Toy', price: '$8.99', emoji: '🧸' },
-  { id: '4', name: 'Grooming Kit', price: '$19.99', emoji: '✨' },
+  { id: '1', name: 'Organic Treats', price: '$12.99', Icon: Bone },
+  { id: '2', name: 'Cozy Bed', price: '$34.99', Icon: Bed },
+  { id: '3', name: 'Rope Toy', price: '$8.99', Icon: Gift },
+  { id: '4', name: 'Grooming Kit', price: '$19.99', Icon: Sparkles },
 ];
 
 /* ── progress circle (SVG) ──────────────────────────────────── */
@@ -90,7 +91,7 @@ export function HomePage() {
                 </span>
               </div>
             </div>
-            <span style={{ fontSize: Font.hero, marginLeft: Spacing.md }}>🐾</span>
+            <PawPrint size={48} color="rgba(255,255,255,0.5)" style={{ marginLeft: Spacing.md, flexShrink: 0 }} />
           </div>
         </GradientCard>
 
@@ -112,9 +113,9 @@ export function HomePage() {
               >
                 <div style={{
                   width: 56, height: 56, borderRadius: 18, backgroundColor: p.color + '18',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  {p.emoji}
+                  <p.Icon size={28} color={p.color} />
                 </div>
                 <span style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink }}>{p.name}</span>
                 <span style={{ fontSize: Font.xs, color: Colors.inkTertiary }}>{p.breed}</span>
@@ -230,9 +231,9 @@ export function HomePage() {
               <Card key={p.id} className="card-interactive" onClick={() => navigate('/shop')} padded={false} style={{ minWidth: 140, flexShrink: 0 }}>
                 <div style={{
                   height: 100, borderRadius: '20px 20px 0 0', backgroundColor: Colors.surfaceSecondary,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  {p.emoji}
+                  <p.Icon size={36} color={Colors.inkTertiary} />
                 </div>
                 <div style={{ padding: '12px 14px 14px' }}>
                   <span style={{ fontSize: 14, fontWeight: Weight.semibold, color: Colors.ink, display: 'block' }}>{p.name}</span>

@@ -24,7 +24,7 @@ const PRODUCTS: Product[] = [
 ];
 
 const CATEGORIES: ShopCategory[] = ['food', 'toys', 'health', 'accessories', 'grooming', 'training'];
-const CAT_EMOJI: Record<ShopCategory, string> = { food: '🍖', toys: '🧸', health: '💊', accessories: '🎀', grooming: '✂️', training: '🎯' };
+const CAT_LABELS: Record<ShopCategory, string> = { food: 'Food', toys: 'Toys', health: 'Health', accessories: 'Accessories', grooming: 'Grooming', training: 'Training' };
 
 export function ShopPage() {
   const [search, setSearch] = useState('');
@@ -54,14 +54,14 @@ export function ShopPage() {
 
       <div style={{ display: 'flex', gap: 8, padding: '0 16px', overflowX: 'auto', marginBottom: 8 }}>
         {(['all', 'dog', 'cat', 'nac'] as PetFilter[]).map(f => {
-          const labels: Record<PetFilter, string> = { all: 'All', dog: '🐕 Dogs', cat: '🐈 Cats', nac: '🐰 NAC' };
+          const labels: Record<PetFilter, string> = { all: 'All', dog: 'Dogs', cat: 'Cats', nac: 'NAC' };
           return <Chip key={f} label={labels[f]} active={petFilter === f} onClick={() => setPetFilter(f)} />;
         })}
       </div>
 
       <div style={{ display: 'flex', gap: 8, padding: '0 16px', overflowX: 'auto', marginBottom: 16 }}>
         <Chip label="All" active={!catFilter} onClick={() => setCatFilter(null)} />
-        {CATEGORIES.map(c => <Chip key={c} label={`${CAT_EMOJI[c]} ${c[0].toUpperCase() + c.slice(1)}`} active={catFilter === c} onClick={() => setCatFilter(c)} />)}
+        {CATEGORIES.map(c => <Chip key={c} label={CAT_LABELS[c]} active={catFilter === c} onClick={() => setCatFilter(c)} />)}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, padding: '0 16px' }}>
