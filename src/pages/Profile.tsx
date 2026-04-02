@@ -4,11 +4,12 @@ import type { LucideIcon } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
 import { SectionHeader } from '../components/SectionHeader';
-import { BADGES, BadgeId } from '../models/types';
+import { BADGES, type BadgeId } from '../models/types';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
+import { useAuth } from '../hooks/useAuth';
+import { usePets } from '../hooks/usePets';
 
-const EARNED_BADGES: BadgeId[] = ['firstPet', 'firstDiagnosis', 'streak7Days', 'points100', 'points500', 'vetVisit5'];
 
 const BADGE_ICON_MAP: Record<string, LucideIcon> = {
   PawPrint, Stethoscope, Flame, 'Star': StarIcon, Award, Diamond, Crown, Building2, Trophy, Footprints, Target, Medal,
@@ -22,6 +23,25 @@ const LEADERBOARD = [
 ];
 
 export function ProfilePage() {
+  const { user, loading } = useAuth();
+  const { pets } = usePets();
+
+  const totalPoints = user?.totalPoints ?? 0;
+  const streak = user?.dailyStreak ?? 0;
+  const earnedBadges = (user?.badges ?? []) as BadgeId[];
+  const level = Math.floor(totalPoints / 200) + 1;
+  const xpInLevel = totalPoints % 200;
+  const xpNeeded = 200;
+  const xpPct = (xpInLevel / xpNeeded) * 100;
+
+  if (loading) {
+    return (
+      <div style={{ backgroundColor: Colors.background, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ color: Colors.inkSecondary, fontSize: Font.body }}>Loading...</span>
+      </div>
+    );
+  }
+
   return (
     <div style={{ backgroundColor: Colors.background, minHeight: '100vh' }}>
       {/* Header */}
@@ -29,10 +49,10 @@ export function ProfilePage() {
         <div style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: 'rgba(255,255,255,0.2)', border: '3px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
           <User size={40} color={Colors.inkInverse} />
         </div>
-        <div style={{ color: Colors.inkInverse, fontSize: Font.title2, fontWeight: Weight.bold, marginTop: 12 }}>Pet Lover</div>
-        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.body, marginTop: 4 }}>Level 12 - Health Champion</div>
+        <div style={{ color: Colors.inkInverse, fontSize: Font.title2, fontWeight: Weight.bold, marginTop: 12 }}>{user?.displayName ?? 'Pet Lover'}</div>
+        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.body, marginTop: 4 }}>Level {level}</div>
         <div style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: 20 }}>
-          {[{ val: '1,250', lbl: 'Points' }, { val: '7', lbl: 'Day Streak' }, { val: '3', lbl: 'Pets' }, { val: '6', lbl: 'Badges' }].map(s => (
+          {[{ val: totalPoints.toLocaleString(), lbl: 'Points' }, { val: String(streak), lbl: 'Day Streak' }, { val: String(pets.length), lbl: 'Pets' }, { val: String(earnedBadges.length), lbl: 'Badges' }].map(s => (
             <div key={s.lbl}>
               <div style={{ color: Colors.inkInverse, fontSize: Font.title3, fontWeight: Weight.bold }}>{s.val}</div>
               <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.xs }}>{s.lbl}</div>
@@ -45,13 +65,13 @@ export function ProfilePage() {
         {/* Level Progress */}
         <Card style={{ marginBottom: 28 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-            <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink }}>Level 12</span>
-            <span style={{ color: Colors.inkSecondary, fontSize: Font.body }}>1,250 / 2,000 XP</span>
+            <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink }}>Level {level}</span>
+            <span style={{ color: Colors.inkSecondary, fontSize: Font.body }}>{xpInLevel} / {xpNeeded} XP</span>
           </div>
           <div style={{ height: 10, backgroundColor: Colors.surfaceSecondary, borderRadius: 5, overflow: 'hidden' }}>
-            <div style={{ width: '62.5%', height: '100%', backgroundColor: Colors.primary, borderRadius: 5 }} />
+            <div style={{ width: `${xpPct}%`, height: '100%', backgroundColor: Colors.primary, borderRadius: 5 }} />
           </div>
-          <div style={{ color: Colors.inkTertiary, fontSize: Font.sm, marginTop: 8 }}>750 XP to Level 13</div>
+          <div style={{ color: Colors.inkTertiary, fontSize: Font.sm, marginTop: 8 }}>{xpNeeded - xpInLevel} XP to Level {level + 1}</div>
         </Card>
 
         {/* Premium */}
@@ -70,7 +90,7 @@ export function ProfilePage() {
         <SectionHeader title="My Badges" />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
           {BADGES.map(badge => {
-            const earned = EARNED_BADGES.includes(badge.id);
+            const earned = earnedBadges.includes(badge.id);
             const BadgeIcon = BADGE_ICON_MAP[badge.icon] || PawPrint;
             return (
               <button className="btn-press" key={badge.id} onClick={() => alert(`${badge.name}\n${badge.description}`)} style={{
@@ -104,10 +124,10 @@ export function ProfilePage() {
         {/* Activity Summary */}
         <SectionHeader title="Activity Summary" />
         <Card style={{ marginBottom: 28 }}>
-          {[{ icon: Stethoscope, label: 'AI Diagnoses', value: '8', color: Colors.primary },
-            { icon: Footprints, label: 'Walks', value: '42', color: Colors.success },
-            { icon: Shield, label: 'Health Records', value: '15', color: Colors.accent },
-            { icon: ShoppingBag, label: 'Shop Visits', value: '23', color: Colors.secondary },
+          {[{ icon: Stethoscope, label: 'AI Diagnoses', value: String(user?.aiDiagnosisUsed ?? 0), color: Colors.primary },
+            { icon: Footprints, label: 'Walks', value: '-', color: Colors.success },
+            { icon: Shield, label: 'Health Records', value: '-', color: Colors.accent },
+            { icon: ShoppingBag, label: 'Shop Visits', value: '-', color: Colors.secondary },
           ].map((item, i, arr) => (
             <React.Fragment key={item.label}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>

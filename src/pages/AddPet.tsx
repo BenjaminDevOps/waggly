@@ -4,6 +4,9 @@ import { ArrowLeft, Camera, Dog, Cat, Bird, Rabbit, PawPrint } from 'lucide-reac
 import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { Button } from '../components/Button';
+import { addPet } from '../services/petService';
+import { useAuth } from '../hooks/useAuth';
+import type { PetGender, PetType } from '../models/types';
 
 const petTypes = [
   { key: 'dog', label: 'Dog', Icon: Dog },
@@ -39,15 +42,32 @@ const labelStyle: React.CSSProperties = {
 
 export function AddPetPage() {
   const navigate = useNavigate();
+  const { firebaseUser } = useAuth();
   const [selectedType, setSelectedType] = useState('dog');
   const [selectedGender, setSelectedGender] = useState('');
   const [name, setName] = useState('');
   const [breed, setBreed] = useState('');
   const [weight, setWeight] = useState('');
   const [microchip, setMicrochip] = useState('');
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
-    navigate('/pets');
+  const handleSave = async () => {
+    if (!firebaseUser || !name.trim() || !breed.trim() || !selectedGender) return;
+    setSaving(true);
+    try {
+      await addPet(firebaseUser.uid, {
+        name: name.trim(),
+        type: selectedType as PetType,
+        breed: breed.trim(),
+        gender: selectedGender.toLowerCase() as PetGender,
+        weight: weight ? parseFloat(weight) : undefined,
+        microchipId: microchip || undefined,
+      });
+      navigate('/pets');
+    } catch (e) {
+      console.error('Error adding pet:', e);
+      setSaving(false);
+    }
   };
 
   return (
@@ -236,7 +256,8 @@ export function AddPetPage() {
             onPress={handleSave}
             variant="primary"
             size="large"
-            disabled={!name.trim() || !breed.trim() || !selectedGender}
+            loading={saving}
+            disabled={saving || !name.trim() || !breed.trim() || !selectedGender}
           />
         </div>
       </div>

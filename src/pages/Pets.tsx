@@ -1,27 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, ChevronRight, Dog, Cat, Rabbit } from 'lucide-react';
+import { Plus, ChevronRight, PawPrint } from 'lucide-react';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Shadow, Font, Weight, Radius } from '../theme/spacing';
 import { Card } from '../components/Card';
-
-const pets = [
-  {
-    id: '1', name: 'Luna', type: 'dog', breed: 'Golden Retriever', Icon: Dog,
-    age: '5 yrs', weight: '28.5 kg', gender: 'Female', color: '#5B5EA6',
-  },
-  {
-    id: '2', name: 'Milo', type: 'cat', breed: 'British Shorthair', Icon: Cat,
-    age: '3 yrs', weight: '5.2 kg', gender: 'Male', color: '#D4726A',
-  },
-  {
-    id: '3', name: 'Coco', type: 'rabbit', breed: 'Holland Lop', Icon: Rabbit,
-    age: '2 yrs', weight: '1.8 kg', gender: 'Female', color: '#E8985E',
-  },
-];
+import { usePets } from '../hooks/usePets';
+import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
 
 export function PetsPage() {
   const navigate = useNavigate();
+  const { pets, loading } = usePets();
 
   return (
     <div className="fade-in" style={{ minHeight: '100vh', backgroundColor: Colors.background }}>
@@ -37,7 +25,14 @@ export function PetsPage() {
 
       {/* Pet Cards */}
       <div style={{ padding: `0 ${Spacing.xl}px`, display: 'flex', flexDirection: 'column', gap: 14 }}>
-        {pets.map((pet) => (
+        {loading ? (
+          <p style={{ textAlign: 'center', color: Colors.inkSecondary, fontSize: Font.body, padding: Spacing.xl }}>Loading...</p>
+        ) : pets.length === 0 ? (
+          <p style={{ textAlign: 'center', color: Colors.inkSecondary, fontSize: Font.body, padding: Spacing.xl }}>No pets yet. Add your first pet!</p>
+        ) : pets.map((pet) => {
+          const PetIcon = PET_ICON_MAP[pet.type] || PawPrint;
+          const petColor = PET_COLOR_MAP[pet.type] || Colors.lavender;
+          return (
           <Card
             key={pet.id}
             className="card-interactive"
@@ -56,14 +51,14 @@ export function PetsPage() {
                 width: Spacing.massive,
                 height: Spacing.massive,
                 borderRadius: Radius.lg,
-                backgroundColor: pet.color + '18',
+                backgroundColor: petColor + '18',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
             >
-              <pet.Icon size={32} color={pet.color} />
+              <PetIcon size={32} color={petColor} />
             </div>
 
             {/* Info */}
@@ -72,17 +67,17 @@ export function PetsPage() {
                 <span style={{ fontSize: 18, fontWeight: Weight.bold, color: Colors.ink }}>{pet.name}</span>
               </div>
               <span style={{ fontSize: 14, color: Colors.inkSecondary, display: 'block', marginBottom: 10 }}>
-                {pet.breed}
+                {pet.breed || pet.type}
               </span>
               {/* Chips */}
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {[
-                  { label: pet.age, color: Colors.primary },
-                  { label: pet.weight, color: Colors.secondary },
-                  { label: pet.gender, color: Colors.accent },
-                ].map((chip) => (
+                  { label: pet.weight ? `${pet.weight} kg` : '-', color: Colors.secondary },
+                  { label: pet.gender.charAt(0).toUpperCase() + pet.gender.slice(1), color: Colors.accent },
+                  { label: pet.breed || pet.type, color: Colors.primary },
+                ].map((chip, idx) => (
                   <span
-                    key={chip.label}
+                    key={idx}
                     style={{
                       display: 'inline-block',
                       backgroundColor: chip.color + '14',
@@ -101,7 +96,8 @@ export function PetsPage() {
 
             <ChevronRight size={20} color={Colors.inkTertiary} style={{ flexShrink: 0 }} />
           </Card>
-        ))}
+          );
+        })}
       </div>
 
       {/* FAB - Add Pet */}

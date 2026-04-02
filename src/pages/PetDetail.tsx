@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Plus, Syringe, ChevronRight, PawPrint, Cake, Scale, User, Building2, Pill } from 'lucide-react';
+import { ArrowLeft, Heart, Plus, Syringe, ChevronRight, PawPrint, Cake, Scale, User, Building2, Pill, FileText } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
 import { SectionHeader } from '../components/SectionHeader';
@@ -8,24 +8,19 @@ import { StatusBadge } from '../components/Badge';
 import { Button } from '../components/Button';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
+import { usePets } from '../hooks/usePets';
+import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
+import { subscribeToHealthRecords } from '../services/healthRecordService';
+import type { HealthRecord } from '../models/types';
+import type { LucideIcon } from 'lucide-react';
 
-const petData = {
-  id: '1',
-  name: 'Luna',
-  type: 'dog' as const,
-  breed: 'Golden Retriever',
-  Icon: PawPrint,
-  age: '5 yrs',
-  weight: '28.5 kg',
-  gender: 'Female',
-  healthScore: 92,
+const RECORD_ICON_MAP: Record<string, LucideIcon> = {
+  vaccination: Syringe,
+  vetVisit: Building2,
+  deworming: Pill,
+  medication: Pill,
+  note: FileText,
 };
-
-const healthRecords = [
-  { id: '1', Icon: Syringe, title: 'Rabies Vaccination', date: 'Mar 15, 2026', type: 'vaccination', status: 'Completed' },
-  { id: '2', Icon: Building2, title: 'Annual Checkup', date: 'Feb 28, 2026', type: 'vetVisit', status: 'Completed' },
-  { id: '3', Icon: Pill, title: 'Deworming Treatment', date: 'Jan 10, 2026', type: 'deworming', status: 'Upcoming' },
-];
 
 const quickActions = [
   { icon: <Heart size={22} color={Colors.accent} />, label: 'Health Record', bg: Colors.accentPale },
@@ -36,12 +31,42 @@ const quickActions = [
 export function PetDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const pet = petData;
+  const { pets, loading } = usePets();
+  const pet = pets.find(p => p.id === id);
+  const [records, setRecords] = useState<HealthRecord[]>([]);
+
+  useEffect(() => {
+    if (!id) return;
+    const unsub = subscribeToHealthRecords(id, setRecords);
+    return unsub;
+  }, [id]);
+
+  const healthScore = Math.min(100, 60 + records.length * 5);
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: Colors.background, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: Colors.inkSecondary, fontSize: Font.body }}>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!pet) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: Colors.background, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: Spacing.md }}>
+        <p style={{ color: Colors.inkSecondary, fontSize: Font.body }}>Pet not found</p>
+        <Button label="Go Back" onPress={() => navigate(-1)} variant="secondary" />
+      </div>
+    );
+  }
+
+  const PetIcon = PET_ICON_MAP[pet.type] || PawPrint;
+  const petColor = PET_COLOR_MAP[pet.type] || Colors.lavender;
 
   const statsData = [
-    { label: 'Age', value: pet.age, Icon: Cake },
-    { label: 'Weight', value: pet.weight, Icon: Scale },
-    { label: 'Gender', value: pet.gender, Icon: User },
+    { label: 'Type', value: pet.type.charAt(0).toUpperCase() + pet.type.slice(1), Icon: Cake },
+    { label: 'Weight', value: pet.weight ? `${pet.weight} kg` : '-', Icon: Scale },
+    { label: 'Gender', value: pet.gender.charAt(0).toUpperCase() + pet.gender.slice(1), Icon: User },
   ];
 
   return (
@@ -86,10 +111,10 @@ export function PetDetailPage() {
               marginBottom: Spacing.md,
             }}
           >
-            <pet.Icon size={44} color="#fff" />
+            <PetIcon size={44} color="#fff" />
           </div>
           <span style={{ fontSize: Font.title1, fontWeight: Weight.bold, color: Colors.inkInverse, marginBottom: Spacing.xs }}>{pet.name}</span>
-          <span style={{ fontSize: Font.body, color: 'rgba(255,255,255,0.8)', fontWeight: Weight.medium }}>{pet.breed}</span>
+          <span style={{ fontSize: Font.body, color: 'rgba(255,255,255,0.8)', fontWeight: Weight.medium }}>{pet.breed || pet.type}</span>
         </div>
       </div>
 
@@ -110,7 +135,7 @@ export function PetDetailPage() {
         <Card style={{ marginBottom: Spacing.xl + 4 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.md }}>
             <span style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink }}>Overall Health</span>
-            <span style={{ fontSize: Font.title1, fontWeight: Weight.heavy, color: Colors.success }}>{pet.healthScore}</span>
+            <span style={{ fontSize: Font.title1, fontWeight: Weight.heavy, color: Colors.success }}>{healthScore}</span>
           </div>
           <div
             style={{
@@ -122,7 +147,7 @@ export function PetDetailPage() {
           >
             <div
               style={{
-                width: `${pet.healthScore}%`,
+                width: `${healthScore}%`,
                 height: '100%',
                 borderRadius: 6,
                 background: `linear-gradient(90deg, ${Colors.success}, #4A9E5C, #3D8B4F)`,
@@ -176,7 +201,11 @@ export function PetDetailPage() {
         {/* Health Records */}
         <SectionHeader title="Health Records" actionLabel="See All" onAction={() => {}} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: Spacing.md, paddingBottom: Spacing.xxxl + 4 }}>
-          {healthRecords.map((record) => (
+          {records.length === 0 ? (
+            <p style={{ textAlign: 'center', color: Colors.inkSecondary, fontSize: Font.body, padding: Spacing.xl }}>No records yet</p>
+          ) : records.map((record) => {
+            const RecordIcon = RECORD_ICON_MAP[record.type] || FileText;
+            return (
             <Card
               key={record.id}
               className="card-interactive"
@@ -202,7 +231,7 @@ export function PetDetailPage() {
                   flexShrink: 0,
                 }}
               >
-                <record.Icon size={24} color={Colors.primary} />
+                <RecordIcon size={24} color={Colors.primary} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink, marginBottom: Spacing.xs }}>
@@ -210,14 +239,10 @@ export function PetDetailPage() {
                 </div>
                 <div style={{ fontSize: Font.sm, color: Colors.inkTertiary }}>{record.date}</div>
               </div>
-              <StatusBadge
-                label={record.status}
-                color={record.status === 'Completed' ? Colors.success : Colors.warning}
-                small
-              />
               <ChevronRight size={18} color={Colors.inkTertiary} />
             </Card>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

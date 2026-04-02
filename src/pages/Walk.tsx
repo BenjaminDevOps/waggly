@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { PawPrint, Play, Square, Navigation, Flame, Star, CheckCircle, Circle, Footprints, MapPin, Dog, Cat, Rabbit, Target, Trophy } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { PawPrint, Play, Square, Navigation, Flame, Star, CheckCircle, Circle, Footprints, MapPin, Target, Trophy } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
 import { SectionHeader } from '../components/SectionHeader';
@@ -8,12 +7,18 @@ import { Button } from '../components/Button';
 import { calculatePoints, estimateCalories, estimateDistanceKm } from '../services/walkService';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
+import { usePets } from '../hooks/usePets';
+import { useAuth } from '../hooks/useAuth';
+import { saveWalk } from '../services/walkFirestoreService';
+import { addPoints } from '../services/userService';
+import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
 
 const WEEKLY_STEPS = [3200, 4100, 2800, 5200, 3900, 4500, 2340];
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const PET_ICONS: Record<string, LucideIcon> = { Luna: Dog, Milo: Cat, Coco: Rabbit };
 
 export function WalkPage() {
+  const { pets } = usePets();
+  const { firebaseUser } = useAuth();
   const [isWalking, setIsWalking] = useState(false);
   const [steps, setSteps] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -40,7 +45,31 @@ export function WalkPage() {
     }
   }, [isWalking]);
 
-  const finishWalk = () => { setTodaySteps(t => t + steps); setSteps(0); setSeconds(0); setShowSummary(false); };
+  const finishWalk = async () => {
+    if (firebaseUser) {
+      const pts = calculatePoints(steps, mins);
+      try {
+        await saveWalk(firebaseUser.uid, {
+          petId: selectedPet || undefined,
+          petName: pets.find(p => p.id === selectedPet)?.name,
+          startTime: new Date(Date.now() - seconds * 1000).toISOString(),
+          endTime: new Date().toISOString(),
+          steps,
+          distanceKm: estimateDistanceKm(steps),
+          durationMinutes: mins,
+          caloriesBurned: estimateCalories(steps),
+          pointsEarned: pts,
+        });
+        await addPoints(firebaseUser.uid, pts);
+      } catch (e) {
+        console.error('Error saving walk:', e);
+      }
+    }
+    setTodaySteps(t => t + steps);
+    setSteps(0);
+    setSeconds(0);
+    setShowSummary(false);
+  };
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
 
@@ -69,17 +98,22 @@ export function WalkPage() {
       {/* Pet selector */}
       <div style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink, marginBottom: Spacing.sm }}>Walking with</div>
       <div style={{ display: 'flex', gap: Spacing.sm, marginBottom: Spacing.xxl, overflowX: 'auto' }}>
-        {Object.entries(PET_ICONS).map(([name, Icon]) => (
-          <button className="btn-press" key={name} onClick={() => setSelectedPet(selectedPet === name ? null : name)} style={{
-            display: 'flex', alignItems: 'center', gap: Spacing.sm, padding: `${Spacing.sm}px ${Spacing.lg}px`, borderRadius: Radius.pill,
-            backgroundColor: selectedPet === name ? Colors.primaryPale : Colors.surfaceSecondary,
-            border: `2px solid ${selectedPet === name ? Colors.primary : 'transparent'}`, cursor: 'pointer',
-            transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-          }}>
-            <Icon size={20} color={selectedPet === name ? Colors.primary : Colors.inkSecondary} />
-            <span style={{ fontWeight: Weight.bold, color: selectedPet === name ? Colors.primary : Colors.inkSecondary }}>{name}</span>
-          </button>
-        ))}
+        {pets.map(pet => {
+          const Icon = PET_ICON_MAP[pet.type] || PawPrint;
+          const active = selectedPet === pet.id;
+          const color = PET_COLOR_MAP[pet.type] || Colors.primary;
+          return (
+            <button className="btn-press" key={pet.id} onClick={() => setSelectedPet(active ? null : pet.id)} style={{
+              display: 'flex', alignItems: 'center', gap: Spacing.sm, padding: `${Spacing.sm}px ${Spacing.lg}px`, borderRadius: Radius.pill,
+              backgroundColor: active ? Colors.primaryPale : Colors.surfaceSecondary,
+              border: `2px solid ${active ? color : 'transparent'}`, cursor: 'pointer',
+              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}>
+              <Icon size={20} color={active ? color : Colors.inkSecondary} />
+              <span style={{ fontWeight: Weight.bold, color: active ? color : Colors.inkSecondary }}>{pet.name}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Start/Stop */}

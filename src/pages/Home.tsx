@@ -3,20 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import {
   PawPrint, Stethoscope, ShoppingBag, Trophy, ChevronRight,
   Plus, Star, Flame, Footprints, Bell, Sparkles,
-  Dog, Cat, Rabbit, Bone, Bed, Gift,
+  Dog, Cat, Rabbit, Bird, Bone, Bed, Gift,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Shadow, Font, Weight } from '../theme/spacing';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
 import { SectionHeader } from '../components/SectionHeader';
+import { usePets } from '../hooks/usePets';
+import { useAuth } from '../hooks/useAuth';
+import type { PetType } from '../models/types';
 
-/* ── demo data ──────────────────────────────────────────────── */
-const pets = [
-  { id: '1', name: 'Luna', type: 'dog', breed: 'Golden Retriever', Icon: Dog, color: '#5B5EA6' },
-  { id: '2', name: 'Milo', type: 'cat', breed: 'British Shorthair', Icon: Cat, color: '#D4726A' },
-  { id: '3', name: 'Coco', type: 'rabbit', breed: 'Holland Lop', Icon: Rabbit, color: '#E8985E' },
-];
+const PET_ICON_MAP: Record<PetType, LucideIcon> = { dog: Dog, cat: Cat, rabbit: Rabbit, bird: Bird, other: PawPrint };
+const PET_COLOR_MAP: Record<PetType, string> = { dog: Colors.primary, cat: Colors.accent, rabbit: Colors.secondary, bird: Colors.success, other: Colors.lavender };
 
 const reminders = [
   { pet: 'Luna', task: 'Rabies Booster', daysLeft: 25, color: Colors.accent },
@@ -49,6 +49,11 @@ const ProgressCircle: React.FC<{ pct: number; size?: number; stroke?: number }> 
 /* ── main page ──────────────────────────────────────────────── */
 export function HomePage() {
   const navigate = useNavigate();
+  const { pets, loading: petsLoading } = usePets();
+  const { user, loading: authLoading } = useAuth();
+
+  const userPoints = user?.totalPoints ?? 0;
+  const userStreak = user?.dailyStreak ?? 0;
 
   return (
     <div className="fade-in" style={{ backgroundColor: Colors.background, minHeight: '100vh' }}>
@@ -66,11 +71,11 @@ export function HomePage() {
         <div style={{ display: 'flex', gap: Spacing.sm }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.xs, backgroundColor: Colors.secondaryPale, borderRadius: 999, padding: `${Spacing.xs}px ${Spacing.md}px` }}>
             <Flame size={14} color={Colors.secondary} />
-            <span style={{ fontSize: Font.sm, fontWeight: Weight.bold, color: Colors.secondary }}>7</span>
+            <span style={{ fontSize: Font.sm, fontWeight: Weight.bold, color: Colors.secondary }}>{userStreak}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.xs, backgroundColor: Colors.primaryPale, borderRadius: 999, padding: `${Spacing.xs}px ${Spacing.md}px` }}>
             <Star size={14} color={Colors.primary} />
-            <span style={{ fontSize: Font.sm, fontWeight: Weight.bold, color: Colors.primary }}>1,250</span>
+            <span style={{ fontSize: Font.sm, fontWeight: Weight.bold, color: Colors.primary }}>{userPoints.toLocaleString()}</span>
           </div>
         </div>
       </div>
@@ -99,7 +104,18 @@ export function HomePage() {
         <div>
           <SectionHeader title="My Pets" actionLabel="See all" onAction={() => navigate('/pets')} />
           <div style={{ display: 'flex', gap: Spacing.md, overflowX: 'auto', paddingBottom: Spacing.xs, marginRight: -Spacing.xl }}>
-            {pets.map(p => (
+            {petsLoading ? (
+              <div style={{ minWidth: 120, padding: Spacing.lg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: Font.sm, color: Colors.inkTertiary }}>Loading...</span>
+              </div>
+            ) : pets.length === 0 ? (
+              <div style={{ minWidth: 120, padding: Spacing.lg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: Font.sm, color: Colors.inkTertiary }}>No pets yet</span>
+              </div>
+            ) : pets.map(p => {
+              const PetIcon = PET_ICON_MAP[p.type] || PawPrint;
+              const petColor = PET_COLOR_MAP[p.type] || Colors.lavender;
+              return (
               <div
                 key={p.id}
                 className="card-interactive"
@@ -112,15 +128,16 @@ export function HomePage() {
                 }}
               >
                 <div style={{
-                  width: 56, height: 56, borderRadius: 18, backgroundColor: p.color + '18',
+                  width: 56, height: 56, borderRadius: 18, backgroundColor: petColor + '18',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <p.Icon size={28} color={p.color} />
+                  <PetIcon size={28} color={petColor} />
                 </div>
                 <span style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink }}>{p.name}</span>
-                <span style={{ fontSize: Font.xs, color: Colors.inkTertiary }}>{p.breed}</span>
+                <span style={{ fontSize: Font.xs, color: Colors.inkTertiary }}>{p.breed || p.type}</span>
               </div>
-            ))}
+              );
+            })}
             {/* add pet card */}
             <div
               className="card-interactive"
