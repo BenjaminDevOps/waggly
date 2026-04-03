@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { PawPrint, Play, Square, Navigation, Flame, Star, CheckCircle, Circle, Footprints, MapPin, Target, Trophy } from 'lucide-react';
+import { PawPrint, Play, Square, Flame, Star, CheckCircle, Circle, Footprints, MapPin, Target, Trophy } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
 import { SectionHeader } from '../components/SectionHeader';
@@ -9,16 +9,17 @@ import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { usePets } from '../hooks/usePets';
 import { useAuth } from '../hooks/useAuth';
+import { useI18n } from '../i18n';
 import { saveWalk } from '../services/walkFirestoreService';
 import { addPoints } from '../services/userService';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
 
 const WEEKLY_STEPS = [3200, 4100, 2800, 5200, 3900, 4500, 2340];
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export function WalkPage() {
   const { pets } = usePets();
   const { firebaseUser } = useAuth();
+  const { t } = useI18n();
   const [isWalking, setIsWalking] = useState(false);
   const [steps, setSteps] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -32,6 +33,8 @@ export function WalkPage() {
   const progress = Math.min(totalSteps / dailyGoal, 1);
   const maxWeekly = Math.max(...WEEKLY_STEPS);
 
+  const DAYS = [t.walk.mon, t.walk.tue, t.walk.wed, t.walk.thu, t.walk.fri, t.walk.sat, t.walk.sun];
+
   useEffect(() => () => { clearInterval(timerRef.current); clearInterval(stepsRef.current); }, []);
 
   const toggleWalk = useCallback(() => {
@@ -44,6 +47,9 @@ export function WalkPage() {
       stepsRef.current = setInterval(() => setSteps(s => s + Math.floor(Math.random() * 3) + 1), 600);
     }
   }, [isWalking]);
+
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
 
   const finishWalk = async () => {
     if (firebaseUser) {
@@ -65,38 +71,32 @@ export function WalkPage() {
         console.error('Error saving walk:', e);
       }
     }
-    setTodaySteps(t => t + steps);
-    setSteps(0);
-    setSeconds(0);
-    setShowSummary(false);
+    setTodaySteps(t2 => t2 + steps);
+    setSteps(0); setSeconds(0); setShowSummary(false);
   };
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
 
   return (
     <div className="fade-in" style={{ padding: Spacing.lg, backgroundColor: Colors.background, minHeight: '100vh' }}>
-      <h1 style={{ fontSize: Font.largeTitle, fontWeight: Weight.bold, color: Colors.ink, marginBottom: Spacing.lg }}>Walk</h1>
+      <h1 style={{ fontSize: Font.largeTitle, fontWeight: Weight.bold, color: Colors.ink, marginBottom: Spacing.lg }}>{t.walk.title}</h1>
 
       {/* Step Counter */}
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: Spacing.xxl }}>
         <div style={{
-          width: 200, height: 200, borderRadius: 100,
-          border: `10px solid ${Colors.hairline}`,
+          width: 200, height: 200, borderRadius: 100, border: `10px solid ${Colors.hairline}`,
           background: `conic-gradient(${Colors.primary} ${progress * 360}deg, transparent 0deg)`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          position: 'relative',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
         }}>
           <div style={{ width: 170, height: 170, borderRadius: 85, backgroundColor: Colors.background, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <PawPrint size={28} color={Colors.primary} />
             <span style={{ fontSize: Font.hero, fontWeight: Weight.bold, color: Colors.ink }}>{totalSteps}</span>
-            <span style={{ fontSize: Font.body, color: Colors.inkSecondary }}>of {dailyGoal} steps</span>
-            {progress >= 1 && <span style={{ color: Colors.success, fontWeight: Weight.bold, fontSize: Font.xs, marginTop: Spacing.xs }}>Goal reached!</span>}
+            <span style={{ fontSize: Font.body, color: Colors.inkSecondary }}>{t.common.of} {dailyGoal} {t.common.steps.toLowerCase()}</span>
+            {progress >= 1 && <span style={{ color: Colors.success, fontWeight: Weight.bold, fontSize: Font.xs, marginTop: Spacing.xs }}>{t.walk.goalReached}</span>}
           </div>
         </div>
       </div>
 
       {/* Pet selector */}
-      <div style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink, marginBottom: Spacing.sm }}>Walking with</div>
+      <div style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink, marginBottom: Spacing.sm }}>{t.walk.walkingWith}</div>
       <div style={{ display: 'flex', gap: Spacing.sm, marginBottom: Spacing.xxl, overflowX: 'auto' }}>
         {pets.map(pet => {
           const Icon = PET_ICON_MAP[pet.type] || PawPrint;
@@ -107,7 +107,6 @@ export function WalkPage() {
               display: 'flex', alignItems: 'center', gap: Spacing.sm, padding: `${Spacing.sm}px ${Spacing.lg}px`, borderRadius: Radius.pill,
               backgroundColor: active ? Colors.primaryPale : Colors.surfaceSecondary,
               border: `2px solid ${active ? color : 'transparent'}`, cursor: 'pointer',
-              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
             }}>
               <Icon size={20} color={active ? color : Colors.inkSecondary} />
               <span style={{ fontWeight: Weight.bold, color: active ? color : Colors.inkSecondary }}>{pet.name}</span>
@@ -122,21 +121,20 @@ export function WalkPage() {
         padding: Spacing.xl, borderRadius: Radius.xl, fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.inkInverse, cursor: 'pointer',
         backgroundColor: isWalking ? Colors.error : Colors.success,
         boxShadow: `0 8px 24px ${isWalking ? 'rgba(212,96,90,0.3)' : 'rgba(110,175,123,0.3)'}`,
-        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
       }}>
         {isWalking ? <Square size={28} color={Colors.inkInverse} /> : <Play size={28} color={Colors.inkInverse} />}
-        {isWalking ? 'Stop Walk' : 'Start Walk'}
+        {isWalking ? t.walk.stopWalk : t.walk.startWalk}
       </button>
 
       {/* Current Walk Stats */}
       {isWalking && (
         <GradientCard colors={[Colors.primary, Colors.primaryLight]} style={{ marginTop: Spacing.xxl, textAlign: 'center' as const }}>
-          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.body }}>Current Walk</div>
+          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.body }}>{t.walk.currentWalk}</div>
           <div style={{ color: Colors.inkInverse, fontSize: 32, fontWeight: Weight.bold, fontVariantNumeric: 'tabular-nums', margin: `${Spacing.sm}px 0` }}>
             {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: Spacing.md }}>
-            {[{ Icon: Footprints, val: steps, lbl: 'Steps' }, { Icon: MapPin, val: estimateDistanceKm(steps).toFixed(2), lbl: 'km' }, { Icon: Flame, val: estimateCalories(steps), lbl: 'cal' }].map(s => (
+            {[{ Icon: Footprints, val: steps, lbl: t.common.steps }, { Icon: MapPin, val: estimateDistanceKm(steps).toFixed(2), lbl: t.common.km }, { Icon: Flame, val: estimateCalories(steps), lbl: t.common.cal }].map(s => (
               <div key={s.lbl} style={{ textAlign: 'center' }}>
                 <div style={{ display: 'flex', justifyContent: 'center' }}><s.Icon size={16} color="rgba(255,255,255,0.7)" /></div>
                 <div style={{ color: Colors.inkInverse, fontSize: Font.title3, fontWeight: Weight.bold }}>{s.val}</div>
@@ -148,11 +146,11 @@ export function WalkPage() {
       )}
 
       {/* Today's Summary */}
-      <SectionHeader title="Today's Summary" />
+      <SectionHeader title={t.walk.todaysSummary} />
       <div style={{ display: 'flex', gap: Spacing.sm, marginBottom: Spacing.xxl }}>
-        {[{ Icon: Footprints, val: totalSteps, lbl: 'Total Steps', color: Colors.primary },
-          { Icon: MapPin, val: estimateDistanceKm(totalSteps).toFixed(1), lbl: 'km walked', color: Colors.success },
-          { Icon: Flame, val: estimateCalories(totalSteps), lbl: 'Calories', color: Colors.accent },
+        {[{ Icon: Footprints, val: totalSteps, lbl: t.walk.totalSteps, color: Colors.primary },
+          { Icon: MapPin, val: estimateDistanceKm(totalSteps).toFixed(1), lbl: t.walk.kmWalked, color: Colors.success },
+          { Icon: Flame, val: estimateCalories(totalSteps), lbl: t.walk.calories, color: Colors.accent },
         ].map(s => (
           <Card key={s.lbl} style={{ flex: 1, textAlign: 'center' as const, padding: Spacing.md }}>
             <div style={{ display: 'flex', justifyContent: 'center' }}><s.Icon size={18} color={s.color} /></div>
@@ -163,7 +161,7 @@ export function WalkPage() {
       </div>
 
       {/* Weekly Chart */}
-      <SectionHeader title="This Week" />
+      <SectionHeader title={t.walk.thisWeek} />
       <Card style={{ marginBottom: Spacing.xxl }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', height: 120, alignItems: 'flex-end' }}>
           {WEEKLY_STEPS.map((s, i) => (
@@ -178,11 +176,11 @@ export function WalkPage() {
       </Card>
 
       {/* Achievements */}
-      <SectionHeader title="Walk Achievements" />
-      {[{ Icon: Footprints, title: 'First Walk', desc: 'Complete your first walk', done: true, color: Colors.primary },
-        { Icon: Target, title: '5K Steps', desc: 'Walk 5,000 steps in a day', done: true, color: Colors.success },
-        { Icon: Flame, title: '7 Day Streak', desc: 'Walk every day for a week', done: false, color: Colors.secondary },
-        { Icon: Trophy, title: 'Marathon Walker', desc: 'Walk 42 km total', done: false, color: Colors.warning },
+      <SectionHeader title={t.walk.achievements} />
+      {[{ Icon: Footprints, title: t.walk.firstWalk, desc: t.walk.firstWalkDesc, done: true, color: Colors.primary },
+        { Icon: Target, title: t.walk.fiveKSteps, desc: t.walk.fiveKStepsDesc, done: true, color: Colors.success },
+        { Icon: Flame, title: t.walk.sevenDayStreak, desc: t.walk.sevenDayStreakDesc, done: false, color: Colors.secondary },
+        { Icon: Trophy, title: t.walk.marathonWalker, desc: t.walk.marathonWalkerDesc, done: false, color: Colors.warning },
       ].map(a => (
         <Card key={a.title} style={{ marginBottom: Spacing.sm }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.md }}>
@@ -201,19 +199,19 @@ export function WalkPage() {
         <div className="modal-backdrop" style={{ position: 'fixed', inset: 0, backgroundColor: Colors.overlay, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 100 }}>
           <div className="modal-sheet" style={{ backgroundColor: Colors.surface, borderRadius: `${Radius.xxl}px ${Radius.xxl}px 0 0`, padding: Spacing.xxl, width: '100%', maxWidth: 430, textAlign: 'center' }}>
             <Trophy size={48} color={Colors.warning} />
-            <h2 style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.ink, margin: `${Spacing.md}px 0` }}>Great Walk!</h2>
+            <h2 style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.ink, margin: `${Spacing.md}px 0` }}>{t.walk.greatWalk}</h2>
             <div style={{ display: 'flex', justifyContent: 'space-evenly', margin: `${Spacing.lg}px 0` }}>
-              {[{ val: steps, lbl: 'Steps' }, { val: `${estimateDistanceKm(steps).toFixed(2)} km`, lbl: 'Distance' }, { val: `${mins} min`, lbl: 'Time' }].map(s => (
+              {[{ val: steps, lbl: t.common.steps }, { val: `${estimateDistanceKm(steps).toFixed(2)} ${t.common.km}`, lbl: t.walk.distance }, { val: `${mins} min`, lbl: t.walk.time }].map(s => (
                 <div key={s.lbl}><div style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink }}>{s.val}</div><div style={{ color: Colors.inkSecondary }}>{s.lbl}</div></div>
               ))}
             </div>
             <GradientCard colors={[Colors.warning, Colors.secondary]} style={{ margin: `${Spacing.lg}px 0`, textAlign: 'center' as const }}>
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: Spacing.sm }}>
                 <Star size={20} color={Colors.inkInverse} />
-                <span style={{ color: Colors.inkInverse, fontWeight: Weight.bold, fontSize: Font.body }}>+{calculatePoints(steps, mins)} points earned!</span>
+                <span style={{ color: Colors.inkInverse, fontWeight: Weight.bold, fontSize: Font.body }}>{t.walk.pointsEarned.replace('{pts}', String(calculatePoints(steps, mins)))}</span>
               </div>
             </GradientCard>
-            <Button label="Done" onPress={finishWalk} size="large" />
+            <Button label={t.common.done} onPress={finishWalk} size="large" />
           </div>
         </div>
       )}

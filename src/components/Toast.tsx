@@ -3,6 +3,7 @@ import { CheckCircle, AlertTriangle, Info, X, WifiOff } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Colors } from '../theme/colors';
 import { Font, Weight, Radius, Shadow } from '../theme/spacing';
+import { useI18n } from '../i18n';
 
 type ToastType = 'success' | 'error' | 'info' | 'warning' | 'offline';
 
@@ -33,6 +34,7 @@ export function useToast() {
 }
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n();
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   const showToast = useCallback((type: ToastType, text: string) => {
@@ -49,8 +51,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   // Network status detection
   useEffect(() => {
-    const handleOffline = () => showToast('offline', 'You are offline. Some features may be unavailable.');
-    const handleOnline = () => showToast('success', 'Back online!');
+    const handleOffline = () => showToast('offline', t.toast.offline);
+    const handleOnline = () => showToast('success', t.toast.backOnline);
 
     window.addEventListener('offline', handleOffline);
     window.addEventListener('online', handleOnline);

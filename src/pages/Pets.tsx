@@ -6,10 +6,12 @@ import { Spacing, Shadow, Font, Weight, Radius } from '../theme/spacing';
 import { Card } from '../components/Card';
 import { usePets } from '../hooks/usePets';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
+import { useI18n } from '../i18n';
 
 export function PetsPage() {
   const navigate = useNavigate();
   const { pets, loading } = usePets();
+  const { t } = useI18n();
 
   return (
     <div className="fade-in" style={{ minHeight: '100vh', backgroundColor: Colors.background }}>
@@ -19,16 +21,16 @@ export function PetsPage() {
           My Pets
         </h1>
         <p style={{ fontSize: Font.body, color: Colors.inkSecondary, margin: '6px 0 0', lineHeight: 1.4 }}>
-          {pets.length} furry {pets.length === 1 ? 'friend' : 'friends'} in your family
+          {t.pets.subtitle.replace('{count}', String(pets.length))}
         </p>
       </div>
 
       {/* Pet Cards */}
       <div style={{ padding: `0 ${Spacing.xl}px`, display: 'flex', flexDirection: 'column', gap: 14 }}>
         {loading ? (
-          <p style={{ textAlign: 'center', color: Colors.inkSecondary, fontSize: Font.body, padding: Spacing.xl }}>Loading...</p>
+          <p style={{ textAlign: 'center', color: Colors.inkSecondary, fontSize: Font.body, padding: Spacing.xl }}>{t.common.loading}</p>
         ) : pets.length === 0 ? (
-          <p style={{ textAlign: 'center', color: Colors.inkSecondary, fontSize: Font.body, padding: Spacing.xl }}>No pets yet. Add your first pet!</p>
+          <p style={{ textAlign: 'center', color: Colors.inkSecondary, fontSize: Font.body, padding: Spacing.xl }}>{t.pets.noPetsDesc}</p>
         ) : pets.map((pet) => {
           const PetIcon = PET_ICON_MAP[pet.type] || PawPrint;
           const petColor = PET_COLOR_MAP[pet.type] || Colors.lavender;

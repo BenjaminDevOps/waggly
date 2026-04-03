@@ -1,5 +1,6 @@
 import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import { Home, PawPrint, Stethoscope, Footprints, ShoppingBag, User } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { HomePage } from './pages/Home';
 import { PetsPage } from './pages/Pets';
 import { AddPetPage } from './pages/AddPet';
@@ -11,18 +12,20 @@ import { ProfilePage } from './pages/Profile';
 import { PremiumPage } from './pages/Premium';
 import { PrivacyPage } from './pages/Privacy';
 import { TermsPage } from './pages/Terms';
+import { useI18n } from './i18n';
 
-const tabs = [
-  { path: '/', icon: Home, label: 'Home' },
-  { path: '/pets', icon: PawPrint, label: 'Pets' },
-  { path: '/diagnosis', icon: Stethoscope, label: 'Diagnosis' },
-  { path: '/walk', icon: Footprints, label: 'Walk' },
-  { path: '/shop', icon: ShoppingBag, label: 'Shop' },
-  { path: '/profile', icon: User, label: 'Profile' },
+const tabDefs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof useI18n>['t']['tabs'] }[] = [
+  { path: '/', icon: Home, key: 'home' },
+  { path: '/pets', icon: PawPrint, key: 'pets' },
+  { path: '/diagnosis', icon: Stethoscope, key: 'diagnosis' },
+  { path: '/walk', icon: Footprints, key: 'walk' },
+  { path: '/shop', icon: ShoppingBag, key: 'shop' },
+  { path: '/profile', icon: User, key: 'profile' },
 ];
 
 export default function App() {
   const location = useLocation();
+  const { t } = useI18n();
   const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
 
   return (
@@ -50,12 +53,12 @@ export default function App() {
           display: 'flex', justifyContent: 'space-around', alignItems: 'flex-start', paddingTop: 8,
           zIndex: 100,
         }}>
-          {tabs.map(({ path, icon: Icon, label }) => {
+          {tabDefs.map(({ path, icon: Icon, key }) => {
             const active = location.pathname === path;
             return (
               <NavLink key={path} to={path} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, textDecoration: 'none' }}>
                 <Icon size={24} color={active ? '#5B5EA6' : '#9D9DAF'} strokeWidth={active ? 2.5 : 2} />
-                <span style={{ fontSize: 11, fontWeight: active ? 600 : 400, color: active ? '#5B5EA6' : '#9D9DAF' }}>{label}</span>
+                <span style={{ fontSize: 11, fontWeight: active ? 600 : 400, color: active ? '#5B5EA6' : '#9D9DAF' }}>{t.tabs[key]}</span>
               </NavLink>
             );
           })}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Diamond, ChevronRight, Bell, Shield, HelpCircle, LogOut, Lock, Stethoscope, Footprints, ShoppingBag, Crown, Medal, PawPrint, Flame, Star as StarIcon, Award, Building2, Trophy, Target, FileText } from 'lucide-react';
+import { User, Diamond, ChevronRight, Bell, Shield, HelpCircle, LogOut, Lock, Stethoscope, Footprints, ShoppingBag, Crown, Medal, PawPrint, Flame, Star as StarIcon, Award, Building2, Trophy, Target, FileText, Globe } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
@@ -10,7 +10,7 @@ import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { useAuth } from '../hooks/useAuth';
 import { usePets } from '../hooks/usePets';
-
+import { useI18n, LOCALE_LABELS, LOCALE_FLAGS, type Locale } from '../i18n';
 
 const BADGE_ICON_MAP: Record<string, LucideIcon> = {
   PawPrint, Stethoscope, Flame, 'Star': StarIcon, Award, Diamond, Crown, Building2, Trophy, Footprints, Target, Medal,
@@ -23,10 +23,13 @@ const LEADERBOARD = [
   { rank: 5, name: 'Pierre L.', points: 980, Icon: null as any, color: '#6B6B80' },
 ];
 
+const LOCALES: Locale[] = ['en', 'fr', 'es'];
+
 export function ProfilePage() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const { pets } = usePets();
+  const { t, locale, setLocale } = useI18n();
 
   const totalPoints = user?.totalPoints ?? 0;
   const streak = user?.dailyStreak ?? 0;
@@ -39,7 +42,7 @@ export function ProfilePage() {
   if (loading) {
     return (
       <div style={{ backgroundColor: Colors.background, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ color: Colors.inkSecondary, fontSize: Font.body }}>Loading...</span>
+        <span style={{ color: Colors.inkSecondary, fontSize: Font.body }}>{t.common.loading}</span>
       </div>
     );
   }
@@ -52,9 +55,9 @@ export function ProfilePage() {
           <User size={40} color={Colors.inkInverse} />
         </div>
         <div style={{ color: Colors.inkInverse, fontSize: Font.title2, fontWeight: Weight.bold, marginTop: 12 }}>{user?.displayName ?? 'Pet Lover'}</div>
-        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.body, marginTop: 4 }}>Level {level}</div>
+        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.body, marginTop: 4 }}>{t.profile.level} {level}</div>
         <div style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: 20 }}>
-          {[{ val: totalPoints.toLocaleString(), lbl: 'Points' }, { val: String(streak), lbl: 'Day Streak' }, { val: String(pets.length), lbl: 'Pets' }, { val: String(earnedBadges.length), lbl: 'Badges' }].map(s => (
+          {[{ val: totalPoints.toLocaleString(), lbl: t.common.points }, { val: String(streak), lbl: t.profile.dayStreak }, { val: String(pets.length), lbl: t.tabs.pets }, { val: String(earnedBadges.length), lbl: t.profile.myBadges }].map(s => (
             <div key={s.lbl}>
               <div style={{ color: Colors.inkInverse, fontSize: Font.title3, fontWeight: Weight.bold }}>{s.val}</div>
               <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.xs }}>{s.lbl}</div>
@@ -67,13 +70,15 @@ export function ProfilePage() {
         {/* Level Progress */}
         <Card style={{ marginBottom: 28 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-            <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink }}>Level {level}</span>
+            <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink }}>{t.profile.level} {level}</span>
             <span style={{ color: Colors.inkSecondary, fontSize: Font.body }}>{xpInLevel} / {xpNeeded} XP</span>
           </div>
           <div style={{ height: 10, backgroundColor: Colors.surfaceSecondary, borderRadius: 5, overflow: 'hidden' }}>
             <div style={{ width: `${xpPct}%`, height: '100%', backgroundColor: Colors.primary, borderRadius: 5 }} />
           </div>
-          <div style={{ color: Colors.inkTertiary, fontSize: Font.sm, marginTop: 8 }}>{xpNeeded - xpInLevel} XP to Level {level + 1}</div>
+          <div style={{ color: Colors.inkTertiary, fontSize: Font.sm, marginTop: 8 }}>
+            {t.profile.xpTo.replace('{xp}', String(xpNeeded - xpInLevel)).replace('{level}', String(level + 1))}
+          </div>
         </Card>
 
         {/* Premium */}
@@ -83,17 +88,52 @@ export function ProfilePage() {
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ color: Colors.inkInverse, fontSize: Font.title3, fontWeight: Weight.bold }}>
-              {user?.isPremium ? 'Premium Active' : 'Go Premium'}
+              {user?.isPremium ? t.profile.premiumActive : t.profile.goPremium}
             </div>
             <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.sm, marginTop: 4 }}>
-              {user?.isPremium ? 'Enjoy unlimited AI diagnoses and exclusive features' : 'Unlimited AI diagnoses, exclusive badges & more!'}
+              {user?.isPremium ? t.profile.premiumActiveDesc : t.profile.premiumDesc}
             </div>
           </div>
           <ChevronRight size={20} color="rgba(255,255,255,0.7)" />
         </GradientCard>
 
+        {/* Language Selector */}
+        <SectionHeader title={t.profile.language} />
+        <Card style={{ padding: 0, marginBottom: 28 }}>
+          {LOCALES.map((loc, i) => {
+            const active = locale === loc;
+            return (
+              <button
+                key={loc}
+                className="card-interactive"
+                onClick={() => setLocale(loc)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%',
+                  borderTop: i > 0 ? `1px solid ${Colors.hairlineLight}` : 'none', cursor: 'pointer',
+                  backgroundColor: active ? Colors.primaryPale : 'transparent',
+                }}
+              >
+                <span style={{
+                  width: 32, height: 32, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  backgroundColor: active ? Colors.primary : Colors.surfaceSecondary,
+                  color: active ? Colors.inkInverse : Colors.inkSecondary,
+                  fontSize: Font.xs, fontWeight: Weight.bold,
+                }}>
+                  {LOCALE_FLAGS[loc]}
+                </span>
+                <span style={{ flex: 1, fontSize: Font.body, color: active ? Colors.primary : Colors.ink, textAlign: 'left', fontWeight: active ? Weight.bold : Weight.regular }}>
+                  {LOCALE_LABELS[loc]}
+                </span>
+                {active && (
+                  <div style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.primary }} />
+                )}
+              </button>
+            );
+          })}
+        </Card>
+
         {/* Badges */}
-        <SectionHeader title="My Badges" />
+        <SectionHeader title={t.profile.myBadges} />
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 28 }}>
           {BADGES.map(badge => {
             const earned = earnedBadges.includes(badge.id);
@@ -113,7 +153,7 @@ export function ProfilePage() {
         </div>
 
         {/* Leaderboard */}
-        <SectionHeader title="Leaderboard" />
+        <SectionHeader title={t.profile.leaderboard} />
         <Card style={{ padding: 0, marginBottom: 28 }}>
           {LEADERBOARD.map(l => {
             const isYou = l.name === 'You';
@@ -128,12 +168,12 @@ export function ProfilePage() {
         </Card>
 
         {/* Activity Summary */}
-        <SectionHeader title="Activity Summary" />
+        <SectionHeader title={t.profile.activitySummary} />
         <Card style={{ marginBottom: 28 }}>
-          {[{ icon: Stethoscope, label: 'AI Diagnoses', value: String(user?.aiDiagnosisUsed ?? 0), color: Colors.primary },
-            { icon: Footprints, label: 'Walks', value: '-', color: Colors.success },
-            { icon: Shield, label: 'Health Records', value: '-', color: Colors.accent },
-            { icon: ShoppingBag, label: 'Shop Visits', value: '-', color: Colors.secondary },
+          {[{ icon: Stethoscope, label: t.profile.aiDiagnoses, value: String(user?.aiDiagnosisUsed ?? 0), color: Colors.primary },
+            { icon: Footprints, label: t.profile.walks, value: '-', color: Colors.success },
+            { icon: Shield, label: t.profile.healthRecords, value: '-', color: Colors.accent },
+            { icon: ShoppingBag, label: t.profile.shopVisits, value: '-', color: Colors.secondary },
           ].map((item, i, arr) => (
             <React.Fragment key={item.label}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
@@ -147,18 +187,18 @@ export function ProfilePage() {
         </Card>
 
         {/* Account */}
-        <SectionHeader title="Account" />
+        <SectionHeader title={t.profile.account} />
         <Card style={{ padding: 0 }}>
-          {[{ icon: User, label: 'Edit Profile', route: '' }, { icon: Bell, label: 'Notifications', route: '' }, { icon: Shield, label: 'Privacy Policy', route: '/privacy' }, { icon: FileText, label: 'Terms of Service', route: '/terms' }, { icon: HelpCircle, label: 'Help & Support', route: '' }].map((item, i) => (
+          {[{ icon: User, label: t.profile.editProfile, route: '' }, { icon: Bell, label: t.profile.notifications, route: '' }, { icon: Shield, label: t.profile.privacyPolicy, route: '/privacy' }, { icon: FileText, label: t.profile.termsOfService, route: '/terms' }, { icon: HelpCircle, label: t.profile.helpSupport, route: '' }].map((item, i) => (
             <button className="card-interactive" key={item.label} onClick={() => item.route && navigate(item.route)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%', borderTop: i > 0 ? `1px solid ${Colors.hairlineLight}` : 'none', cursor: 'pointer' }}>
               <item.icon size={22} color={Colors.inkSecondary} />
               <span style={{ flex: 1, fontSize: Font.body, color: Colors.ink, textAlign: 'left' }}>{item.label}</span>
               <ChevronRight size={18} color={Colors.inkTertiary} />
             </button>
           ))}
-          <button className="btn-press" onClick={() => alert('Are you sure you want to sign out?')} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%', borderTop: `1px solid ${Colors.hairlineLight}`, cursor: 'pointer' }}>
+          <button className="btn-press" onClick={() => alert(t.profile.signOutConfirm)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%', borderTop: `1px solid ${Colors.hairlineLight}`, cursor: 'pointer' }}>
             <LogOut size={22} color={Colors.error} />
-            <span style={{ flex: 1, fontSize: Font.body, color: Colors.error, textAlign: 'left' }}>Sign Out</span>
+            <span style={{ flex: 1, fontSize: Font.body, color: Colors.error, textAlign: 'left' }}>{t.profile.signOut}</span>
           </button>
         </Card>
         <div style={{ height: 40 }} />

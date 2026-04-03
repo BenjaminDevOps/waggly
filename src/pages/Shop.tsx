@@ -5,6 +5,7 @@ import { Button } from '../components/Button';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { AFFILIATE } from '../constants/app';
+import { useI18n } from '../i18n';
 
 type PetFilter = 'all' | 'dog' | 'cat' | 'nac';
 type ShopCategory = 'food' | 'toys' | 'health' | 'accessories' | 'grooming' | 'training';
@@ -25,9 +26,10 @@ const PRODUCTS: Product[] = [
 ];
 
 const CATEGORIES: ShopCategory[] = ['food', 'toys', 'health', 'accessories', 'grooming', 'training'];
-const CAT_LABELS: Record<ShopCategory, string> = { food: 'Food', toys: 'Toys', health: 'Health', accessories: 'Accessories', grooming: 'Grooming', training: 'Training' };
+// Labels are set dynamically via i18n in the component
 
 export function ShopPage() {
+  const { t } = useI18n();
   const [search, setSearch] = useState('');
   const [petFilter, setPetFilter] = useState<PetFilter>('all');
   const [catFilter, setCatFilter] = useState<ShopCategory | null>(null);
@@ -45,24 +47,27 @@ export function ShopPage() {
 
   return (
     <div style={{ backgroundColor: Colors.background, minHeight: '100vh' }}>
-      <h1 style={{ fontSize: Font.largeTitle, fontWeight: Weight.bold, color: Colors.ink, padding: '0 16px', marginBottom: 8 }}>Shop</h1>
+      <h1 style={{ fontSize: Font.largeTitle, fontWeight: Weight.bold, color: Colors.ink, padding: '0 16px', marginBottom: 8 }}>{t.shop.title}</h1>
 
       <div style={{ display: 'flex', alignItems: 'center', backgroundColor: Colors.surfaceSecondary, margin: '0 16px', borderRadius: 16, padding: '8px 12px', gap: 8, marginBottom: 8 }}>
         <Search size={20} color={Colors.inkTertiary} />
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..." style={{ flex: 1, fontSize: 15, color: Colors.ink, backgroundColor: 'transparent' }} />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t.shop.searchProducts} style={{ flex: 1, fontSize: 15, color: Colors.ink, backgroundColor: 'transparent' }} />
         {search && <button onClick={() => setSearch('')}><X size={20} color={Colors.inkTertiary} /></button>}
       </div>
 
       <div style={{ display: 'flex', gap: 8, padding: '0 16px', overflowX: 'auto', marginBottom: 8 }}>
         {(['all', 'dog', 'cat', 'nac'] as PetFilter[]).map(f => {
-          const labels: Record<PetFilter, string> = { all: 'All', dog: 'Dogs', cat: 'Cats', nac: 'NAC' };
+          const labels: Record<PetFilter, string> = { all: t.shop.all, dog: t.shop.dogs, cat: t.shop.cats, nac: t.shop.nac };
           return <Chip key={f} label={labels[f]} active={petFilter === f} onClick={() => setPetFilter(f)} />;
         })}
       </div>
 
       <div style={{ display: 'flex', gap: 8, padding: '0 16px', overflowX: 'auto', marginBottom: 16 }}>
-        <Chip label="All" active={!catFilter} onClick={() => setCatFilter(null)} />
-        {CATEGORIES.map(c => <Chip key={c} label={CAT_LABELS[c]} active={catFilter === c} onClick={() => setCatFilter(c)} />)}
+        <Chip label={t.shop.all} active={!catFilter} onClick={() => setCatFilter(null)} />
+        {CATEGORIES.map(c => {
+          const catLabels: Record<ShopCategory, string> = { food: t.shop.food, toys: t.shop.toys, health: t.shop.health, accessories: t.shop.accessories, grooming: t.shop.grooming, training: t.shop.training };
+          return <Chip key={c} label={catLabels[c]} active={catFilter === c} onClick={() => setCatFilter(c)} />;
+        })}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, padding: '0 16px' }}>
@@ -71,7 +76,7 @@ export function ShopPage() {
       {filtered.length === 0 && (
         <div style={{ textAlign: 'center', paddingTop: 60 }}>
           <Search size={64} color={Colors.hairline} />
-          <div style={{ fontSize: 17, color: Colors.inkTertiary, marginTop: 16 }}>No products found</div>
+          <div style={{ fontSize: 17, color: Colors.inkTertiary, marginTop: 16 }}>{t.shop.noProducts}</div>
         </div>
       )}
 
@@ -89,10 +94,10 @@ export function ShopPage() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8 }}>
               {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={18} color={Colors.secondary} fill={i < Math.floor(selectedProduct.rating) ? Colors.secondary : 'none'} />)}
-              <span style={{ color: Colors.inkSecondary, marginLeft: 4 }}>{selectedProduct.rating} ({selectedProduct.reviews} reviews)</span>
+              <span style={{ color: Colors.inkSecondary, marginLeft: 4 }}>{selectedProduct.rating} ({selectedProduct.reviews} {t.shop.reviews})</span>
             </div>
             <p style={{ fontSize: 15, color: Colors.inkSecondary, lineHeight: 1.6, marginTop: 16 }}>{selectedProduct.desc}</p>
-            <Button label="View on Amazon" onPress={() => {
+            <Button label={t.shop.viewOnAmazon} onPress={() => {
               if (selectedProduct.affiliateUrl) {
                 window.open(selectedProduct.affiliateUrl, '_blank', 'noopener,noreferrer');
               }
@@ -100,7 +105,7 @@ export function ShopPage() {
             }} icon={<ExternalLink size={22} color={Colors.inkInverse} />} size="large" style={{ marginTop: 28 }} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: Colors.secondaryPale, borderRadius: 16, padding: 12, marginTop: 12 }}>
               <Star size={16} color={Colors.secondary} />
-              <span style={{ color: Colors.secondary, fontWeight: Weight.semibold, fontSize: 13 }}>Earn 15 Waggly points with this purchase!</span>
+              <span style={{ color: Colors.secondary, fontWeight: Weight.semibold, fontSize: 13 }}>{t.shop.earnPoints}</span>
             </div>
             <button onClick={() => setSelectedProduct(null)} style={{ width: '100%', textAlign: 'center', padding: 16, color: Colors.inkSecondary, fontWeight: Weight.semibold }}>Close</button>
           </div>

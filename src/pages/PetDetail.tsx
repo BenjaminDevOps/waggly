@@ -11,6 +11,7 @@ import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { usePets } from '../hooks/usePets';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
 import { subscribeToHealthRecords } from '../services/healthRecordService';
+import { useI18n } from '../i18n';
 import type { HealthRecord } from '../models/types';
 import type { LucideIcon } from 'lucide-react';
 
@@ -32,6 +33,7 @@ export function PetDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { pets, loading } = usePets();
+  const { t } = useI18n();
   const pet = pets.find(p => p.id === id);
   const [records, setRecords] = useState<HealthRecord[]>([]);
 
@@ -46,7 +48,7 @@ export function PetDetailPage() {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: Colors.background, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: Colors.inkSecondary, fontSize: Font.body }}>Loading...</p>
+        <p style={{ color: Colors.inkSecondary, fontSize: Font.body }}>{t.common.loading}</p>
       </div>
     );
   }
@@ -55,7 +57,7 @@ export function PetDetailPage() {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: Colors.background, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: Spacing.md }}>
         <p style={{ color: Colors.inkSecondary, fontSize: Font.body }}>Pet not found</p>
-        <Button label="Go Back" onPress={() => navigate(-1)} variant="secondary" />
+        <Button label={t.common.back} onPress={() => navigate(-1)} variant="secondary" />
       </div>
     );
   }
@@ -64,9 +66,9 @@ export function PetDetailPage() {
   const petColor = PET_COLOR_MAP[pet.type] || Colors.lavender;
 
   const statsData = [
-    { label: 'Type', value: pet.type.charAt(0).toUpperCase() + pet.type.slice(1), Icon: Cake },
-    { label: 'Weight', value: pet.weight ? `${pet.weight} kg` : '-', Icon: Scale },
-    { label: 'Gender', value: pet.gender.charAt(0).toUpperCase() + pet.gender.slice(1), Icon: User },
+    { label: t.addPet.petType, value: pet.type.charAt(0).toUpperCase() + pet.type.slice(1), Icon: Cake },
+    { label: t.petDetail.weightLabel, value: pet.weight ? `${pet.weight} kg` : '-', Icon: Scale },
+    { label: t.petDetail.genderLabel, value: pet.gender.charAt(0).toUpperCase() + pet.gender.slice(1), Icon: User },
   ];
 
   return (
@@ -131,7 +133,7 @@ export function PetDetailPage() {
         </div>
 
         {/* Health Score */}
-        <SectionHeader title="Health Score" />
+        <SectionHeader title={t.petDetail.healthScore} />
         <Card style={{ marginBottom: Spacing.xl + 4 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.md }}>
             <span style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink }}>Overall Health</span>
@@ -156,13 +158,13 @@ export function PetDetailPage() {
             />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: Spacing.sm }}>
-            <span style={{ fontSize: Font.xs + 1, color: Colors.inkTertiary }}>Poor</span>
-            <span style={{ fontSize: Font.xs + 1, color: Colors.inkTertiary }}>Excellent</span>
+            <span style={{ fontSize: Font.xs + 1, color: Colors.inkTertiary }}>{t.petDetail.needsAttention}</span>
+            <span style={{ fontSize: Font.xs + 1, color: Colors.inkTertiary }}>{t.petDetail.excellent}</span>
           </div>
         </Card>
 
         {/* Quick Actions */}
-        <SectionHeader title="Quick Actions" />
+        <SectionHeader title={t.petDetail.quickActions} />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: Spacing.md, marginBottom: Spacing.xl + 4 }}>
           {quickActions.map((action) => (
             <Card
@@ -199,10 +201,10 @@ export function PetDetailPage() {
         </div>
 
         {/* Health Records */}
-        <SectionHeader title="Health Records" actionLabel="See All" onAction={() => {}} />
+        <SectionHeader title={t.petDetail.healthHistory} actionLabel={t.common.seeAll} onAction={() => {}} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: Spacing.md, paddingBottom: Spacing.xxxl + 4 }}>
           {records.length === 0 ? (
-            <p style={{ textAlign: 'center', color: Colors.inkSecondary, fontSize: Font.body, padding: Spacing.xl }}>No records yet</p>
+            <p style={{ textAlign: 'center', color: Colors.inkSecondary, fontSize: Font.body, padding: Spacing.xl }}>{t.petDetail.noRecords}</p>
           ) : records.map((record) => {
             const RecordIcon = RECORD_ICON_MAP[record.type] || FileText;
             return (
