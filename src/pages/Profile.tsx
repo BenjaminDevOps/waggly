@@ -1,5 +1,6 @@
 import React from 'react';
-import { User, Diamond, ChevronRight, Bell, Shield, HelpCircle, LogOut, Lock, Stethoscope, Footprints, ShoppingBag, Crown, Medal, PawPrint, Flame, Star as StarIcon, Award, Building2, Trophy, Target } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { User, Diamond, ChevronRight, Bell, Shield, HelpCircle, LogOut, Lock, Stethoscope, Footprints, ShoppingBag, Crown, Medal, PawPrint, Flame, Star as StarIcon, Award, Building2, Trophy, Target, FileText } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
@@ -23,6 +24,7 @@ const LEADERBOARD = [
 ];
 
 export function ProfilePage() {
+  const navigate = useNavigate();
   const { user, loading } = useAuth();
   const { pets } = usePets();
 
@@ -75,13 +77,17 @@ export function ProfilePage() {
         </Card>
 
         {/* Premium */}
-        <GradientCard colors={[Colors.secondary, Colors.accent]} style={{ marginBottom: 28, display: 'flex', alignItems: 'center', gap: 16 }}>
+        <GradientCard colors={[Colors.secondary, Colors.accent]} onClick={() => navigate('/premium')} style={{ marginBottom: 28, display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }}>
           <div style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Diamond size={28} color={Colors.inkInverse} />
+            {user?.isPremium ? <Crown size={28} color={Colors.inkInverse} /> : <Diamond size={28} color={Colors.inkInverse} />}
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ color: Colors.inkInverse, fontSize: Font.title3, fontWeight: Weight.bold }}>Go Premium</div>
-            <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.sm, marginTop: 4 }}>Unlimited AI diagnoses, exclusive badges & more!</div>
+            <div style={{ color: Colors.inkInverse, fontSize: Font.title3, fontWeight: Weight.bold }}>
+              {user?.isPremium ? 'Premium Active' : 'Go Premium'}
+            </div>
+            <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.sm, marginTop: 4 }}>
+              {user?.isPremium ? 'Enjoy unlimited AI diagnoses and exclusive features' : 'Unlimited AI diagnoses, exclusive badges & more!'}
+            </div>
           </div>
           <ChevronRight size={20} color="rgba(255,255,255,0.7)" />
         </GradientCard>
@@ -143,8 +149,8 @@ export function ProfilePage() {
         {/* Account */}
         <SectionHeader title="Account" />
         <Card style={{ padding: 0 }}>
-          {[{ icon: User, label: 'Edit Profile' }, { icon: Bell, label: 'Notifications' }, { icon: Shield, label: 'Privacy & Data' }, { icon: HelpCircle, label: 'Help & Support' }].map((item, i) => (
-            <button className="card-interactive" key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%', borderTop: i > 0 ? `1px solid ${Colors.hairlineLight}` : 'none', cursor: 'pointer' }}>
+          {[{ icon: User, label: 'Edit Profile', route: '' }, { icon: Bell, label: 'Notifications', route: '' }, { icon: Shield, label: 'Privacy Policy', route: '/privacy' }, { icon: FileText, label: 'Terms of Service', route: '/terms' }, { icon: HelpCircle, label: 'Help & Support', route: '' }].map((item, i) => (
+            <button className="card-interactive" key={item.label} onClick={() => item.route && navigate(item.route)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%', borderTop: i > 0 ? `1px solid ${Colors.hairlineLight}` : 'none', cursor: 'pointer' }}>
               <item.icon size={22} color={Colors.inkSecondary} />
               <span style={{ flex: 1, fontSize: Font.body, color: Colors.ink, textAlign: 'left' }}>{item.label}</span>
               <ChevronRight size={18} color={Colors.inkTertiary} />

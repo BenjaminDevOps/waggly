@@ -47,5 +47,17 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Waggly needs access to your camera to take photos of your pet for health diagnosis.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Waggly needs access to your photo library to upload pet photos and health records.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Waggly needs permission to save photos of your pet to your library.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Waggly uses motion data to track steps during walks with your pet.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Waggly uses your location to track walk routes with your pet.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

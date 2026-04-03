@@ -8,6 +8,9 @@ import { DiagnosisPage } from './pages/Diagnosis';
 import { WalkPage } from './pages/Walk';
 import { ShopPage } from './pages/Shop';
 import { ProfilePage } from './pages/Profile';
+import { PremiumPage } from './pages/Premium';
+import { PrivacyPage } from './pages/Privacy';
+import { TermsPage } from './pages/Terms';
 
 const tabs = [
   { path: '/', icon: Home, label: 'Home' },
@@ -20,7 +23,7 @@ const tabs = [
 
 export default function App() {
   const location = useLocation();
-  const hideTabBar = ['/add-pet'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
+  const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
 
   return (
     <div style={{ minHeight: '100vh', paddingBottom: hideTabBar ? 0 : 88 }}>
@@ -33,6 +36,9 @@ export default function App() {
         <Route path="/walk" element={<WalkPage />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/premium" element={<PremiumPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
       </Routes>
 
       {!hideTabBar && (

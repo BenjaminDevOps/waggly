@@ -15,7 +15,9 @@ import { usePets } from '../hooks/usePets';
 import { useAuth } from '../hooks/useAuth';
 import { analyzePetSymptoms, type DiagnosisResult } from '../services/gemini';
 import { addPoints } from '../services/userService';
+import { incrementDiagnosisUsage, canUseDiagnosis, getRemainingDiagnoses } from '../services/purchaseService';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
+import { FREEMIUM } from '../constants/app';
 
 const symptomChips = [
   'Vomiting', 'Diarrhea', 'Scratching', 'Limping', 'Not Eating', 'Coughing',
@@ -33,7 +35,7 @@ const SEVERITY_CONFIG: Record<string, { label: string; subtitle: string; colors:
 export function DiagnosisPage() {
   const navigate = useNavigate();
   const { pets } = usePets();
-  const { firebaseUser } = useAuth();
+  const { firebaseUser, user } = useAuth();
   const [selectedPet, setSelectedPet] = useState('');
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [description, setDescription] = useState('');
@@ -67,6 +69,7 @@ export function DiagnosisPage() {
       setShowResults(true);
       if (firebaseUser) {
         await addPoints(firebaseUser.uid, 25);
+        await incrementDiagnosisUsage(firebaseUser.uid);
       }
     } catch (e: any) {
       setError(e.message || 'Failed to analyze. Check your API key.');
@@ -206,7 +209,14 @@ export function DiagnosisPage() {
           </button>
           <span style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink }}>AI Diagnosis</span>
         </div>
-        <StatusBadge label="3/3 free" color={Colors.success} />
+        {user?.isPremium ? (
+          <StatusBadge label="Premium" color={Colors.secondary} />
+        ) : (
+          <StatusBadge
+            label={`${getRemainingDiagnoses(false, user?.aiDiagnosisUsed ?? 0, FREEMIUM.freeAiDiagnosisLimit)}/${FREEMIUM.freeAiDiagnosisLimit} free`}
+            color={getRemainingDiagnoses(false, user?.aiDiagnosisUsed ?? 0, FREEMIUM.freeAiDiagnosisLimit) > 0 ? Colors.success : Colors.error}
+          />
+        )}
       </div>
 
       <div style={{ padding: `0 ${Spacing.xl}px`, display: 'flex', flexDirection: 'column', gap: Spacing.xl }}>
@@ -328,6 +338,35 @@ export function DiagnosisPage() {
           </button>
         </div>
 
+        {/* paywall gate */}
+        {!canUseDiagnosis(user?.isPremium ?? false, user?.aiDiagnosisUsed ?? 0, FREEMIUM.freeAiDiagnosisLimit) && (
+          <div style={{
+            display: 'flex', alignItems: 'flex-start', gap: Spacing.sm + 2, padding: Spacing.lg,
+            backgroundColor: Colors.secondaryPale, borderRadius: Radius.md, border: `1px solid ${Colors.secondary}40`,
+          }}>
+            <Star size={18} color={Colors.secondary} style={{ flexShrink: 0, marginTop: 2 }} />
+            <div style={{ flex: 1 }}>
+              <span style={{ fontSize: Font.body, fontWeight: Weight.bold, color: Colors.secondary, display: 'block' }}>
+                Free diagnoses used
+              </span>
+              <span style={{ fontSize: Font.sm, color: Colors.inkSecondary, lineHeight: 1.5, display: 'block', marginTop: 4 }}>
+                Upgrade to Premium for unlimited AI diagnoses and more.
+              </span>
+              <button
+                className="btn-press"
+                onClick={() => navigate('/premium')}
+                style={{
+                  marginTop: 10, padding: '8px 20px', borderRadius: Radius.pill,
+                  backgroundColor: Colors.secondary, color: Colors.inkInverse,
+                  fontSize: Font.sm, fontWeight: Weight.bold, border: 'none', cursor: 'pointer',
+                }}
+              >
+                Go Premium
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* analyze button */}
         <Button
           label={loading ? 'Analyzing...' : 'Analyze Symptoms'}
@@ -335,7 +374,11 @@ export function DiagnosisPage() {
           variant="primary"
           size="large"
           loading={loading}
-          disabled={pets.length === 0 || (selectedSymptoms.length === 0 && description.length === 0)}
+          disabled={
+            pets.length === 0 ||
+            (selectedSymptoms.length === 0 && description.length === 0) ||
+            !canUseDiagnosis(user?.isPremium ?? false, user?.aiDiagnosisUsed ?? 0, FREEMIUM.freeAiDiagnosisLimit)
+          }
           icon={<Sparkles size={20} color={Colors.inkInverse} />}
         />
       </div>
