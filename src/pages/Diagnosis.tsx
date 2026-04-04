@@ -24,7 +24,7 @@ export function DiagnosisPage() {
   const navigate = useNavigate();
   const { pets } = usePets();
   const { firebaseUser, user } = useAuth();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [selectedPet, setSelectedPet] = useState('');
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [description, setDescription] = useState('');
@@ -63,6 +63,7 @@ export function DiagnosisPage() {
         petType: pet?.type || 'dog',
         petAge: pet?.breed || 'unknown',
         symptoms: [...selectedSymptoms, description].filter(Boolean).join(', '),
+        locale,
       });
       setResult(res);
       setShowResults(true);
