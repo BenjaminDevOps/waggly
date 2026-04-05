@@ -10,11 +10,9 @@ import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { usePets } from '../hooks/usePets';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
-import { saveWalk } from '../services/walkFirestoreService';
+import { saveWalk, subscribeToTodayWalks, subscribeToWalks } from '../services/walkFirestoreService';
 import { addPoints } from '../services/userService';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
-
-const WEEKLY_STEPS = [3200, 4100, 2800, 5200, 3900, 4500, 2340];
 
 export function WalkPage() {
   const { pets } = usePets();
@@ -24,16 +22,51 @@ export function WalkPage() {
   const [steps, setSteps] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [selectedPet, setSelectedPet] = useState<string | null>(null);
-  const [todaySteps, setTodaySteps] = useState(2340);
+  const [todaySteps, setTodaySteps] = useState(0);
+  const [weeklySteps, setWeeklySteps] = useState<number[]>([0, 0, 0, 0, 0, 0, 0]);
   const [showSummary, setShowSummary] = useState(false);
   const dailyGoal = 5000;
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const stepsRef = useRef<ReturnType<typeof setInterval>>();
   const totalSteps = todaySteps + steps;
   const progress = Math.min(totalSteps / dailyGoal, 1);
-  const maxWeekly = Math.max(...WEEKLY_STEPS);
+  const maxWeekly = Math.max(...weeklySteps, 1);
 
   const DAYS = [t.walk.mon, t.walk.tue, t.walk.wed, t.walk.thu, t.walk.fri, t.walk.sat, t.walk.sun];
+
+  // Subscribe to today's walks from Firestore for real step count
+  useEffect(() => {
+    if (!firebaseUser) return;
+    const unsubscribe = subscribeToTodayWalks(firebaseUser.uid, (walks) => {
+      const total = walks.reduce((sum, w) => sum + (w.steps || 0), 0);
+      setTodaySteps(total);
+    });
+    return unsubscribe;
+  }, [firebaseUser]);
+
+  // Subscribe to this week's walks for the weekly chart
+  useEffect(() => {
+    if (!firebaseUser) return;
+    const unsubscribe = subscribeToWalks(firebaseUser.uid, (walks) => {
+      const now = new Date();
+      const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon, ...
+      // Build array for Mon-Sun
+      const stepsPerDay = [0, 0, 0, 0, 0, 0, 0];
+      walks.forEach(w => {
+        const walkDate = new Date(w.startTime);
+        const diffDays = Math.floor((now.getTime() - walkDate.getTime()) / (1000 * 60 * 60 * 24));
+        // Convert to Mon=0 index
+        const walkDayIndex = (walkDate.getDay() + 6) % 7; // Mon=0, Tue=1, ... Sun=6
+        const todayIndex = (dayOfWeek + 6) % 7;
+        // Only include walks from this week (within 7 days and same week)
+        if (diffDays < 7 && walkDate >= getStartOfWeek(now)) {
+          stepsPerDay[walkDayIndex] += w.steps || 0;
+        }
+      });
+      setWeeklySteps(stepsPerDay);
+    }, 50);
+    return unsubscribe;
+  }, [firebaseUser]);
 
   useEffect(() => () => { clearInterval(timerRef.current); clearInterval(stepsRef.current); }, []);
 
@@ -71,7 +104,7 @@ export function WalkPage() {
         console.error('Error saving walk:', e);
       }
     }
-    setTodaySteps(t2 => t2 + steps);
+    // todaySteps will update automatically via Firestore subscription
     setSteps(0); setSeconds(0); setShowSummary(false);
   };
 
@@ -164,14 +197,17 @@ export function WalkPage() {
       <SectionHeader title={t.walk.thisWeek} />
       <Card style={{ marginBottom: Spacing.xxl }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', height: 120, alignItems: 'flex-end' }}>
-          {WEEKLY_STEPS.map((s, i) => (
-            <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: 20, height: 100, backgroundColor: Colors.surfaceSecondary, borderRadius: 6, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden' }}>
-                <div style={{ width: '100%', height: `${(s / maxWeekly) * 100}%`, backgroundColor: i === 6 ? Colors.primary : `${Colors.primary}60`, borderRadius: 6 }} />
+          {weeklySteps.map((s, i) => {
+            const todayIndex = (new Date().getDay() + 6) % 7;
+            return (
+              <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ width: 20, height: 100, backgroundColor: Colors.surfaceSecondary, borderRadius: 6, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', overflow: 'hidden' }}>
+                  <div style={{ width: '100%', height: `${(s / maxWeekly) * 100}%`, backgroundColor: i === todayIndex ? Colors.primary : `${Colors.primary}60`, borderRadius: 6 }} />
+                </div>
+                <span style={{ fontSize: Font.xs, color: i === todayIndex ? Colors.primary : Colors.inkSecondary, fontWeight: i === todayIndex ? Weight.bold : Weight.regular, marginTop: Spacing.xs }}>{DAYS[i]}</span>
               </div>
-              <span style={{ fontSize: Font.xs, color: Colors.inkSecondary, marginTop: Spacing.xs }}>{DAYS[i]}</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </Card>
 
@@ -218,4 +254,13 @@ export function WalkPage() {
       <div style={{ height: 40 }} />
     </div>
   );
+}
+
+function getStartOfWeek(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
+  d.setDate(diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
 }

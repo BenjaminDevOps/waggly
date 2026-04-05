@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signInAnonymously, type User as FirebaseUser } from 'firebase/auth';
+import { onAuthStateChanged, signOut as firebaseSignOut, type User as FirebaseUser } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { getOrCreateUser, subscribeToUser } from '../services/userService';
 import type { User } from '../models/types';
@@ -8,12 +8,14 @@ interface AuthContextValue {
   firebaseUser: FirebaseUser | null;
   user: User | null;
   loading: boolean;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
   firebaseUser: null,
   user: null,
   loading: true,
+  signOut: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -28,20 +30,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           await getOrCreateUser(
             fbUser.uid,
-            fbUser.email ?? 'anonymous@waggly.app',
+            fbUser.email ?? fbUser.uid + '@waggly.app',
             fbUser.displayName ?? 'Pet Lover',
           );
         } catch (e) {
           console.error('Error creating user:', e);
         }
-      } else {
-        // Sign in anonymously if no user
-        try {
-          await signInAnonymously(auth);
-        } catch (e) {
-          console.error('Error signing in anonymously:', e);
-          setLoading(false);
-        }
+      }
+      // No auto anonymous sign-in — let user sign in via Login page
+      if (!fbUser) {
+        setLoading(false);
       }
     });
     return unsubscribe;
@@ -50,7 +48,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!firebaseUser) {
       setUser(null);
-      setLoading(false);
       return;
     }
     const unsubscribe = subscribeToUser(firebaseUser.uid, (u) => {
@@ -60,8 +57,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return unsubscribe;
   }, [firebaseUser]);
 
+  const signOut = async () => {
+    await firebaseSignOut(auth);
+    setUser(null);
+    setFirebaseUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ firebaseUser, user, loading }}>
+    <AuthContext.Provider value={{ firebaseUser, user, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   );

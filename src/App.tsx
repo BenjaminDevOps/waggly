@@ -12,7 +12,9 @@ import { ProfilePage } from './pages/Profile';
 import { PremiumPage } from './pages/Premium';
 import { PrivacyPage } from './pages/Privacy';
 import { TermsPage } from './pages/Terms';
+import { LoginPage } from './pages/Login';
 import { useI18n } from './i18n';
+import { useAuth } from './hooks/useAuth';
 
 const tabDefs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof useI18n>['t']['tabs'] }[] = [
   { path: '/', icon: Home, key: 'home' },
@@ -26,7 +28,25 @@ const tabDefs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof us
 export default function App() {
   const location = useLocation();
   const { t } = useI18n();
+  const { firebaseUser, loading } = useAuth();
   const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        backgroundColor: '#FAF8F5',
+      }}>
+        <div className="spinner spinner--dark" style={{ width: 32, height: 32 }} />
+      </div>
+    );
+  }
+
+  // Not authenticated — show login
+  if (!firebaseUser) {
+    return <LoginPage />;
+  }
 
   return (
     <div style={{ minHeight: '100vh', paddingBottom: hideTabBar ? 0 : 88 }}>
@@ -51,6 +71,7 @@ export default function App() {
           backgroundColor: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
           borderTop: '1px solid #F0EDE8',
           display: 'flex', justifyContent: 'space-around', alignItems: 'flex-start', paddingTop: 8,
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
           zIndex: 100,
         }}>
           {tabDefs.map(({ path, icon: Icon, key }) => {

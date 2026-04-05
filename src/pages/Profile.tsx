@@ -27,7 +27,7 @@ const LOCALES: Locale[] = ['en', 'fr', 'es'];
 
 export function ProfilePage() {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const { pets } = usePets();
   const { t, locale, setLocale } = useI18n();
 
@@ -196,7 +196,7 @@ export function ProfilePage() {
               <ChevronRight size={18} color={Colors.inkTertiary} />
             </button>
           ))}
-          <button className="btn-press" onClick={() => alert(t.profile.signOutConfirm)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%', borderTop: `1px solid ${Colors.hairlineLight}`, cursor: 'pointer' }}>
+          <button className="btn-press" onClick={() => { if (window.confirm(t.profile.signOutConfirm)) { signOut(); } }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%', borderTop: `1px solid ${Colors.hairlineLight}`, cursor: 'pointer' }}>
             <LogOut size={22} color={Colors.error} />
             <span style={{ flex: 1, fontSize: Font.body, color: Colors.error, textAlign: 'left' }}>{t.profile.signOut}</span>
           </button>

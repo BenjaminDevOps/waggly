@@ -274,6 +274,30 @@ export interface Translations {
     adFreeDesc: string;
   };
 
+  // Auth
+  auth: {
+    welcome: string;
+    welcomeDesc: string;
+    signIn: string;
+    signUp: string;
+    email: string;
+    emailPlaceholder: string;
+    password: string;
+    passwordPlaceholder: string;
+    confirmPassword: string;
+    noAccount: string;
+    hasAccount: string;
+    orContinueWith: string;
+    googleSignIn: string;
+    forgotPassword: string;
+    resetPasswordSent: string;
+    passwordMismatch: string;
+    weakPassword: string;
+    emailInUse: string;
+    invalidEmail: string;
+    wrongCredentials: string;
+  };
+
   // Toast / Network
   toast: {
     offline: string;
