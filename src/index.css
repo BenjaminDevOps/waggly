@@ -188,6 +188,11 @@ img {
   to { transform: rotate(360deg); }
 }
 
+@keyframes splashLoading {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
 @keyframes progressFill {
   from { width: 0; }
 }

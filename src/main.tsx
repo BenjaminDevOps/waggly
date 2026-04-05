@@ -7,6 +7,15 @@ import { I18nProvider } from './i18n'
 import App from './App'
 import './index.css'
 
+// Hide native splash screen once React is mounted
+function hideSplash() {
+  const splash = document.getElementById('splash');
+  if (splash) {
+    splash.classList.add('hide');
+    setTimeout(() => splash.remove(), 400);
+  }
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
@@ -20,3 +29,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </BrowserRouter>
   </React.StrictMode>,
 )
+
+hideSplash();

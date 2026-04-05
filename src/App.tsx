@@ -31,14 +31,32 @@ export default function App() {
   const { firebaseUser, loading } = useAuth();
   const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
 
-  // Loading state
+  // Loading state — branded spinner while Firebase auth initializes
   if (loading) {
     return (
       <div style={{
-        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        backgroundColor: '#FAF8F5',
+        minHeight: '100vh', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        backgroundColor: '#FAF8F5', gap: 20,
       }}>
-        <div className="spinner spinner--dark" style={{ width: 32, height: 32 }} />
+        <div style={{
+          width: 72, height: 72, borderRadius: 20,
+          background: 'linear-gradient(135deg, #5B5EA6, #7B7FCC)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 8px 32px rgba(91,94,166,0.25)',
+          animation: 'scaleIn 0.4s ease both',
+        }}>
+          <PawPrint size={36} color="#fff" style={{ animation: 'spin 1.5s linear infinite' }} />
+        </div>
+        <div style={{
+          width: 100, height: 4, borderRadius: 2, backgroundColor: '#E8E4DF', overflow: 'hidden',
+        }}>
+          <div style={{
+            width: '40%', height: '100%', borderRadius: 2,
+            background: 'linear-gradient(90deg, #5B5EA6, #7B7FCC)',
+            animation: 'splashLoading 1.4s ease-in-out infinite',
+          }} />
+        </div>
       </div>
     );
   }
