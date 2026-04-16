@@ -1,13 +1,14 @@
 /**
  * In-App Purchase Service for Waggly Premium
  *
- * Uses Capacitor's native bridge for StoreKit 2 integration.
- * Products are configured in App Store Connect.
+ * Uses @capgo/native-purchases for direct StoreKit 2 integration.
+ * No third-party service required — talks directly to App Store.
  *
- * To complete the native integration:
- * 1. Install: npm install cordova-plugin-purchase
+ * Setup:
+ * 1. npm install @capgo/native-purchases
  * 2. npx cap sync ios
  * 3. Configure products in App Store Connect
+ * 4. Enable "In-App Purchase" capability in Xcode
  */
 import { db } from './firebase';
 import { doc, updateDoc, increment } from 'firebase/firestore';
@@ -53,9 +54,6 @@ export const PREMIUM_FEATURES = [
   { title: 'Ad-Free Experience', desc: 'No interruptions, ever' },
 ];
 
-/**
- * Check if running on native iOS platform.
- */
 function isNativePlatform(): boolean {
   try {
     return typeof (window as any).Capacitor !== 'undefined' &&
@@ -65,37 +63,39 @@ function isNativePlatform(): boolean {
   }
 }
 
-/**
- * Get the CdvPurchase store if available.
- */
-function getStore(): any {
-  return (window as any).CdvPurchase?.store ?? null;
+let nativePurchases: any = null;
+let purchaseType: any = null;
+
+async function getNativePurchases() {
+  if (nativePurchases) return { NativePurchases: nativePurchases, PURCHASE_TYPE: purchaseType };
+  try {
+    const mod = await import('@capgo/native-purchases');
+    nativePurchases = mod.NativePurchases;
+    purchaseType = mod.PURCHASE_TYPE;
+    return { NativePurchases: nativePurchases, PURCHASE_TYPE: purchaseType };
+  } catch {
+    return null;
+  }
 }
 
 /**
- * Initialize the store and load products.
- * Called once on app startup.
+ * Initialize and check billing availability.
  */
 export async function initializePurchases(): Promise<void> {
   if (!isNativePlatform()) {
-    console.log('[Purchases] Not on native platform, skipping StoreKit init');
+    console.log('[Purchases] Not on native platform, skipping init');
     return;
   }
 
-  const store = getStore();
-  if (!store) {
-    console.log('[Purchases] cordova-plugin-purchase not available');
+  const plugins = await getNativePurchases();
+  if (!plugins) {
+    console.log('[Purchases] @capgo/native-purchases not available');
     return;
   }
 
   try {
-    store.register([
-      { id: PRODUCTS.premiumMonthly, type: store.PAID_SUBSCRIPTION, platform: store.APPLE_APPSTORE },
-      { id: PRODUCTS.premiumYearly, type: store.PAID_SUBSCRIPTION, platform: store.APPLE_APPSTORE },
-    ]);
-
-    await store.initialize([store.APPLE_APPSTORE]);
-    console.log('[Purchases] Products registered');
+    const { isBillingSupported } = await plugins.NativePurchases.isBillingSupported();
+    console.log('[Purchases] Billing supported:', isBillingSupported);
   } catch (error) {
     console.error('[Purchases] Init error:', error);
   }
@@ -103,8 +103,6 @@ export async function initializePurchases(): Promise<void> {
 
 /**
  * Initiate a purchase for a premium plan.
- * On native: uses StoreKit via cordova-plugin-purchase.
- * On web: shows info message.
  */
 export async function purchasePremium(
   productId: string,
@@ -117,27 +115,26 @@ export async function purchasePremium(
     };
   }
 
-  const store = getStore();
-  if (!store) {
+  const plugins = await getNativePurchases();
+  if (!plugins) {
     return { success: false, message: 'Purchase service not available. Please try again later.' };
   }
 
   try {
-    const offer = store.get(productId)?.getOffer();
-    if (!offer) {
-      return { success: false, message: 'Product not found. Please try again later.' };
-    }
+    const transaction = await plugins.NativePurchases.purchaseProduct({
+      productIdentifier: productId,
+      productType: plugins.PURCHASE_TYPE.SUBS,
+      quantity: 1,
+    });
 
-    const result = await store.order(offer);
-
-    if (result && !result.isError) {
+    if (transaction) {
       await setPremiumStatus(userId, true);
       return { success: true, message: 'Welcome to Waggly Premium!' };
     }
 
     return { success: false, message: 'Purchase was cancelled.' };
   } catch (error: any) {
-    if (error?.code === 'USER_CANCELLED' || error?.code === 6777010) {
+    if (error?.message?.includes('cancelled') || error?.code === 2) {
       return { success: false, message: 'Purchase cancelled.' };
     }
     console.error('[Purchases] Error:', error);
@@ -155,17 +152,20 @@ export async function restorePurchases(
     return { success: false, message: 'Restore is only available on iOS.' };
   }
 
-  const store = getStore();
-  if (!store) {
+  const plugins = await getNativePurchases();
+  if (!plugins) {
     return { success: false, message: 'Purchase service not available.' };
   }
 
   try {
-    await store.restorePurchases();
+    await plugins.NativePurchases.restorePurchases();
+    const { purchases } = await plugins.NativePurchases.getPurchases({
+      productType: plugins.PURCHASE_TYPE.SUBS,
+    });
 
-    const monthly = store.get(PRODUCTS.premiumMonthly);
-    const yearly = store.get(PRODUCTS.premiumYearly);
-    const hasActive = monthly?.owned || yearly?.owned;
+    const hasActive = purchases?.some(
+      (p: any) => p.isActive === true || p.purchaseState === '1',
+    );
 
     if (hasActive) {
       await setPremiumStatus(userId, true);
@@ -207,6 +207,6 @@ export function canUseDiagnosis(isPremium: boolean, aiDiagnosisUsed: number, fre
  * Get remaining free diagnoses.
  */
 export function getRemainingDiagnoses(isPremium: boolean, aiDiagnosisUsed: number, freeLimit: number): number {
-  if (isPremium) return -1; // unlimited
+  if (isPremium) return -1;
   return Math.max(0, freeLimit - aiDiagnosisUsed);
 }
