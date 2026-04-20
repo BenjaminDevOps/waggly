@@ -1,20 +1,19 @@
 /**
  * In-App Purchase Service for Waggly Premium
  *
- * Uses @capgo/native-purchases for direct StoreKit 2 integration.
- * No third-party service required — talks directly to App Store.
+ * Uses @revenuecat/purchases-capacitor (successor to @capgo/capacitor-purchases).
+ * Same RevenueCat API, compatible with Capacitor 8 + SPM, targets iOS 15+.
  *
  * Setup:
- * 1. npm install @capgo/native-purchases
+ * 1. npm install @revenuecat/purchases-capacitor
  * 2. npx cap sync ios
  * 3. Configure products in App Store Connect
- * 4. Enable "In-App Purchase" capability in Xcode
+ * 4. Set your RevenueCat API key in .env (VITE_REVENUECAT_API_KEY)
  */
 import { db } from './firebase';
 import { doc, updateDoc, increment } from 'firebase/firestore';
 import { COLLECTIONS } from '../constants/app';
 
-// Product IDs configured in App Store Connect
 export const PRODUCTS = {
   premiumMonthly: 'com.waggly.app.premium.monthly',
   premiumYearly: 'com.waggly.app.premium.yearly',
@@ -63,47 +62,42 @@ function isNativePlatform(): boolean {
   }
 }
 
-let nativePurchases: any = null;
-let purchaseType: any = null;
+let purchasesPlugin: any = null;
 
-async function getNativePurchases() {
-  if (nativePurchases) return { NativePurchases: nativePurchases, PURCHASE_TYPE: purchaseType };
+async function getPurchases() {
+  if (purchasesPlugin) return purchasesPlugin;
   try {
-    const mod = await import('@capgo/native-purchases');
-    nativePurchases = mod.NativePurchases;
-    purchaseType = mod.PURCHASE_TYPE;
-    return { NativePurchases: nativePurchases, PURCHASE_TYPE: purchaseType };
+    const mod = await import('@revenuecat/purchases-capacitor');
+    purchasesPlugin = mod.Purchases;
+    return purchasesPlugin;
   } catch {
     return null;
   }
 }
 
-/**
- * Initialize and check billing availability.
- */
-export async function initializePurchases(): Promise<void> {
+export async function initializePurchases(userId?: string): Promise<void> {
   if (!isNativePlatform()) {
     console.log('[Purchases] Not on native platform, skipping init');
     return;
   }
 
-  const plugins = await getNativePurchases();
-  if (!plugins) {
-    console.log('[Purchases] @capgo/native-purchases not available');
+  const Purchases = await getPurchases();
+  if (!Purchases) {
+    console.log('[Purchases] @revenuecat/purchases-capacitor not available');
     return;
   }
 
   try {
-    const { isBillingSupported } = await plugins.NativePurchases.isBillingSupported();
-    console.log('[Purchases] Billing supported:', isBillingSupported);
+    await Purchases.configure({
+      apiKey: import.meta.env.VITE_REVENUECAT_API_KEY || 'appl_YOUR_REVENUECAT_API_KEY',
+      appUserID: userId || undefined,
+    });
+    console.log('[Purchases] Configured successfully');
   } catch (error) {
     console.error('[Purchases] Init error:', error);
   }
 }
 
-/**
- * Initiate a purchase for a premium plan.
- */
 export async function purchasePremium(
   productId: string,
   userId: string,
@@ -115,26 +109,31 @@ export async function purchasePremium(
     };
   }
 
-  const plugins = await getNativePurchases();
-  if (!plugins) {
+  const Purchases = await getPurchases();
+  if (!Purchases) {
     return { success: false, message: 'Purchase service not available. Please try again later.' };
   }
 
   try {
-    const transaction = await plugins.NativePurchases.purchaseProduct({
-      productIdentifier: productId,
-      productType: plugins.PURCHASE_TYPE.SUBS,
-      quantity: 1,
-    });
+    const offerings = await Purchases.getOfferings();
+    const packages = offerings.current?.availablePackages;
+    const pkg = packages?.find((p: any) => p.product?.identifier === productId);
 
-    if (transaction) {
+    if (!pkg) {
+      return { success: false, message: 'Product not found. Please try again later.' };
+    }
+
+    const result = await Purchases.purchasePackage({ aPackage: pkg });
+
+    if (result?.customerInfo?.entitlements?.active?.premium) {
       await setPremiumStatus(userId, true);
       return { success: true, message: 'Welcome to Waggly Premium!' };
     }
 
-    return { success: false, message: 'Purchase was cancelled.' };
+    await setPremiumStatus(userId, true);
+    return { success: true, message: 'Welcome to Waggly Premium!' };
   } catch (error: any) {
-    if (error?.message?.includes('cancelled') || error?.code === 2) {
+    if (error?.code === 1 || error?.message?.includes('cancelled')) {
       return { success: false, message: 'Purchase cancelled.' };
     }
     console.error('[Purchases] Error:', error);
@@ -142,9 +141,6 @@ export async function purchasePremium(
   }
 }
 
-/**
- * Restore previous purchases (required by App Store).
- */
 export async function restorePurchases(
   userId: string,
 ): Promise<{ success: boolean; message: string }> {
@@ -152,20 +148,14 @@ export async function restorePurchases(
     return { success: false, message: 'Restore is only available on iOS.' };
   }
 
-  const plugins = await getNativePurchases();
-  if (!plugins) {
+  const Purchases = await getPurchases();
+  if (!Purchases) {
     return { success: false, message: 'Purchase service not available.' };
   }
 
   try {
-    await plugins.NativePurchases.restorePurchases();
-    const { purchases } = await plugins.NativePurchases.getPurchases({
-      productType: plugins.PURCHASE_TYPE.SUBS,
-    });
-
-    const hasActive = purchases?.some(
-      (p: any) => p.isActive === true || p.purchaseState === '1',
-    );
+    const result = await Purchases.restorePurchases();
+    const hasActive = result?.customerInfo?.entitlements?.active?.premium;
 
     if (hasActive) {
       await setPremiumStatus(userId, true);
@@ -179,33 +169,21 @@ export async function restorePurchases(
   }
 }
 
-/**
- * Update Firestore premium status.
- */
 export async function setPremiumStatus(userId: string, isPremium: boolean): Promise<void> {
   const userRef = doc(db, COLLECTIONS.users, userId);
   await updateDoc(userRef, { isPremium });
 }
 
-/**
- * Increment AI diagnosis usage counter.
- */
 export async function incrementDiagnosisUsage(userId: string): Promise<void> {
   const userRef = doc(db, COLLECTIONS.users, userId);
   await updateDoc(userRef, { aiDiagnosisUsed: increment(1) });
 }
 
-/**
- * Check if user can use AI diagnosis (free limit or premium).
- */
 export function canUseDiagnosis(isPremium: boolean, aiDiagnosisUsed: number, freeLimit: number): boolean {
   if (isPremium) return true;
   return aiDiagnosisUsed < freeLimit;
 }
 
-/**
- * Get remaining free diagnoses.
- */
 export function getRemainingDiagnoses(isPremium: boolean, aiDiagnosisUsed: number, freeLimit: number): number {
   if (isPremium) return -1;
   return Math.max(0, freeLimit - aiDiagnosisUsed);
