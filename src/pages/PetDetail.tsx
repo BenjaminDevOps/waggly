@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Plus, Syringe, ChevronRight, PawPrint, Cake, Scale, User, Building2, Pill, FileText } from 'lucide-react';
+import { ArrowLeft, Heart, Plus, Syringe, ChevronRight, PawPrint, Cake, Scale, User, Building2, Pill, FileText, Download } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
 import { SectionHeader } from '../components/SectionHeader';
@@ -11,6 +11,7 @@ import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { usePets } from '../hooks/usePets';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
 import { subscribeToHealthRecords } from '../services/healthRecordService';
+import { generateHealthReport } from '../services/healthReportService';
 import { useI18n } from '../i18n';
 import type { HealthRecord } from '../models/types';
 import type { LucideIcon } from 'lucide-react';
@@ -33,9 +34,10 @@ export function PetDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { pets, loading } = usePets();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const pet = pets.find(p => p.id === id);
   const [records, setRecords] = useState<HealthRecord[]>([]);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -199,6 +201,27 @@ export function PetDetailPage() {
             </Card>
           ))}
         </div>
+
+        {/* Download Health Report PDF */}
+        <Button
+          label={generatingPdf ? '...' : 'Download Health Report (PDF)'}
+          onPress={async () => {
+            if (!pet) return;
+            setGeneratingPdf(true);
+            try {
+              await generateHealthReport(pet, records, [], locale);
+            } catch (e) {
+              console.error('Error generating PDF:', e);
+            } finally {
+              setGeneratingPdf(false);
+            }
+          }}
+          variant="secondary"
+          size="large"
+          disabled={generatingPdf}
+          icon={<Download size={18} color={Colors.primary} />}
+        />
+        <div style={{ height: Spacing.md }} />
 
         {/* Health Records */}
         <SectionHeader title={t.petDetail.healthHistory} actionLabel={t.common.seeAll} onAction={() => {}} />

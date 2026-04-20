@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, AlertTriangle, Camera, Sparkles, Info, CheckCircle, Phone, Star,
-  Trophy, PawPrint,
+  Trophy, PawPrint, MapPin, X,
 } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
@@ -17,6 +17,9 @@ import { useI18n } from '../i18n';
 import { analyzePetSymptoms, type DiagnosisResult } from '../services/gemini';
 import { addPoints } from '../services/userService';
 import { incrementDiagnosisUsage, canUseDiagnosis, getRemainingDiagnoses } from '../services/purchaseService';
+import { takePhoto } from '../services/photoService';
+import { openVetMap } from '../services/locationService';
+import { addHealthRecord } from '../services/healthRecordService';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
 import { FREEMIUM } from '../constants/app';
 
@@ -32,6 +35,8 @@ export function DiagnosisPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<DiagnosisResult | null>(null);
   const [error, setError] = useState('');
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const symptomChips = [
     t.diagnosis.vomiting, t.diagnosis.diarrhea, t.diagnosis.scratching, t.diagnosis.limping,
@@ -163,9 +168,24 @@ export function DiagnosisPage() {
           </Card>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: Spacing.sm + 2, paddingBottom: Spacing.xl }}>
-            <Button label={t.diagnosis.findNearbyVet} onPress={() => {}} variant="primary" />
-            <Button label={t.diagnosis.saveToRecords} onPress={() => {}} variant="secondary" />
-            <Button label={t.diagnosis.newDiagnosis} onPress={() => { setShowResults(false); setResult(null); setSelectedSymptoms([]); setDescription(''); }} variant="ghost" />
+            <Button label={t.diagnosis.findNearbyVet} onPress={() => openVetMap()} variant="primary" icon={<MapPin size={18} color={Colors.inkInverse} />} />
+            <Button label={saving ? '...' : t.diagnosis.saveToRecords} onPress={async () => {
+              if (!firebaseUser || !selectedPet || !result) return;
+              setSaving(true);
+              try {
+                await addHealthRecord(firebaseUser.uid, selectedPet, {
+                  type: 'note',
+                  title: `AI Diagnosis — ${result.severity.toUpperCase()}`,
+                  description: `${result.possibleConditions.join(', ')}\n\n${result.recommendations.join('\n')}`,
+                  date: new Date().toISOString().split('T')[0],
+                });
+              } catch (e) {
+                console.error('Error saving record:', e);
+              } finally {
+                setSaving(false);
+              }
+            }} variant="secondary" disabled={saving} />
+            <Button label={t.diagnosis.newDiagnosis} onPress={() => { setShowResults(false); setResult(null); setSelectedSymptoms([]); setDescription(''); setPhotoUrl(null); }} variant="ghost" />
           </div>
         </div>
       </div>
@@ -265,15 +285,31 @@ export function DiagnosisPage() {
 
         <div>
           <SectionHeader title={t.diagnosis.addPhoto} />
-          <button style={{
-            width: '100%', padding: `${Spacing.xxl + 4}px ${Spacing.xl}px`, borderRadius: Radius.md,
-            border: `2px dashed ${Colors.hairline}`, backgroundColor: Colors.surface,
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: Spacing.sm, cursor: 'pointer',
-          }}>
-            <Camera size={28} color={Colors.inkTertiary} />
-            <span style={{ fontSize: Font.body - 1, color: Colors.inkTertiary, fontWeight: Weight.medium }}>{t.diagnosis.photoHint}</span>
-            <span style={{ fontSize: Font.xs, color: Colors.inkTertiary }}>JPG, PNG max 5MB</span>
-          </button>
+          {photoUrl ? (
+            <div style={{ position: 'relative', borderRadius: Radius.md, overflow: 'hidden' }}>
+              <img src={photoUrl} alt="Pet photo" style={{ width: '100%', maxHeight: 200, objectFit: 'cover', borderRadius: Radius.md }} />
+              <button onClick={() => setPhotoUrl(null)} style={{
+                position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: 14,
+                backgroundColor: 'rgba(0,0,0,0.6)', border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <X size={16} color="#fff" />
+              </button>
+            </div>
+          ) : (
+            <button onClick={async () => {
+              const url = await takePhoto();
+              if (url) setPhotoUrl(url);
+            }} style={{
+              width: '100%', padding: `${Spacing.xxl + 4}px ${Spacing.xl}px`, borderRadius: Radius.md,
+              border: `2px dashed ${Colors.hairline}`, backgroundColor: Colors.surface,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: Spacing.sm, cursor: 'pointer',
+            }}>
+              <Camera size={28} color={Colors.inkTertiary} />
+              <span style={{ fontSize: Font.body - 1, color: Colors.inkTertiary, fontWeight: Weight.medium }}>{t.diagnosis.photoHint}</span>
+              <span style={{ fontSize: Font.xs, color: Colors.inkTertiary }}>JPG, PNG max 5MB</span>
+            </button>
+          )}
         </div>
 
         {!canUseDiagnosis(user?.isPremium ?? false, user?.aiDiagnosisUsed ?? 0, FREEMIUM.freeAiDiagnosisLimit) && (

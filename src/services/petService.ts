@@ -22,6 +22,7 @@ export async function addPet(
     gender: PetGender;
     weight?: number;
     microchipId?: string;
+    photoUrl?: string;
   },
 ): Promise<string> {
   const now = new Date().toISOString();
@@ -33,6 +34,7 @@ export async function addPet(
     gender: data.gender,
     weight: data.weight ?? null,
     microchipId: data.microchipId ?? null,
+    photoUrl: data.photoUrl ?? null,
     createdAt: now,
     updatedAt: now,
   });

@@ -7,6 +7,7 @@ import { Button } from '../components/Button';
 import { addPet } from '../services/petService';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
+import { captureAndUpload } from '../services/photoService';
 import type { PetGender, PetType } from '../models/types';
 
 const petTypeIcons = [
@@ -49,6 +50,8 @@ export function AddPetPage() {
   const [breed, setBreed] = useState('');
   const [weight, setWeight] = useState('');
   const [microchip, setMicrochip] = useState('');
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoDownloadUrl, setPhotoDownloadUrl] = useState<string | undefined>(undefined);
   const [saving, setSaving] = useState(false);
 
   const petTypeLabels: Record<string, string> = {
@@ -66,6 +69,7 @@ export function AddPetPage() {
         gender: selectedGender.toLowerCase() as PetGender,
         weight: weight ? parseFloat(weight) : undefined,
         microchipId: microchip || undefined,
+        photoUrl: photoDownloadUrl,
       });
       navigate('/pets');
     } catch (e) {
@@ -91,12 +95,30 @@ export function AddPetPage() {
       <div className="slide-up" style={{ padding: `0 ${Spacing.xl}px 40px`, display: 'flex', flexDirection: 'column', gap: Spacing.xxl }}>
         {/* Photo */}
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: Spacing.sm }}>
-          <div style={{
-            width: 110, height: 110, borderRadius: Radius.xxl + 4, backgroundColor: Colors.surfaceSecondary,
-            border: `2px dashed ${Colors.hairline}`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer',
-          }}>
-            <Camera size={28} color={Colors.inkTertiary} />
-            <span style={{ fontSize: Font.xs + 1, fontWeight: Weight.semibold, color: Colors.inkTertiary }}>{t.addPet.addPhoto}</span>
+          <div
+            onClick={async () => {
+              const result = await captureAndUpload('pets', name.trim() || 'pet');
+              if (result) {
+                setPhotoPreview(result.dataUrl);
+                setPhotoDownloadUrl(result.downloadUrl);
+              }
+            }}
+            style={{
+              width: 110, height: 110, borderRadius: Radius.xxl + 4,
+              backgroundColor: Colors.surfaceSecondary,
+              border: `2px dashed ${Colors.hairline}`,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              gap: 6, cursor: 'pointer', overflow: 'hidden',
+            }}
+          >
+            {photoPreview ? (
+              <img src={photoPreview} alt="Pet" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <>
+                <Camera size={28} color={Colors.inkTertiary} />
+                <span style={{ fontSize: Font.xs + 1, fontWeight: Weight.semibold, color: Colors.inkTertiary }}>{t.addPet.addPhoto}</span>
+              </>
+            )}
           </div>
         </div>
 
