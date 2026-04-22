@@ -13,6 +13,8 @@ import { useI18n } from '../i18n';
 import { saveWalk, subscribeToTodayWalks, subscribeToWalks } from '../services/walkFirestoreService';
 import { addPoints } from '../services/userService';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
+import { startPedometer, stopPedometer, isPedometerAvailable } from '../services/pedometerService';
+import { startWalkTracking, stopWalkTracking } from '../services/locationService';
 
 export function WalkPage() {
   const { pets } = usePets();
@@ -20,11 +22,13 @@ export function WalkPage() {
   const { t } = useI18n();
   const [isWalking, setIsWalking] = useState(false);
   const [steps, setSteps] = useState(0);
+  const [gpsDistanceKm, setGpsDistanceKm] = useState(0);
   const [seconds, setSeconds] = useState(0);
   const [selectedPet, setSelectedPet] = useState<string | null>(null);
   const [todaySteps, setTodaySteps] = useState(0);
   const [weeklySteps, setWeeklySteps] = useState<number[]>([0, 0, 0, 0, 0, 0, 0]);
   const [showSummary, setShowSummary] = useState(false);
+  const [useNativePedometer, setUseNativePedometer] = useState(false);
   const dailyGoal = 5000;
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const stepsRef = useRef<ReturnType<typeof setInterval>>();
@@ -68,21 +72,58 @@ export function WalkPage() {
     return unsubscribe;
   }, [firebaseUser]);
 
-  useEffect(() => () => { clearInterval(timerRef.current); clearInterval(stepsRef.current); }, []);
+  useEffect(() => {
+    isPedometerAvailable().then(setUseNativePedometer);
+  }, []);
 
-  const toggleWalk = useCallback(() => {
+  useEffect(() => () => {
+    clearInterval(timerRef.current);
+    clearInterval(stepsRef.current);
+    stopPedometer();
+    stopWalkTracking();
+  }, []);
+
+  const toggleWalk = useCallback(async () => {
     if (isWalking) {
-      clearInterval(timerRef.current); clearInterval(stepsRef.current);
-      setIsWalking(false); setShowSummary(true);
+      clearInterval(timerRef.current);
+      clearInterval(stepsRef.current);
+      await stopPedometer();
+      const gpsState = await stopWalkTracking();
+      setGpsDistanceKm(gpsState.distanceKm);
+      setIsWalking(false);
+      setShowSummary(true);
     } else {
-      setSteps(0); setSeconds(0); setIsWalking(true);
+      setSteps(0);
+      setSeconds(0);
+      setGpsDistanceKm(0);
+      setIsWalking(true);
+
       timerRef.current = setInterval(() => setSeconds(s => s + 1), 1000);
-      stepsRef.current = setInterval(() => setSteps(s => s + Math.floor(Math.random() * 3) + 1), 600);
+
+      const pedometerStarted = await startPedometer((state) => {
+        setSteps(state.steps);
+        if (state.distanceMeters > 0) {
+          setGpsDistanceKm(state.distanceMeters / 1000);
+        }
+      });
+
+      startWalkTracking((gpsState) => {
+        setGpsDistanceKm(gpsState.distanceKm);
+        if (!pedometerStarted) {
+          setSteps(gpsState.steps);
+        }
+      });
+
+      if (!pedometerStarted) {
+        stepsRef.current = setInterval(() => setSteps(s => s + Math.floor(Math.random() * 3) + 1), 600);
+      }
     }
   }, [isWalking]);
 
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
+
+  const walkDistanceKm = gpsDistanceKm > 0 ? gpsDistanceKm : estimateDistanceKm(steps);
 
   const finishWalk = async () => {
     if (firebaseUser) {
@@ -94,7 +135,7 @@ export function WalkPage() {
           startTime: new Date(Date.now() - seconds * 1000).toISOString(),
           endTime: new Date().toISOString(),
           steps,
-          distanceKm: estimateDistanceKm(steps),
+          distanceKm: walkDistanceKm,
           durationMinutes: mins,
           caloriesBurned: estimateCalories(steps),
           pointsEarned: pts,
@@ -104,8 +145,7 @@ export function WalkPage() {
         console.error('Error saving walk:', e);
       }
     }
-    // todaySteps will update automatically via Firestore subscription
-    setSteps(0); setSeconds(0); setShowSummary(false);
+    setSteps(0); setSeconds(0); setGpsDistanceKm(0); setShowSummary(false);
   };
 
   return (
@@ -167,7 +207,7 @@ export function WalkPage() {
             {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: Spacing.md }}>
-            {[{ Icon: Footprints, val: steps, lbl: t.common.steps }, { Icon: MapPin, val: estimateDistanceKm(steps).toFixed(2), lbl: t.common.km }, { Icon: Flame, val: estimateCalories(steps), lbl: t.common.cal }].map(s => (
+            {[{ Icon: Footprints, val: steps, lbl: t.common.steps }, { Icon: MapPin, val: walkDistanceKm.toFixed(2), lbl: t.common.km }, { Icon: Flame, val: estimateCalories(steps), lbl: t.common.cal }].map(s => (
               <div key={s.lbl} style={{ textAlign: 'center' }}>
                 <div style={{ display: 'flex', justifyContent: 'center' }}><s.Icon size={16} color="rgba(255,255,255,0.7)" /></div>
                 <div style={{ color: Colors.inkInverse, fontSize: Font.title3, fontWeight: Weight.bold }}>{s.val}</div>
@@ -237,7 +277,7 @@ export function WalkPage() {
             <Trophy size={48} color={Colors.warning} />
             <h2 style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.ink, margin: `${Spacing.md}px 0` }}>{t.walk.greatWalk}</h2>
             <div style={{ display: 'flex', justifyContent: 'space-evenly', margin: `${Spacing.lg}px 0` }}>
-              {[{ val: steps, lbl: t.common.steps }, { val: `${estimateDistanceKm(steps).toFixed(2)} ${t.common.km}`, lbl: t.walk.distance }, { val: `${mins} min`, lbl: t.walk.time }].map(s => (
+              {[{ val: steps, lbl: t.common.steps }, { val: `${walkDistanceKm.toFixed(2)} ${t.common.km}`, lbl: t.walk.distance }, { val: `${mins} min`, lbl: t.walk.time }].map(s => (
                 <div key={s.lbl}><div style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink }}>{s.val}</div><div style={{ color: Colors.inkSecondary }}>{s.lbl}</div></div>
               ))}
             </div>
