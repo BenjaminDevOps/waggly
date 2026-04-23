@@ -163,6 +163,7 @@ export function PremiumPage() {
           <div style={{ display: 'flex', justifyContent: 'center', gap: Spacing.lg, marginTop: Spacing.md }}>
             <a href="/privacy" style={{ fontSize: Font.xs, color: Colors.primary, textDecoration: 'none' }}>{t.profile.privacyPolicy}</a>
             <a href="/terms" style={{ fontSize: Font.xs, color: Colors.primary, textDecoration: 'none' }}>{t.profile.termsOfService}</a>
+            <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" target="_blank" rel="noopener noreferrer" style={{ fontSize: Font.xs, color: Colors.inkTertiary, textDecoration: 'none' }}>EULA</a>
           </div>
         </div>
       </div>
