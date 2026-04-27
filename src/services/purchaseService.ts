@@ -15,8 +15,8 @@ import { doc, updateDoc, increment } from 'firebase/firestore';
 import { COLLECTIONS } from '../constants/app';
 
 export const PRODUCTS = {
-  premiumMonthly: 'com.waggly.app.premium.monthly',
-  premiumYearly: 'com.waggly.app.premium.yearly',
+  premiumMonthly: 'com.ministeredesapp.waggly.premium.monthly',
+  premiumYearly: 'com.ministeredesapp.waggly.premium.yearly',
 } as const;
 
 export interface PremiumPlan {
