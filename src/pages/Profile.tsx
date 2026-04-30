@@ -12,6 +12,12 @@ import { useAuth } from '../hooks/useAuth';
 import { usePets } from '../hooks/usePets';
 import { useI18n, LOCALE_LABELS, LOCALE_FLAGS, type Locale } from '../i18n';
 
+const AVATAR_EMOJI: Record<string, string> = {
+  dog1: '\u{1F436}', cat1: '\u{1F431}', rabbit1: '\u{1F430}', bird1: '\u{1F426}',
+  fox1: '\u{1F98A}', bear1: '\u{1F43B}', panda1: '\u{1F43C}', koala1: '\u{1F428}',
+  lion1: '\u{1F981}', unicorn1: '\u{1F984}', owl1: '\u{1F989}', paw1: '\u{1F43E}',
+};
+
 const BADGE_ICON_MAP: Record<string, LucideIcon> = {
   PawPrint, Stethoscope, Flame, 'Star': StarIcon, Award, Diamond, Crown, Building2, Trophy, Footprints, Target, Medal,
 };
@@ -51,8 +57,8 @@ export function ProfilePage() {
     <div style={{ backgroundColor: Colors.background, minHeight: '100vh' }}>
       {/* Header */}
       <div style={{ background: `linear-gradient(135deg, ${Colors.primary}, ${Colors.primaryLight})`, padding: '60px 16px 28px', textAlign: 'center' }}>
-        <div style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: 'rgba(255,255,255,0.2)', border: '3px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto' }}>
-          <User size={40} color={Colors.inkInverse} />
+        <div style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: 'rgba(255,255,255,0.2)', border: '3px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontSize: 44 }}>
+          {user?.photoUrl ? AVATAR_EMOJI[user.photoUrl] ?? '\u{1F43E}' : <User size={40} color={Colors.inkInverse} />}
         </div>
         <div style={{ color: Colors.inkInverse, fontSize: Font.title2, fontWeight: Weight.bold, marginTop: 12 }}>{user?.displayName ?? 'Pet Lover'}</div>
         <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: Font.body, marginTop: 4 }}>{t.profile.level} {level}</div>
@@ -189,7 +195,7 @@ export function ProfilePage() {
         {/* Account */}
         <SectionHeader title={t.profile.account} />
         <Card style={{ padding: 0 }}>
-          {[{ icon: User, label: t.profile.editProfile, route: '' }, { icon: Bell, label: t.profile.notifications, route: '' }, { icon: Shield, label: t.profile.privacyPolicy, route: '/privacy' }, { icon: FileText, label: t.profile.termsOfService, route: '/terms' }, { icon: HelpCircle, label: t.profile.helpSupport, route: '' }].map((item, i) => (
+          {[{ icon: User, label: t.profile.editProfile, route: '/edit-profile' }, { icon: Bell, label: t.profile.notifications, route: '' }, { icon: Shield, label: t.profile.privacyPolicy, route: '/privacy' }, { icon: FileText, label: t.profile.termsOfService, route: '/terms' }, { icon: HelpCircle, label: t.profile.helpSupport, route: '/contact' }].map((item, i) => (
             <button className="card-interactive" key={item.label} onClick={() => item.route && navigate(item.route)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%', borderTop: i > 0 ? `1px solid ${Colors.hairlineLight}` : 'none', cursor: 'pointer' }}>
               <item.icon size={22} color={Colors.inkSecondary} />
               <span style={{ flex: 1, fontSize: Font.body, color: Colors.ink, textAlign: 'left' }}>{item.label}</span>

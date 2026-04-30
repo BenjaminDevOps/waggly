@@ -12,6 +12,8 @@ import { ProfilePage } from './pages/Profile';
 import { PremiumPage } from './pages/Premium';
 import { PrivacyPage } from './pages/Privacy';
 import { TermsPage } from './pages/Terms';
+import { EditProfilePage } from './pages/EditProfile';
+import { ContactPage } from './pages/Contact';
 import { LoginPage } from './pages/Login';
 import { useI18n } from './i18n';
 import { useAuth } from './hooks/useAuth';
@@ -29,7 +31,7 @@ export default function App() {
   const location = useLocation();
   const { t } = useI18n();
   const { firebaseUser, loading } = useAuth();
-  const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
+  const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms', '/edit-profile', '/contact'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
 
   // Loading state — branded spinner while Firebase auth initializes
   if (loading) {
@@ -80,6 +82,8 @@ export default function App() {
         <Route path="/premium" element={<PremiumPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
+        <Route path="/edit-profile" element={<EditProfilePage />} />
+        <Route path="/contact" element={<ContactPage />} />
       </Routes>
 
       {!hideTabBar && (

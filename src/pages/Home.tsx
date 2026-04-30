@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   PawPrint, Stethoscope, ShoppingBag, Trophy, ChevronRight,
@@ -14,6 +14,7 @@ import { SectionHeader } from '../components/SectionHeader';
 import { usePets } from '../hooks/usePets';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
+import { subscribeToTodayWalks } from '../services/walkFirestoreService';
 import type { PetType } from '../models/types';
 
 const PET_ICON_MAP: Record<PetType, LucideIcon> = { dog: Dog, cat: Cat, rabbit: Rabbit, bird: Bird, other: PawPrint };
@@ -46,6 +47,20 @@ export function HomePage() {
   const { pets, loading: petsLoading } = usePets();
   const { user, loading: authLoading } = useAuth();
   const { t } = useI18n();
+
+  const { firebaseUser } = useAuth();
+  const [todaySteps, setTodaySteps] = useState(0);
+  const dailyGoal = 5000;
+  const walkPct = Math.min(todaySteps / dailyGoal, 1);
+
+  useEffect(() => {
+    if (!firebaseUser) return;
+    const unsubscribe = subscribeToTodayWalks(firebaseUser.uid, (walks) => {
+      const total = walks.reduce((sum, w) => sum + (w.steps || 0), 0);
+      setTodaySteps(total);
+    });
+    return unsubscribe;
+  }, [firebaseUser]);
 
   const userPoints = user?.totalPoints ?? 0;
   const userStreak = user?.dailyStreak ?? 0;
@@ -165,19 +180,19 @@ export function HomePage() {
           <SectionHeader title={t.home.todaysWalk} />
           <Card className="card-interactive" onClick={() => navigate('/walk')} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: Spacing.xl }}>
             <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
-              <ProgressCircle pct={0.47} />
+              <ProgressCircle pct={walkPct} />
               <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.primary }}>47%</span>
+                <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.primary }}>{Math.round(walkPct * 100)}%</span>
               </div>
             </div>
             <div style={{ flex: 1 }}>
-              <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.semibold, color: Colors.ink }}>2,340 {t.common.steps.toLowerCase()}</span>
+              <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.semibold, color: Colors.ink }}>{todaySteps.toLocaleString()} {t.common.steps.toLowerCase()}</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.xs, marginTop: Spacing.xs }}>
                 <Footprints size={14} color={Colors.inkTertiary} />
-                <span style={{ fontSize: Font.sm, color: Colors.inkTertiary }}>{t.home.ofDailyGoal.replace('{goal}', '5,000')}</span>
+                <span style={{ fontSize: Font.sm, color: Colors.inkTertiary }}>{t.home.ofDailyGoal.replace('{goal}', dailyGoal.toLocaleString())}</span>
               </div>
               <div style={{ marginTop: 10, height: 6, borderRadius: 3, backgroundColor: Colors.primaryPale, overflow: 'hidden' }}>
-                <div style={{ width: '47%', height: '100%', borderRadius: 3, background: `linear-gradient(90deg, ${Gradients.primary[0]}, ${Gradients.primary[1]})` }} />
+                <div style={{ width: `${Math.round(walkPct * 100)}%`, height: '100%', borderRadius: 3, background: `linear-gradient(90deg, ${Gradients.primary[0]}, ${Gradients.primary[1]})` }} />
               </div>
             </div>
             <ChevronRight size={20} color={Colors.inkTertiary} />
