@@ -24,7 +24,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      clearTimeout(timeout);
       setFirebaseUser(fbUser);
       if (fbUser) {
         try {
@@ -35,14 +40,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           );
         } catch (e) {
           console.error('Error creating user:', e);
+          setLoading(false);
         }
       }
-      // No auto anonymous sign-in — let user sign in via Login page
       if (!fbUser) {
         setLoading(false);
       }
     });
-    return unsubscribe;
+    return () => { clearTimeout(timeout); unsubscribe(); };
   }, []);
 
   useEffect(() => {
@@ -50,11 +55,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       return;
     }
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 5000);
+
     const unsubscribe = subscribeToUser(firebaseUser.uid, (u) => {
+      clearTimeout(timeout);
       setUser(u);
       setLoading(false);
     });
-    return unsubscribe;
+    return () => { clearTimeout(timeout); unsubscribe(); };
   }, [firebaseUser]);
 
   const signOut = async () => {
