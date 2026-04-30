@@ -28,24 +28,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     }, 5000);
 
-    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
       clearTimeout(timeout);
       setFirebaseUser(fbUser);
       if (fbUser) {
-        try {
-          await getOrCreateUser(
-            fbUser.uid,
-            fbUser.email ?? fbUser.uid + '@waggly.app',
-            fbUser.displayName ?? 'Pet Lover',
-          );
-        } catch (e) {
-          console.error('Error creating user:', e);
-          setLoading(false);
-        }
+        getOrCreateUser(
+          fbUser.uid,
+          fbUser.email ?? fbUser.uid + '@waggly.app',
+          fbUser.displayName ?? 'Pet Lover',
+        ).catch((e) => console.error('Error creating user:', e));
       }
-      if (!fbUser) {
-        setLoading(false);
-      }
+      setLoading(false);
     });
     return () => { clearTimeout(timeout); unsubscribe(); };
   }, []);
