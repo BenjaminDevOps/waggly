@@ -52,7 +52,12 @@ export async function captureAndUpload(
   const dataUrl = await takePhoto();
   if (!dataUrl) return null;
 
-  const path = `${folder}/${fileName}_${Date.now()}.jpg`;
-  const downloadUrl = await uploadPhoto(dataUrl, path);
-  return { dataUrl, downloadUrl };
+  try {
+    const path = `${folder}/${fileName}_${Date.now()}.jpg`;
+    const downloadUrl = await uploadPhoto(dataUrl, path);
+    return { dataUrl, downloadUrl };
+  } catch (e) {
+    console.warn('Photo upload failed, using local data URL:', e);
+    return { dataUrl, downloadUrl: dataUrl };
+  }
 }

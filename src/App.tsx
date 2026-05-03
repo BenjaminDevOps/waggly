@@ -1,4 +1,5 @@
 import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Home, PawPrint, Stethoscope, Footprints, ShoppingBag, User } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { HomePage } from './pages/Home';
@@ -26,6 +27,12 @@ const tabDefs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof us
   { path: '/shop', icon: ShoppingBag, key: 'shop' },
   { path: '/profile', icon: User, key: 'profile' },
 ];
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
 
 export default function App() {
   const location = useLocation();
@@ -70,6 +77,7 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', paddingBottom: hideTabBar ? 0 : 88 }}>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/pets" element={<PetsPage />} />

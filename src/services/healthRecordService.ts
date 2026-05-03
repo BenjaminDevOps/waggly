@@ -4,7 +4,6 @@ import {
   addDoc,
   query,
   where,
-  orderBy,
   onSnapshot,
   deleteDoc,
   doc,
@@ -52,16 +51,16 @@ export function subscribeToHealthRecords(
     const q = query(
       collection(db, COLLECTIONS.healthRecords),
       where('petId', '==', petId),
-      orderBy('date', 'desc'),
     );
 
     return onSnapshot(
       q,
       (snapshot) => {
-        const records: HealthRecord[] = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
+        const records: HealthRecord[] = snapshot.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
         })) as HealthRecord[];
+        records.sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
         callback(records);
       },
       (error) => {

@@ -85,12 +85,12 @@ export function WalkPage() {
 
   const toggleWalk = useCallback(async () => {
     if (isWalking) {
+      setIsWalking(false);
       clearInterval(timerRef.current);
       clearInterval(stepsRef.current);
       await stopPedometer();
       const gpsState = await stopWalkTracking();
       setGpsDistanceKm(gpsState.distanceKm);
-      setIsWalking(false);
       setShowSummary(true);
     } else {
       setSteps(0);

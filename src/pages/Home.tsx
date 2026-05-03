@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   PawPrint, Stethoscope, ShoppingBag, Trophy, ChevronRight,
-  Plus, Star, Flame, Footprints, Bell, Sparkles,
-  Dog, Cat, Rabbit, Bird, Bone, Bed, Gift,
+  Plus, Star, Flame, Footprints, Sparkles,
+  Dog, Cat, Rabbit, Bird,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Colors, Gradients } from '../theme/colors';
@@ -20,12 +20,6 @@ import type { PetType } from '../models/types';
 const PET_ICON_MAP: Record<PetType, LucideIcon> = { dog: Dog, cat: Cat, rabbit: Rabbit, bird: Bird, other: PawPrint };
 const PET_COLOR_MAP: Record<PetType, string> = { dog: Colors.primary, cat: Colors.accent, rabbit: Colors.secondary, bird: Colors.success, other: Colors.lavender };
 
-const products = [
-  { id: '1', name: 'Organic Treats', price: '$12.99', Icon: Bone },
-  { id: '2', name: 'Cozy Bed', price: '$34.99', Icon: Bed },
-  { id: '3', name: 'Rope Toy', price: '$8.99', Icon: Gift },
-  { id: '4', name: 'Grooming Kit', price: '$19.99', Icon: Sparkles },
-];
 
 const ProgressCircle: React.FC<{ pct: number; size?: number; stroke?: number }> = ({ pct, size = 80, stroke = 7 }) => {
   const r = (size - stroke) / 2;
@@ -65,10 +59,6 @@ export function HomePage() {
   const userPoints = user?.totalPoints ?? 0;
   const userStreak = user?.dailyStreak ?? 0;
 
-  const reminders = [
-    { pet: 'Luna', task: 'Rabies Booster', daysLeft: 25, color: Colors.accent },
-    { pet: 'Milo', task: 'Deworming', daysLeft: 41, color: Colors.warning },
-  ];
 
   return (
     <div className="fade-in" style={{ backgroundColor: Colors.background, minHeight: '100vh' }}>
@@ -175,51 +165,6 @@ export function HomePage() {
           </div>
         </div>
 
-        {/* Today's Walk */}
-        <div>
-          <SectionHeader title={t.home.todaysWalk} />
-          <Card className="card-interactive" onClick={() => navigate('/walk')} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: Spacing.xl }}>
-            <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
-              <ProgressCircle pct={walkPct} />
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.primary }}>{Math.round(walkPct * 100)}%</span>
-              </div>
-            </div>
-            <div style={{ flex: 1 }}>
-              <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.semibold, color: Colors.ink }}>{todaySteps.toLocaleString()} {t.common.steps.toLowerCase()}</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.xs, marginTop: Spacing.xs }}>
-                <Footprints size={14} color={Colors.inkTertiary} />
-                <span style={{ fontSize: Font.sm, color: Colors.inkTertiary }}>{t.home.ofDailyGoal.replace('{goal}', dailyGoal.toLocaleString())}</span>
-              </div>
-              <div style={{ marginTop: 10, height: 6, borderRadius: 3, backgroundColor: Colors.primaryPale, overflow: 'hidden' }}>
-                <div style={{ width: `${Math.round(walkPct * 100)}%`, height: '100%', borderRadius: 3, background: `linear-gradient(90deg, ${Gradients.primary[0]}, ${Gradients.primary[1]})` }} />
-              </div>
-            </div>
-            <ChevronRight size={20} color={Colors.inkTertiary} />
-          </Card>
-        </div>
-
-        {/* Reminders */}
-        <div>
-          <SectionHeader title={t.home.reminders} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {reminders.map((r, i) => (
-              <Card key={i} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: r.color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Bell size={20} color={r.color} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <span style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink }}>{r.pet} — {r.task}</span>
-                  <span style={{ display: 'block', fontSize: Font.sm, color: Colors.inkTertiary, marginTop: 2 }}>
-                    {t.home.dueInDays.replace('{days}', String(r.daysLeft))}
-                  </span>
-                </div>
-                <ChevronRight size={18} color={Colors.inkTertiary} />
-              </Card>
-            ))}
-          </div>
-        </div>
-
         {/* Quick Actions 2x2 */}
         <div>
           <SectionHeader title={t.home.quickActions} />
@@ -245,22 +190,41 @@ export function HomePage() {
           </div>
         </div>
 
-        {/* Featured Products */}
+        {/* Today's Walk */}
         <div>
-          <SectionHeader title={t.home.featuredProducts} actionLabel={t.common.seeAll} onAction={() => navigate('/shop')} />
-          <div style={{ display: 'flex', gap: Spacing.md, overflowX: 'auto', paddingBottom: Spacing.xs, marginRight: -Spacing.xl }}>
-            {products.map(p => (
-              <Card key={p.id} className="card-interactive" onClick={() => navigate('/shop')} padded={false} style={{ minWidth: 140, flexShrink: 0 }}>
-                <div style={{ height: 100, borderRadius: '20px 20px 0 0', backgroundColor: Colors.surfaceSecondary, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <p.Icon size={36} color={Colors.inkTertiary} />
-                </div>
-                <div style={{ padding: '12px 14px 14px' }}>
-                  <span style={{ fontSize: 14, fontWeight: Weight.semibold, color: Colors.ink, display: 'block' }}>{p.name}</span>
-                  <span style={{ fontSize: Font.sm, fontWeight: Weight.bold, color: Colors.primary, marginTop: Spacing.xs, display: 'block' }}>{p.price}</span>
-                </div>
-              </Card>
-            ))}
-          </div>
+          <SectionHeader title={t.home.todaysWalk} />
+          <Card className="card-interactive" onClick={() => navigate('/walk')} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: Spacing.xl }}>
+            <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
+              <ProgressCircle pct={walkPct} />
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.primary }}>{Math.round(walkPct * 100)}%</span>
+              </div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.semibold, color: Colors.ink }}>{todaySteps.toLocaleString()} {t.common.steps.toLowerCase()}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.xs, marginTop: Spacing.xs }}>
+                <Footprints size={14} color={Colors.inkTertiary} />
+                <span style={{ fontSize: Font.sm, color: Colors.inkTertiary }}>{t.home.ofDailyGoal.replace('{goal}', dailyGoal.toLocaleString())}</span>
+              </div>
+              <div style={{ marginTop: 10, height: 6, borderRadius: 3, backgroundColor: Colors.primaryPale, overflow: 'hidden' }}>
+                <div style={{ width: `${Math.round(walkPct * 100)}%`, height: '100%', borderRadius: 3, background: `linear-gradient(90deg, ${Gradients.primary[0]}, ${Gradients.primary[1]})` }} />
+              </div>
+            </div>
+            <ChevronRight size={20} color={Colors.inkTertiary} />
+          </Card>
+        </div>
+
+        {/* Shop link */}
+        <div>
+          <Card className="card-interactive" onClick={() => navigate('/shop')} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: Spacing.md }}>
+            <div style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: Colors.secondaryPale, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <ShoppingBag size={24} color={Colors.secondary} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.semibold, color: Colors.ink }}>{t.home.goToShop}</span>
+            </div>
+            <ChevronRight size={20} color={Colors.inkTertiary} />
+          </Card>
         </div>
       </div>
     </div>

@@ -7,7 +7,6 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy,
   onSnapshot,
 } from 'firebase/firestore';
 import { Pet, PetType, PetGender } from '../models/types';
@@ -64,16 +63,16 @@ export function subscribeToPets(
     const q = query(
       collection(db, COLLECTIONS.pets),
       where('userId', '==', userId),
-      orderBy('createdAt', 'desc'),
     );
 
     return onSnapshot(
       q,
       (snapshot) => {
-        const pets: Pet[] = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
+        const pets: Pet[] = snapshot.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
         })) as Pet[];
+        pets.sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? ''));
         callback(pets);
       },
       (error) => {

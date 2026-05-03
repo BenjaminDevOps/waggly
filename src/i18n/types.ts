@@ -46,13 +46,11 @@ export interface Translations {
     addPet: string;
     todaysWalk: string;
     ofDailyGoal: string;
-    reminders: string;
-    dueInDays: string;
     quickActions: string;
     aiDiagnosis: string;
     shop: string;
     badges: string;
-    featuredProducts: string;
+    goToShop: string;
   };
 
   // Pets page
@@ -106,6 +104,19 @@ export interface Translations {
     healthHistory: string;
     noRecords: string;
     noRecordsDesc: string;
+    addRecord: string;
+    deworming: string;
+    tickTreatment: string;
+    recordType: string;
+    recordTitle: string;
+    recordTitlePlaceholder: string;
+    recordDate: string;
+    nextDueDate: string;
+    notes: string;
+    notesPlaceholder: string;
+    save: string;
+    cancel: string;
+    recordSaved: string;
   };
 
   // Diagnosis page
