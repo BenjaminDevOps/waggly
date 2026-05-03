@@ -308,8 +308,8 @@ export function PetDetailPage() {
 
       {/* Add Record Modal */}
       {showAddModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: Colors.overlay, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 100 }}>
-          <div className="modal-sheet" style={{ backgroundColor: Colors.surface, borderRadius: `${Radius.xxl}px ${Radius.xxl}px 0 0`, padding: Spacing.xl, width: '100%', maxWidth: 430, maxHeight: '85vh', overflowY: 'auto' }}>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: Colors.overlay, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: `0 ${Spacing.xl}px` }}>
+          <div className="fade-in" style={{ backgroundColor: Colors.surface, borderRadius: Radius.xxl, padding: Spacing.xl, width: '100%', maxWidth: 430, maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 24px 60px rgba(0,0,0,0.25)' }}>
             {/* Modal Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.xl }}>
               <span style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink }}>{t.petDetail.addRecord}</span>

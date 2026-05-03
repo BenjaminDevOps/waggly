@@ -81,9 +81,13 @@ export function ShopPage() {
       )}
 
       {selectedProduct && (
-        <div className="modal-backdrop" onClick={() => setSelectedProduct(null)} style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', zIndex: 100 }}>
-          <div className="modal-sheet" onClick={e => e.stopPropagation()} style={{ padding: 28, width: '100%', maxWidth: 430, maxHeight: '80vh', overflowY: 'auto' }}>
-            <div style={{ width: 40, height: 4, backgroundColor: Colors.hairline, borderRadius: 2, margin: '0 auto 16px' }} />
+        <div className="modal-backdrop" onClick={() => setSelectedProduct(null)} style={{ position: 'fixed', inset: 0, backgroundColor: Colors.overlay, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '0 16px' }}>
+          <div className="fade-in" onClick={e => e.stopPropagation()} style={{ backgroundColor: Colors.surface, borderRadius: Radius.xxl, padding: 28, width: '100%', maxWidth: 400, maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 24px 60px rgba(0,0,0,0.25)' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+              <button onClick={() => setSelectedProduct(null)} style={{ background: Colors.surfaceSecondary, border: 'none', cursor: 'pointer', width: 32, height: 32, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X size={18} color={Colors.inkSecondary} />
+              </button>
+            </div>
             <div style={{ height: 160, backgroundColor: Colors.primaryPale, borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
               <ShoppingCart size={56} color={Colors.primary + '40'} />
             </div>
@@ -107,7 +111,6 @@ export function ShopPage() {
               <Star size={16} color={Colors.secondary} />
               <span style={{ color: Colors.secondary, fontWeight: Weight.semibold, fontSize: 13 }}>{t.shop.earnPoints}</span>
             </div>
-            <button onClick={() => setSelectedProduct(null)} style={{ width: '100%', textAlign: 'center', padding: 16, color: Colors.inkSecondary, fontWeight: Weight.semibold }}>Close</button>
           </div>
         </div>
       )}
