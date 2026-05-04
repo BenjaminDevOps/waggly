@@ -253,7 +253,7 @@ export function PetDetailPage() {
         <Button
           label={generatingPdf ? '...' : 'Download Health Report (PDF)'}
           onPress={async () => {
-            if (!pet) return;
+            if (!pet || generatingPdf) return;
             setGeneratingPdf(true);
             try {
               await generateHealthReport(pet, records, [], locale);
@@ -266,6 +266,7 @@ export function PetDetailPage() {
           variant="secondary"
           size="large"
           disabled={generatingPdf}
+          loading={generatingPdf}
           icon={<Download size={18} color={Colors.primary} />}
         />
         <div style={{ height: Spacing.md }} />

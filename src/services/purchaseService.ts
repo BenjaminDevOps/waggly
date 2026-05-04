@@ -98,6 +98,15 @@ export async function initializePurchases(userId?: string): Promise<void> {
   }
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms / 1000}s`)), ms),
+    ),
+  ]);
+}
+
 export async function purchasePremium(
   productId: string,
   userId: string,
@@ -115,12 +124,12 @@ export async function purchasePremium(
   }
 
   try {
-    const offerings = await Purchases.getOfferings();
+    const offerings: any = await withTimeout(Purchases.getOfferings(), 15000, 'getOfferings');
     const packages = offerings.current?.availablePackages;
     const pkg = packages?.find((p: any) => p.product?.identifier === productId);
 
     if (!pkg) {
-      return { success: false, message: 'Product not found. Please try again later.' };
+      return { success: false, message: 'Product not found. Make sure products are configured in App Store Connect and RevenueCat.' };
     }
 
     const result = await Purchases.purchasePackage({ aPackage: pkg });
