@@ -134,45 +134,46 @@ export function PetDetailPage() {
 
   return (
     <div className="fade-in" style={{ minHeight: '100vh', backgroundColor: Colors.background }}>
-      {/* Hero Header */}
+      {/* Hero Header — extends into safe area */}
       <div
         style={{
           background: `linear-gradient(135deg, ${Gradients.primary[0]}, ${Gradients.primary[1]}, #9B9EE6)`,
-          padding: `${Spacing.lg}px ${Spacing.xl}px ${Spacing.xxl}px`,
+          paddingTop: 'env(safe-area-inset-top, 20px)',
           borderRadius: `0 0 ${Radius.xxl}px ${Radius.xxl}px`,
-          position: 'relative',
         }}
       >
-        <button
-          className="btn-press"
-          onClick={() => navigate(-1)}
-          style={{
-            background: 'rgba(255,255,255,0.2)',
-            border: 'none',
-            borderRadius: Radius.sm,
-            padding: Spacing.sm,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <ArrowLeft size={20} color={Colors.inkInverse} />
-        </button>
+        <div style={{ padding: `${Spacing.sm}px ${Spacing.lg}px 0` }}>
+          <button
+            className="btn-press"
+            onClick={() => navigate(-1)}
+            style={{
+              background: 'rgba(255,255,255,0.2)',
+              border: 'none',
+              borderRadius: Radius.sm,
+              padding: Spacing.sm,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <ArrowLeft size={20} color={Colors.inkInverse} />
+          </button>
+        </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: Spacing.sm }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: `${Spacing.sm}px ${Spacing.lg}px ${Spacing.xl}px` }}>
           <div
             style={{
-              width: 68, height: 68, borderRadius: 34,
+              width: 64, height: 64, borderRadius: 32,
               background: 'rgba(255,255,255,0.25)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               marginBottom: Spacing.sm,
             }}
           >
-            <PetIcon size={34} color="#fff" />
+            <PetIcon size={32} color="#fff" />
           </div>
-          <span style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.inkInverse, marginBottom: 2 }}>{pet.name}</span>
-          <span style={{ fontSize: Font.sm, color: 'rgba(255,255,255,0.8)', fontWeight: Weight.medium }}>{pet.breed || pet.type}</span>
+          <span style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.inkInverse, marginBottom: 2 }}>{pet.name}</span>
+          <span style={{ fontSize: Font.sm, color: 'rgba(255,255,255,0.8)' }}>{pet.breed || pet.type}</span>
         </div>
       </div>
 

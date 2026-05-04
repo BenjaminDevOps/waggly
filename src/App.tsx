@@ -18,6 +18,7 @@ import { ContactPage } from './pages/Contact';
 import { LoginPage } from './pages/Login';
 import { useI18n } from './i18n';
 import { useAuth } from './hooks/useAuth';
+import { useBadgeChecker } from './hooks/useBadges';
 
 const tabDefs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof useI18n>['t']['tabs'] }[] = [
   { path: '/', icon: Home, key: 'home' },
@@ -38,6 +39,7 @@ export default function App() {
   const location = useLocation();
   const { t } = useI18n();
   const { firebaseUser, loading } = useAuth();
+  useBadgeChecker();
   const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms', '/edit-profile', '/contact'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
 
   // Loading state — branded spinner while Firebase auth initializes
