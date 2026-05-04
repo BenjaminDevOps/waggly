@@ -141,8 +141,14 @@ export async function generateHealthReport(
         path: fileName,
         directory: Directory.Documents,
       });
-      if (uri?.uri) {
-        window.open(uri.uri, '_blank');
+      try {
+        const { Share } = await import('@capacitor/share');
+        await Share.share({
+          title: fileName,
+          url: uri?.uri,
+        });
+      } catch {
+        alert('PDF saved to Documents folder.');
       }
     } catch {
       doc.save(fileName);

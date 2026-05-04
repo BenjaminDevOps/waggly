@@ -67,10 +67,15 @@ let purchasesPlugin: any = null;
 async function getPurchases() {
   if (purchasesPlugin) return purchasesPlugin;
   try {
-    const mod = await import('@revenuecat/purchases-capacitor');
+    const mod = await withTimeout(
+      import('@revenuecat/purchases-capacitor'),
+      10000,
+      'import purchases plugin',
+    );
     purchasesPlugin = mod.Purchases;
     return purchasesPlugin;
-  } catch {
+  } catch (e) {
+    console.warn('[Purchases] Could not load plugin:', e);
     return null;
   }
 }

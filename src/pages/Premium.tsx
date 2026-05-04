@@ -40,22 +40,42 @@ export function PremiumPage() {
   };
 
   const handlePurchase = async () => {
-    if (!firebaseUser) return;
+    if (!firebaseUser || loading) return;
     setLoading(true);
     setMessage('');
-    const result = await purchasePremium(selectedPlan, firebaseUser.uid);
-    setMessage(result.message);
-    setLoading(false);
-    if (result.success) setTimeout(() => navigate(-1), 1500);
+    try {
+      const result = await Promise.race([
+        purchasePremium(selectedPlan, firebaseUser.uid),
+        new Promise<{ success: false; message: string }>((resolve) =>
+          setTimeout(() => resolve({ success: false, message: 'Request timed out. Check your RevenueCat configuration and try again.' }), 20000),
+        ),
+      ]);
+      setMessage(result.message);
+      if (result.success) setTimeout(() => navigate(-1), 1500);
+    } catch (e: any) {
+      setMessage(e?.message || 'An unexpected error occurred.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRestore = async () => {
-    if (!firebaseUser) return;
+    if (!firebaseUser || restoring) return;
     setRestoring(true);
     setMessage('');
-    const result = await restorePurchases(firebaseUser.uid);
-    setMessage(result.message);
-    setRestoring(false);
+    try {
+      const result = await Promise.race([
+        restorePurchases(firebaseUser.uid),
+        new Promise<{ success: false; message: string }>((resolve) =>
+          setTimeout(() => resolve({ success: false, message: 'Restore timed out.' }), 15000),
+        ),
+      ]);
+      setMessage(result.message);
+    } catch (e: any) {
+      setMessage(e?.message || 'An unexpected error occurred.');
+    } finally {
+      setRestoring(false);
+    }
   };
 
   if (user?.isPremium) {
