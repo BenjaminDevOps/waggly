@@ -138,7 +138,7 @@ export function PetDetailPage() {
       <div
         style={{
           background: `linear-gradient(135deg, ${Gradients.primary[0]}, ${Gradients.primary[1]}, #9B9EE6)`,
-          padding: `${Spacing.xl}px ${Spacing.xl}px ${Spacing.xxxl + 4}px`,
+          padding: `${Spacing.lg}px ${Spacing.xl}px ${Spacing.xxl}px`,
           borderRadius: `0 0 ${Radius.xxl}px ${Radius.xxl}px`,
           position: 'relative',
         }}
@@ -150,40 +150,40 @@ export function PetDetailPage() {
             background: 'rgba(255,255,255,0.2)',
             border: 'none',
             borderRadius: Radius.sm,
-            padding: Spacing.sm + 2,
+            padding: Spacing.sm,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <ArrowLeft size={22} color={Colors.inkInverse} />
+          <ArrowLeft size={20} color={Colors.inkInverse} />
         </button>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: Spacing.lg }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: Spacing.sm }}>
           <div
             style={{
-              width: 88, height: 88, borderRadius: 44,
+              width: 68, height: 68, borderRadius: 34,
               background: 'rgba(255,255,255,0.25)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginBottom: Spacing.md,
+              marginBottom: Spacing.sm,
             }}
           >
-            <PetIcon size={44} color="#fff" />
+            <PetIcon size={34} color="#fff" />
           </div>
-          <span style={{ fontSize: Font.title1, fontWeight: Weight.bold, color: Colors.inkInverse, marginBottom: Spacing.xs }}>{pet.name}</span>
-          <span style={{ fontSize: Font.body, color: 'rgba(255,255,255,0.8)', fontWeight: Weight.medium }}>{pet.breed || pet.type}</span>
+          <span style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.inkInverse, marginBottom: 2 }}>{pet.name}</span>
+          <span style={{ fontSize: Font.sm, color: 'rgba(255,255,255,0.8)', fontWeight: Weight.medium }}>{pet.breed || pet.type}</span>
         </div>
       </div>
 
-      <div style={{ padding: `0 ${Spacing.xl}px`, marginTop: -20 }}>
+      <div style={{ padding: `0 ${Spacing.lg}px`, marginTop: -16 }}>
         {/* Stats Row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: Spacing.md, marginBottom: Spacing.xl + 4 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: Spacing.sm, marginBottom: Spacing.xl }}>
           {statsData.map((stat) => (
-            <Card key={stat.label} style={{ textAlign: 'center', padding: Spacing.lg }}>
-              <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'center' }}><stat.Icon size={24} color={Colors.primary} /></div>
-              <div style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink, marginBottom: 2 }}>{stat.value}</div>
-              <div style={{ fontSize: Font.xs + 1, color: Colors.inkTertiary, fontWeight: Weight.medium }}>{stat.label}</div>
+            <Card key={stat.label} style={{ textAlign: 'center', padding: Spacing.md }}>
+              <div style={{ marginBottom: 4, display: 'flex', justifyContent: 'center' }}><stat.Icon size={20} color={Colors.primary} /></div>
+              <div style={{ fontSize: Font.body, fontWeight: Weight.bold, color: Colors.ink, marginBottom: 2 }}>{stat.value}</div>
+              <div style={{ fontSize: Font.xs, color: Colors.inkTertiary, fontWeight: Weight.medium }}>{stat.label}</div>
             </Card>
           ))}
         </div>
@@ -206,22 +206,22 @@ export function PetDetailPage() {
 
         {/* Quick Actions — Add Records */}
         <SectionHeader title={t.petDetail.quickActions} />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: Spacing.md, marginBottom: Spacing.xl + 4 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: Spacing.sm, marginBottom: Spacing.xl }}>
           {[
-            { type: 'vaccination' as RecordType, icon: <Syringe size={22} color={Colors.success} />, label: t.petDetail.vaccination, bg: Colors.successPale },
-            { type: 'deworming' as RecordType, icon: <Pill size={22} color={Colors.accent} />, label: t.petDetail.deworming, bg: Colors.accentPale },
-            { type: 'vetVisit' as RecordType, icon: <Building2 size={22} color={Colors.primary} />, label: t.petDetail.vetVisit, bg: Colors.primaryPale },
+            { type: 'vaccination' as RecordType, icon: <Syringe size={20} color={Colors.success} />, label: t.petDetail.vaccination, bg: Colors.successPale },
+            { type: 'deworming' as RecordType, icon: <Pill size={20} color={Colors.accent} />, label: t.petDetail.deworming, bg: Colors.accentPale },
+            { type: 'vetVisit' as RecordType, icon: <Building2 size={20} color={Colors.primary} />, label: t.petDetail.vetVisit, bg: Colors.primaryPale },
           ].map((action) => (
             <Card
               key={action.type}
               className="card-interactive"
               onClick={() => openAddModal(action.type)}
-              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: Spacing.sm + 2, padding: Spacing.lg }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: Spacing.sm, padding: `${Spacing.lg}px ${Spacing.sm}px`, overflow: 'hidden' }}
             >
-              <div style={{ width: Spacing.huge, height: Spacing.huge, borderRadius: 14, backgroundColor: action.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: action.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {action.icon}
               </div>
-              <span style={{ fontSize: Font.sm, fontWeight: Weight.semibold, color: Colors.ink, textAlign: 'center' }}>
+              <span style={{ fontSize: Font.xs, fontWeight: Weight.semibold, color: Colors.ink, textAlign: 'center', lineHeight: 1.2, wordBreak: 'break-word' }}>
                 {action.label}
               </span>
             </Card>
