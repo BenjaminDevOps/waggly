@@ -225,6 +225,7 @@ export interface Translations {
     viewOnAmazon: string;
     reviews: string;
     earnPoints: string;
+    comingSoon: string;
   };
 
   // Profile page

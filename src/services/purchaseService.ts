@@ -93,11 +93,16 @@ export async function initializePurchases(userId?: string): Promise<void> {
   }
 
   try {
+    const apiKey = import.meta.env.VITE_REVENUECAT_API_KEY || '';
+    if (!apiKey || apiKey === 'appl_YOUR_REVENUECAT_API_KEY') {
+      console.warn('[Purchases] No valid API key set in VITE_REVENUECAT_API_KEY');
+      return;
+    }
     await Purchases.configure({
-      apiKey: import.meta.env.VITE_REVENUECAT_API_KEY || 'appl_YOUR_REVENUECAT_API_KEY',
+      apiKey,
       appUserID: userId || undefined,
     });
-    console.log('[Purchases] Configured successfully');
+    console.log('[Purchases] Configured with key:', apiKey.slice(0, 10) + '...');
   } catch (error) {
     console.error('[Purchases] Init error:', error);
   }
@@ -130,11 +135,31 @@ export async function purchasePremium(
 
   try {
     const offerings: any = await withTimeout(Purchases.getOfferings(), 15000, 'getOfferings');
-    const packages = offerings.current?.availablePackages;
-    const pkg = packages?.find((p: any) => p.product?.identifier === productId);
+    console.log('[Purchases] Offerings:', JSON.stringify(offerings?.current?.identifier));
+    const packages = offerings.current?.availablePackages ?? [];
+    console.log('[Purchases] Available packages:', packages.map((p: any) => `${p.packageType}:${p.product?.identifier}`));
+
+    let pkg = packages.find((p: any) => p.product?.identifier === productId);
 
     if (!pkg) {
-      return { success: false, message: 'Product not found. Make sure products are configured in App Store Connect and RevenueCat.' };
+      const isYearly = productId.includes('yearly');
+      const fallbackType = isYearly ? 'ANNUAL' : 'MONTHLY';
+      pkg = packages.find((p: any) =>
+        p.packageType === fallbackType ||
+        p.packageType === fallbackType.toLowerCase(),
+      );
+      if (pkg) {
+        console.log('[Purchases] Matched by packageType:', fallbackType);
+      }
+    }
+
+    if (!pkg && packages.length > 0) {
+      pkg = packages[0];
+      console.log('[Purchases] Using first available package as fallback');
+    }
+
+    if (!pkg) {
+      return { success: false, message: 'No products available. Check RevenueCat Offerings configuration.' };
     }
 
     const result = await Purchases.purchasePackage({ aPackage: pkg });

@@ -205,6 +205,7 @@ export const en: Translations = {
     viewOnAmazon: 'View on Amazon',
     reviews: 'reviews',
     earnPoints: 'Earn 15 Waggly points with this purchase!',
+    comingSoon: 'Link coming soon',
   },
   profile: {
     level: 'Level',
