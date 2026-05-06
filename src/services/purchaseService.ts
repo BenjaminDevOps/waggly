@@ -120,62 +120,77 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
 export async function purchasePremium(
   productId: string,
   userId: string,
+  log?: (msg: string) => void,
 ): Promise<{ success: boolean; message: string }> {
+  const l = log || ((msg: string) => console.log('[Purchases]', msg));
+
   if (!isNativePlatform()) {
+    l('Not native platform');
     return {
       success: false,
       message: 'In-app purchases are only available on iOS. Please use the app on your iPhone.',
     };
   }
 
+  l('Loading plugin...');
   const Purchases = await getPurchases();
   if (!Purchases) {
+    l('Plugin load FAILED');
     return { success: false, message: 'Purchase service not available. Please try again later.' };
   }
+  l('Plugin loaded OK');
 
   try {
+    l('Fetching offerings (15s timeout)...');
     const offerings: any = await withTimeout(Purchases.getOfferings(), 15000, 'getOfferings');
-    console.log('[Purchases] Offerings:', JSON.stringify(offerings?.current?.identifier));
+    l(`Offering: ${offerings?.current?.identifier || 'NONE'}`);
     const packages = offerings.current?.availablePackages ?? [];
-    console.log('[Purchases] Available packages:', packages.map((p: any) => `${p.packageType}:${p.product?.identifier}`));
+    l(`Packages (${packages.length}): ${packages.map((p: any) => `${p.packageType}:${p.product?.identifier}`).join(', ') || 'empty'}`);
 
     let pkg = packages.find((p: any) => p.product?.identifier === productId);
 
     if (!pkg) {
       const isYearly = productId.includes('yearly');
       const fallbackType = isYearly ? 'ANNUAL' : 'MONTHLY';
+      l(`No exact match, trying packageType: ${fallbackType}`);
       pkg = packages.find((p: any) =>
         p.packageType === fallbackType ||
         p.packageType === fallbackType.toLowerCase(),
       );
       if (pkg) {
-        console.log('[Purchases] Matched by packageType:', fallbackType);
+        l(`Matched by packageType: ${fallbackType}`);
       }
     }
 
     if (!pkg && packages.length > 0) {
       pkg = packages[0];
-      console.log('[Purchases] Using first available package as fallback');
+      l('Using first available package as fallback');
     }
 
     if (!pkg) {
+      l('NO packages found at all');
       return { success: false, message: 'No products available. Check RevenueCat Offerings configuration.' };
     }
 
+    l(`Purchasing: ${pkg.product?.identifier} (${pkg.packageType})...`);
     const result = await Purchases.purchasePackage({ aPackage: pkg });
+    l('Purchase completed, checking entitlements...');
 
     if (result?.customerInfo?.entitlements?.active?.premium) {
+      l('Entitlement "premium" active');
       await setPremiumStatus(userId, true);
       return { success: true, message: 'Welcome to Waggly Premium!' };
     }
 
+    l('No "premium" entitlement found but purchase succeeded, granting anyway');
     await setPremiumStatus(userId, true);
     return { success: true, message: 'Welcome to Waggly Premium!' };
   } catch (error: any) {
     if (error?.code === 1 || error?.message?.includes('cancelled')) {
+      l('User cancelled');
       return { success: false, message: 'Purchase cancelled.' };
     }
-    console.error('[Purchases] Error:', error);
+    l(`ERROR: ${error?.code || 'no code'} - ${error?.message || String(error)}`);
     return { success: false, message: error?.message || 'Purchase failed. Please try again.' };
   }
 }

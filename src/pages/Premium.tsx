@@ -39,20 +39,37 @@ export function PremiumPage() {
     [PREMIUM_PLANS[1].id]: { name: t.premiumPage.yearly, period: t.premiumPage.perYear, savings: t.premiumPage.savePct },
   };
 
+  const [debugLog, setDebugLog] = useState<string[]>([]);
+
+  const addLog = (msg: string) => {
+    console.log('[Premium]', msg);
+    setDebugLog(prev => [...prev, `${new Date().toLocaleTimeString()} ${msg}`]);
+  };
+
   const handlePurchase = async () => {
     if (!firebaseUser || loading) return;
     setLoading(true);
     setMessage('');
+    setDebugLog([]);
     try {
+      addLog('Starting purchase flow...');
+      addLog(`Product ID: ${selectedPlan}`);
+      addLog(`API key present: ${!!import.meta.env.VITE_REVENUECAT_API_KEY}`);
+
       const result = await Promise.race([
-        purchasePremium(selectedPlan, firebaseUser.uid),
+        purchasePremium(selectedPlan, firebaseUser.uid, addLog),
         new Promise<{ success: false; message: string }>((resolve) =>
-          setTimeout(() => resolve({ success: false, message: 'Request timed out. Check your RevenueCat configuration and try again.' }), 20000),
+          setTimeout(() => {
+            addLog('⏱ TIMEOUT after 20s');
+            resolve({ success: false, message: 'Request timed out after 20s.' });
+          }, 20000),
         ),
       ]);
+      addLog(`Result: ${result.message}`);
       setMessage(result.message);
       if (result.success) setTimeout(() => navigate(-1), 1500);
     } catch (e: any) {
+      addLog(`❌ Exception: ${e?.message || String(e)}`);
       setMessage(e?.message || 'An unexpected error occurred.');
     } finally {
       setLoading(false);
@@ -168,6 +185,16 @@ export function PremiumPage() {
         {message && (
           <Card style={{ backgroundColor: message.includes('Welcome') || message.includes('restored') || message.includes('Premium') ? Colors.successPale : Colors.secondaryPale, textAlign: 'center' as const }}>
             <span style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: message.includes('Welcome') || message.includes('restored') || message.includes('Premium') ? Colors.success : Colors.ink }}>{message}</span>
+          </Card>
+        )}
+
+        {debugLog.length > 0 && (
+          <Card style={{ backgroundColor: '#1a1a2e', padding: Spacing.md, maxHeight: 200, overflow: 'auto' }}>
+            <div style={{ fontSize: 11, fontFamily: 'monospace', color: '#00ff88', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+              {debugLog.map((log, i) => (
+                <div key={i}>{log}</div>
+              ))}
+            </div>
           </Card>
         )}
 
