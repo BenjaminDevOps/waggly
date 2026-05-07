@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, AlertTriangle, Camera, Sparkles, Info, CheckCircle, Phone, Star,
-  Trophy, PawPrint, MapPin, X,
+  ArrowLeft, AlertTriangle, Sparkles, Info, CheckCircle, Phone, Star,
+  Trophy, PawPrint, MapPin,
 } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
@@ -17,7 +17,6 @@ import { useI18n } from '../i18n';
 import { analyzePetSymptoms, type DiagnosisResult } from '../services/gemini';
 import { addPoints } from '../services/userService';
 import { incrementDiagnosisUsage, canUseDiagnosis, getRemainingDiagnoses } from '../services/purchaseService';
-import { takePhoto } from '../services/photoService';
 import { openVetMap } from '../services/locationService';
 import { addHealthRecord } from '../services/healthRecordService';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
@@ -35,7 +34,6 @@ export function DiagnosisPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<DiagnosisResult | null>(null);
   const [error, setError] = useState('');
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const symptomChips = [
@@ -66,7 +64,7 @@ export function DiagnosisPage() {
     try {
       const res = await analyzePetSymptoms({
         petType: pet?.type || 'dog',
-        petAge: pet?.breed || 'unknown',
+        petAge: (() => { if (pet?.birthDate) { const age = Math.floor((Date.now() - new Date(pet.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)); return `${age} years, ${pet.breed || pet.type}`; } return pet?.breed || 'unknown'; })(),
         symptoms: [...selectedSymptoms, description].filter(Boolean).join(', '),
         locale,
       });
@@ -185,7 +183,7 @@ export function DiagnosisPage() {
                 setSaving(false);
               }
             }} variant="secondary" disabled={saving} />
-            <Button label={t.diagnosis.newDiagnosis} onPress={() => { setShowResults(false); setResult(null); setSelectedSymptoms([]); setDescription(''); setPhotoUrl(null); }} variant="ghost" />
+            <Button label={t.diagnosis.newDiagnosis} onPress={() => { setShowResults(false); setResult(null); setSelectedSymptoms([]); setDescription(''); }} variant="ghost" />
           </div>
         </div>
       </div>
@@ -281,35 +279,6 @@ export function DiagnosisPage() {
             backgroundColor: Colors.surface, fontSize: Font.body - 1, color: Colors.ink, resize: 'vertical',
             fontFamily: 'inherit', lineHeight: 1.5, outline: 'none', boxSizing: 'border-box',
           }} />
-        </div>
-
-        <div>
-          <SectionHeader title={t.diagnosis.addPhoto} />
-          {photoUrl ? (
-            <div style={{ position: 'relative', borderRadius: Radius.md, overflow: 'hidden' }}>
-              <img src={photoUrl} alt="Pet photo" style={{ width: '100%', maxHeight: 200, objectFit: 'cover', borderRadius: Radius.md }} />
-              <button onClick={() => setPhotoUrl(null)} style={{
-                position: 'absolute', top: 8, right: 8, width: 28, height: 28, borderRadius: 14,
-                backgroundColor: 'rgba(0,0,0,0.6)', border: 'none', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <X size={16} color="#fff" />
-              </button>
-            </div>
-          ) : (
-            <button onClick={async () => {
-              const url = await takePhoto();
-              if (url) setPhotoUrl(url);
-            }} style={{
-              width: '100%', padding: `${Spacing.xxl + 4}px ${Spacing.xl}px`, borderRadius: Radius.md,
-              border: `2px dashed ${Colors.hairline}`, backgroundColor: Colors.surface,
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: Spacing.sm, cursor: 'pointer',
-            }}>
-              <Camera size={28} color={Colors.inkTertiary} />
-              <span style={{ fontSize: Font.body - 1, color: Colors.inkTertiary, fontWeight: Weight.medium }}>{t.diagnosis.photoHint}</span>
-              <span style={{ fontSize: Font.xs, color: Colors.inkTertiary }}>JPG, PNG max 5MB</span>
-            </button>
-          )}
         </div>
 
         {!canUseDiagnosis(user?.isPremium ?? false, user?.aiDiagnosisUsed ?? 0, FREEMIUM.freeAiDiagnosisLimit) && (

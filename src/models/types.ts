@@ -37,6 +37,7 @@ export const PET_COLORS: Record<PetType, string> = {
 export type RecordType =
   | 'vaccination'
   | 'deworming'
+  | 'tickTreatment'
   | 'vetVisit'
   | 'weight'
   | 'medication'
@@ -61,6 +62,7 @@ export interface HealthRecord {
 export const RECORD_EMOJI: Record<RecordType, string> = {
   vaccination: '\u{1F489}',
   deworming: '\u{1F48A}',
+  tickTreatment: '\u{1F41B}',
   vetVisit: '\u{1F3E5}',
   weight: '\u2696\uFE0F',
   medication: '\u{1F48A}',
@@ -72,6 +74,7 @@ export const RECORD_EMOJI: Record<RecordType, string> = {
 export const RECORD_LABELS: Record<RecordType, string> = {
   vaccination: 'Vaccination',
   deworming: 'Deworming',
+  tickTreatment: 'Tick Treatment',
   vetVisit: 'Vet Visit',
   weight: 'Weight',
   medication: 'Medication',

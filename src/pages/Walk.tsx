@@ -18,7 +18,7 @@ import { startWalkTracking, stopWalkTracking } from '../services/locationService
 
 export function WalkPage() {
   const { pets } = usePets();
-  const { firebaseUser } = useAuth();
+  const { firebaseUser, user } = useAuth();
   const { t } = useI18n();
   const [isWalking, setIsWalking] = useState(false);
   const [steps, setSteps] = useState(0);
@@ -30,8 +30,11 @@ export function WalkPage() {
   const [showSummary, setShowSummary] = useState(false);
   const [useNativePedometer, setUseNativePedometer] = useState(false);
   const dailyGoal = 5000;
+  const earnedBadges = (user?.badges ?? []) as string[];
+  const hasBadge = (id: string) => earnedBadges.includes(id);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
   const stepsRef = useRef<ReturnType<typeof setInterval>>();
+  const walkStartRef = useRef<number>(0);
   const totalSteps = todaySteps + steps;
   const progress = Math.min(totalSteps / dailyGoal, 1);
   const maxWeekly = Math.max(...weeklySteps, 1);
@@ -98,7 +101,8 @@ export function WalkPage() {
       setGpsDistanceKm(0);
       setIsWalking(true);
 
-      timerRef.current = setInterval(() => setSeconds(s => s + 1), 1000);
+      walkStartRef.current = Date.now();
+      timerRef.current = setInterval(() => setSeconds(Math.floor((Date.now() - walkStartRef.current) / 1000)), 1000);
 
       const pedometerStarted = await startPedometer((state) => {
         setSteps(state.steps);
@@ -253,10 +257,10 @@ export function WalkPage() {
 
       {/* Achievements */}
       <SectionHeader title={t.walk.achievements} />
-      {[{ Icon: Footprints, title: t.walk.firstWalk, desc: t.walk.firstWalkDesc, done: true, color: Colors.primary },
-        { Icon: Target, title: t.walk.fiveKSteps, desc: t.walk.fiveKStepsDesc, done: true, color: Colors.success },
-        { Icon: Flame, title: t.walk.sevenDayStreak, desc: t.walk.sevenDayStreakDesc, done: false, color: Colors.secondary },
-        { Icon: Trophy, title: t.walk.marathonWalker, desc: t.walk.marathonWalkerDesc, done: false, color: Colors.warning },
+      {[{ Icon: Footprints, title: t.walk.firstWalk, desc: t.walk.firstWalkDesc, done: hasBadge('firstWalk'), color: Colors.primary },
+        { Icon: Target, title: t.walk.fiveKSteps, desc: t.walk.fiveKStepsDesc, done: hasBadge('walker5k'), color: Colors.success },
+        { Icon: Flame, title: t.walk.sevenDayStreak, desc: t.walk.sevenDayStreakDesc, done: hasBadge('streak7Days'), color: Colors.secondary },
+        { Icon: Trophy, title: t.walk.marathonWalker, desc: t.walk.marathonWalkerDesc, done: hasBadge('marathonWalker'), color: Colors.warning },
       ].map(a => (
         <Card key={a.title} style={{ marginBottom: Spacing.sm }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.md }}>

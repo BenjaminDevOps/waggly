@@ -160,16 +160,21 @@ function toRad(deg: number): number {
  * Open Google Maps with nearby veterinarians based on current location.
  */
 export async function openVetMap(): Promise<void> {
+  let url = 'https://www.google.com/maps/search/veterinaire+near+me';
   try {
     const position = await Geolocation.getCurrentPosition({
       enableHighAccuracy: true,
       timeout: 10000,
     });
     const { latitude, longitude } = position.coords;
-    const url = `https://www.google.com/maps/search/veterinaire/@${latitude},${longitude},14z`;
-    window.open(url, '_blank');
+    url = `https://www.google.com/maps/search/veterinaire/@${latitude},${longitude},14z`;
   } catch {
-    // Fallback: open Google Maps without specific coordinates
-    window.open('https://www.google.com/maps/search/veterinaire+near+me', '_blank');
+    // Use default URL without coordinates
+  }
+  try {
+    const { Browser } = await import('@capacitor/browser');
+    await Browser.open({ url });
+  } catch {
+    window.open(url, '_blank');
   }
 }

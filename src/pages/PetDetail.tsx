@@ -25,10 +25,10 @@ const RECORD_ICON_MAP: Record<string, LucideIcon> = {
   note: FileText,
 };
 
-const RECORD_TYPES: { type: RecordType | 'tickTreatment'; icon: LucideIcon; color: string; bg: string }[] = [
+const RECORD_TYPES: { type: RecordType; icon: LucideIcon; color: string; bg: string }[] = [
   { type: 'vaccination', icon: Syringe, color: Colors.success, bg: Colors.successPale },
   { type: 'deworming', icon: Pill, color: Colors.accent, bg: Colors.accentPale },
-  { type: 'tickTreatment' as RecordType, icon: Bug, color: Colors.warning, bg: Colors.warningPale ?? '#FFF3E0' },
+  { type: 'tickTreatment', icon: Bug, color: Colors.warning, bg: Colors.warningPale ?? '#FFF3E0' },
   { type: 'vetVisit', icon: Building2, color: Colors.primary, bg: Colors.primaryPale },
   { type: 'medication', icon: Heart, color: Colors.secondary, bg: Colors.secondaryPale },
   { type: 'note', icon: FileText, color: Colors.lavender, bg: Colors.lavender + '20' },

@@ -7,7 +7,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
 import { Colors } from '../theme/colors';
-import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
+import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import {
@@ -39,37 +39,20 @@ export function PremiumPage() {
     [PREMIUM_PLANS[1].id]: { name: t.premiumPage.yearly, period: t.premiumPage.perYear, savings: t.premiumPage.savePct },
   };
 
-  const [debugLog, setDebugLog] = useState<string[]>([]);
-
-  const addLog = (msg: string) => {
-    console.log('[Premium]', msg);
-    setDebugLog(prev => [...prev, `${new Date().toLocaleTimeString()} ${msg}`]);
-  };
-
   const handlePurchase = async () => {
     if (!firebaseUser || loading) return;
     setLoading(true);
     setMessage('');
-    setDebugLog([]);
     try {
-      addLog('Starting purchase flow...');
-      addLog(`Product ID: ${selectedPlan}`);
-      addLog(`API key present: ${!!import.meta.env.VITE_REVENUECAT_API_KEY}`);
-
       const result = await Promise.race([
-        purchasePremium(selectedPlan, firebaseUser.uid, addLog),
+        purchasePremium(selectedPlan, firebaseUser.uid),
         new Promise<{ success: false; message: string }>((resolve) =>
-          setTimeout(() => {
-            addLog('⏱ TIMEOUT after 20s');
-            resolve({ success: false, message: 'Request timed out after 20s.' });
-          }, 20000),
+          setTimeout(() => resolve({ success: false, message: 'Request timed out after 20s.' }), 20000),
         ),
       ]);
-      addLog(`Result: ${result.message}`);
       setMessage(result.message);
       if (result.success) setTimeout(() => navigate(-1), 1500);
     } catch (e: any) {
-      addLog(`❌ Exception: ${e?.message || String(e)}`);
       setMessage(e?.message || 'An unexpected error occurred.');
     } finally {
       setLoading(false);
@@ -188,15 +171,6 @@ export function PremiumPage() {
           </Card>
         )}
 
-        {debugLog.length > 0 && (
-          <Card style={{ backgroundColor: '#1a1a2e', padding: Spacing.md, maxHeight: 200, overflow: 'auto' }}>
-            <div style={{ fontSize: 11, fontFamily: 'monospace', color: '#00ff88', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
-              {debugLog.map((log, i) => (
-                <div key={i}>{log}</div>
-              ))}
-            </div>
-          </Card>
-        )}
 
         <Button label={loading ? t.premiumPage.processing : t.premiumPage.subscribeNow} onPress={handlePurchase} variant="primary" size="large" loading={loading} icon={<Diamond size={20} color={Colors.inkInverse} />} />
 
@@ -208,9 +182,9 @@ export function PremiumPage() {
         <div style={{ textAlign: 'center', paddingBottom: Spacing.xxl }}>
           <p style={{ fontSize: Font.xs, color: Colors.inkTertiary, lineHeight: 1.6, margin: 0 }}>{t.premiumPage.paymentDisclaimer}</p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: Spacing.lg, marginTop: Spacing.md }}>
-            <a href="/privacy" style={{ fontSize: Font.xs, color: Colors.primary, textDecoration: 'none' }}>{t.profile.privacyPolicy}</a>
-            <a href="/terms" style={{ fontSize: Font.xs, color: Colors.primary, textDecoration: 'none' }}>{t.profile.termsOfService}</a>
-            <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" target="_blank" rel="noopener noreferrer" style={{ fontSize: Font.xs, color: Colors.inkTertiary, textDecoration: 'none' }}>EULA</a>
+            <button onClick={() => navigate('/privacy')} style={{ fontSize: Font.xs, color: Colors.primary, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer' }}>{t.profile.privacyPolicy}</button>
+            <button onClick={() => navigate('/terms')} style={{ fontSize: Font.xs, color: Colors.primary, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer' }}>{t.profile.termsOfService}</button>
+            <button onClick={async () => { try { const { Browser } = await import('@capacitor/browser'); await Browser.open({ url: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/' }); } catch { window.open('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/', '_blank'); } }} style={{ fontSize: Font.xs, color: Colors.inkTertiary, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer' }}>EULA</button>
           </div>
         </div>
       </div>

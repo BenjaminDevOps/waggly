@@ -18,7 +18,7 @@ export function PetsPage() {
       {/* Header */}
       <div style={{ padding: `${Spacing.xl}px ${Spacing.xl}px ${Spacing.md}px` }}>
         <h1 style={{ fontSize: Font.title1, fontWeight: Weight.bold, color: Colors.ink, margin: 0, letterSpacing: -0.3 }}>
-          My Pets
+          {t.pets.title}
         </h1>
         <p style={{ fontSize: Font.body, color: Colors.inkSecondary, margin: '6px 0 0', lineHeight: 1.4 }}>
           {t.pets.subtitle.replace('{count}', String(pets.length))}
@@ -75,7 +75,7 @@ export function PetsPage() {
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 {[
                   { label: pet.weight ? `${pet.weight} kg` : '-', color: Colors.secondary },
-                  { label: pet.gender.charAt(0).toUpperCase() + pet.gender.slice(1), color: Colors.accent },
+                  { label: pet.gender ? pet.gender.charAt(0).toUpperCase() + pet.gender.slice(1) : '-', color: Colors.accent },
                   { label: pet.breed || pet.type, color: Colors.primary },
                 ].map((chip, idx) => (
                   <span

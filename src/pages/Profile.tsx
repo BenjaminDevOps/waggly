@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Diamond, ChevronRight, Bell, Shield, HelpCircle, LogOut, Lock, Stethoscope, Footprints, ShoppingBag, Crown, Medal, PawPrint, Flame, Star as StarIcon, Award, Building2, Trophy, Target, FileText, Globe } from 'lucide-react';
+import { User, Diamond, ChevronRight, Shield, HelpCircle, LogOut, Lock, Stethoscope, Footprints, Crown, Medal, PawPrint, Flame, Star as StarIcon, Award, Building2, Trophy, Target, FileText, Globe } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
@@ -36,6 +36,8 @@ export function ProfilePage() {
   const { user, loading, signOut } = useAuth();
   const { pets } = usePets();
   const { t, locale, setLocale } = useI18n();
+  const [selectedBadge, setSelectedBadge] = useState<{ name: string; description: string } | null>(null);
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
 
   const totalPoints = user?.totalPoints ?? 0;
   const streak = user?.dailyStreak ?? 0;
@@ -145,7 +147,7 @@ export function ProfilePage() {
             const earned = earnedBadges.includes(badge.id);
             const BadgeIcon = BADGE_ICON_MAP[badge.icon] || PawPrint;
             return (
-              <button className="btn-press" key={badge.id} onClick={() => alert(`${badge.name}\n${badge.description}`)} style={{
+              <button className="btn-press" key={badge.id} onClick={() => setSelectedBadge({ name: badge.name, description: badge.description })} style={{
                 aspectRatio: '0.85', borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                 backgroundColor: earned ? Colors.primaryPale : Colors.surfaceSecondary,
                 border: `1px solid ${earned ? Colors.primary + '30' : Colors.hairline}`, cursor: 'pointer',
@@ -177,9 +179,8 @@ export function ProfilePage() {
         <SectionHeader title={t.profile.activitySummary} />
         <Card style={{ marginBottom: 28 }}>
           {[{ icon: Stethoscope, label: t.profile.aiDiagnoses, value: String(user?.aiDiagnosisUsed ?? 0), color: Colors.primary },
-            { icon: Footprints, label: t.profile.walks, value: '-', color: Colors.success },
+            { icon: Footprints, label: t.profile.walks, value: String(user?.totalPoints ? Math.floor((user.totalPoints) / 10) : 0), color: Colors.success },
             { icon: Shield, label: t.profile.healthRecords, value: '-', color: Colors.accent },
-            { icon: ShoppingBag, label: t.profile.shopVisits, value: '-', color: Colors.secondary },
           ].map((item, i, arr) => (
             <React.Fragment key={item.label}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
@@ -195,20 +196,42 @@ export function ProfilePage() {
         {/* Account */}
         <SectionHeader title={t.profile.account} />
         <Card style={{ padding: 0 }}>
-          {[{ icon: User, label: t.profile.editProfile, route: '/edit-profile' }, { icon: Bell, label: t.profile.notifications, route: '' }, { icon: Shield, label: t.profile.privacyPolicy, route: '/privacy' }, { icon: FileText, label: t.profile.termsOfService, route: '/terms' }, { icon: HelpCircle, label: t.profile.helpSupport, route: '/contact' }].map((item, i) => (
+          {[{ icon: User, label: t.profile.editProfile, route: '/edit-profile' }, { icon: Shield, label: t.profile.privacyPolicy, route: '/privacy' }, { icon: FileText, label: t.profile.termsOfService, route: '/terms' }, { icon: HelpCircle, label: t.profile.helpSupport, route: '/contact' }].map((item, i) => (
             <button className="card-interactive" key={item.label} onClick={() => item.route && navigate(item.route)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%', borderTop: i > 0 ? `1px solid ${Colors.hairlineLight}` : 'none', cursor: 'pointer' }}>
               <item.icon size={22} color={Colors.inkSecondary} />
               <span style={{ flex: 1, fontSize: Font.body, color: Colors.ink, textAlign: 'left' }}>{item.label}</span>
               <ChevronRight size={18} color={Colors.inkTertiary} />
             </button>
           ))}
-          <button className="btn-press" onClick={() => { if (window.confirm(t.profile.signOutConfirm)) { signOut(); } }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%', borderTop: `1px solid ${Colors.hairlineLight}`, cursor: 'pointer' }}>
+          <button className="btn-press" onClick={() => setShowSignOutConfirm(true)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%', borderTop: `1px solid ${Colors.hairlineLight}`, cursor: 'pointer' }}>
             <LogOut size={22} color={Colors.error} />
             <span style={{ flex: 1, fontSize: Font.body, color: Colors.error, textAlign: 'left' }}>{t.profile.signOut}</span>
           </button>
         </Card>
         <div style={{ height: 40 }} />
       </div>
+
+      {selectedBadge && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: Colors.overlay, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 32 }} onClick={() => setSelectedBadge(null)}>
+          <div style={{ backgroundColor: Colors.surface, borderRadius: Radius.xl, padding: 32, maxWidth: 320, width: '100%', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink, marginBottom: 8 }}>{selectedBadge.name}</div>
+            <div style={{ fontSize: Font.body, color: Colors.inkSecondary, lineHeight: 1.5 }}>{selectedBadge.description}</div>
+            <button onClick={() => setSelectedBadge(null)} style={{ marginTop: 20, padding: '10px 32px', borderRadius: Radius.pill, backgroundColor: Colors.primary, color: Colors.inkInverse, fontSize: Font.body, fontWeight: Weight.bold, border: 'none', cursor: 'pointer' }}>{t.common.close}</button>
+          </div>
+        </div>
+      )}
+
+      {showSignOutConfirm && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: Colors.overlay, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 32 }} onClick={() => setShowSignOutConfirm(false)}>
+          <div style={{ backgroundColor: Colors.surface, borderRadius: Radius.xl, padding: 32, maxWidth: 320, width: '100%', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: Font.body, color: Colors.ink, marginBottom: 20, lineHeight: 1.5 }}>{t.profile.signOutConfirm}</div>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <button onClick={() => setShowSignOutConfirm(false)} style={{ flex: 1, padding: '12px 0', borderRadius: Radius.md, backgroundColor: Colors.surfaceSecondary, color: Colors.ink, fontSize: Font.body, fontWeight: Weight.semibold, border: 'none', cursor: 'pointer' }}>{t.common.cancel}</button>
+              <button onClick={() => { setShowSignOutConfirm(false); signOut(); }} style={{ flex: 1, padding: '12px 0', borderRadius: Radius.md, backgroundColor: Colors.error, color: Colors.inkInverse, fontSize: Font.body, fontWeight: Weight.bold, border: 'none', cursor: 'pointer' }}>{t.profile.signOut}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

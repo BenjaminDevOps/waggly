@@ -1,4 +1,4 @@
-import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
+import { Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Home, PawPrint, Stethoscope, Footprints, ShoppingBag, User } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -16,6 +16,7 @@ import { TermsPage } from './pages/Terms';
 import { EditProfilePage } from './pages/EditProfile';
 import { ContactPage } from './pages/Contact';
 import { LoginPage } from './pages/Login';
+import { initializePurchases } from './services/purchaseService';
 import { useI18n } from './i18n';
 import { useAuth } from './hooks/useAuth';
 import { useBadgeChecker } from './hooks/useBadges';
@@ -40,6 +41,19 @@ export default function App() {
   const { t } = useI18n();
   const { firebaseUser, loading } = useAuth();
   useBadgeChecker();
+  useEffect(() => {
+    if (firebaseUser) {
+      initializePurchases(firebaseUser.uid);
+      import('./services/userService').then(({ updateStreak }) => {
+        const lastStreak = localStorage.getItem('waggly_last_streak');
+        const today = new Date().toISOString().split('T')[0];
+        if (lastStreak !== today) {
+          updateStreak(firebaseUser.uid);
+          localStorage.setItem('waggly_last_streak', today);
+        }
+      });
+    }
+  }, [firebaseUser]);
   const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms', '/edit-profile', '/contact'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
 
   // Loading state — branded spinner while Firebase auth initializes
@@ -94,6 +108,7 @@ export default function App() {
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/edit-profile" element={<EditProfilePage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       {!hideTabBar && (
