@@ -9,7 +9,7 @@ import { useI18n } from '../i18n';
 type PetFilter = 'all' | 'dog' | 'cat' | 'nac';
 type ShopCategory = 'food' | 'toys' | 'health' | 'accessories' | 'grooming' | 'training';
 
-interface Product { id: string; name: string; desc: string; price: number; original?: number; rating: number; reviews: number; category: ShopCategory; pets: string[]; featured: boolean; isNew: boolean; affiliateUrl?: string; }
+interface Product { id: string; name: string; desc: string; price: number; original?: number; rating: number; reviews: number; category: ShopCategory; pets: string[]; featured: boolean; isNew: boolean; affiliateUrl?: string; imageUrl?: string; }
 
 // To add a product: paste your amzn.to short link directly in affiliateUrl.
 // Short links (amzn.to) already contain your affiliate tag — do NOT append ?tag=
@@ -90,8 +90,8 @@ export function ShopPage() {
                 <X size={18} color={Colors.inkSecondary} />
               </button>
             </div>
-            <div style={{ height: 160, backgroundColor: Colors.primaryPale, borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-              <ShoppingCart size={56} color={Colors.primary + '40'} />
+            <div style={{ height: 180, backgroundColor: Colors.primaryPale, borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, overflow: 'hidden' }}>
+              <ProductImage src={selectedProduct.imageUrl} name={selectedProduct.name} size={180} />
             </div>
             <h2 style={{ fontSize: 22, fontWeight: Weight.bold, color: Colors.ink }}>{selectedProduct.name}</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
@@ -143,12 +143,20 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
   );
 }
 
+function ProductImage({ src, name, size = 110 }: { src?: string; name: string; size?: number }) {
+  const [failed, setFailed] = useState(false);
+  if (src && !failed) {
+    return <img src={src} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={() => setFailed(true)} />;
+  }
+  return <ShoppingCart size={size > 130 ? 56 : 36} color={Colors.primary + '40'} />;
+}
+
 function ProductCard({ product, onClick }: { product: Product; onClick: () => void }) {
   const discount = product.original ? Math.round(((product.original - product.price) / product.original) * 100) : 0;
   return (
     <button className="card-interactive" onClick={onClick} style={{ backgroundColor: Colors.surface, borderRadius: 20, overflow: 'hidden', boxShadow: Shadow.soft, textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ height: 110, backgroundColor: Colors.primaryPale, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-        <ShoppingCart size={36} color={Colors.primary + '40'} />
+      <div style={{ height: 110, backgroundColor: Colors.primaryPale, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+        <ProductImage src={product.imageUrl} name={product.name} />
         {discount > 0 && <span style={{ position: 'absolute', top: 8, left: 8, backgroundColor: Colors.error, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>-{discount}%</span>}
         {product.isNew && <span style={{ position: 'absolute', top: 8, right: 8, backgroundColor: Colors.success, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>NEW</span>}
         {product.featured && !product.isNew && <span style={{ position: 'absolute', top: 8, right: 8, backgroundColor: Colors.secondary, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>TOP</span>}
