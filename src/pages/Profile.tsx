@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Diamond, ChevronRight, Shield, HelpCircle, LogOut, Lock, Stethoscope, Footprints, Crown, Medal, PawPrint, Flame, Star as StarIcon, Award, Building2, Trophy, Target, FileText, Globe } from 'lucide-react';
+import { User, Diamond, ChevronRight, Shield, HelpCircle, LogOut, Lock, Stethoscope, Footprints, Crown, Medal, PawPrint, Flame, Star as StarIcon, Award, Building2, Trophy, Target, FileText } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
@@ -21,14 +21,6 @@ const AVATAR_EMOJI: Record<string, string> = {
 const BADGE_ICON_MAP: Record<string, LucideIcon> = {
   PawPrint, Stethoscope, Flame, 'Star': StarIcon, Award, Diamond, Crown, Building2, Trophy, Footprints, Target, Medal,
 };
-const LEADERBOARD = [
-  { rank: 1, name: 'Sophie M.', points: 3450, Icon: Crown, color: '#E5A84B' },
-  { rank: 2, name: 'Lucas D.', points: 2890, Icon: Medal, color: '#9D9DAF' },
-  { rank: 3, name: 'Emma R.', points: 2340, Icon: Medal, color: '#D4726A' },
-  { rank: 4, name: 'You', points: 1250, Icon: PawPrint, color: '#5B5EA6' },
-  { rank: 5, name: 'Pierre L.', points: 980, Icon: null as any, color: '#6B6B80' },
-];
-
 const LOCALES: Locale[] = ['en', 'fr', 'es'];
 
 export function ProfilePage() {
@@ -159,21 +151,6 @@ export function ProfilePage() {
             );
           })}
         </div>
-
-        {/* Leaderboard */}
-        <SectionHeader title={t.profile.leaderboard} />
-        <Card style={{ padding: 0, marginBottom: 28 }}>
-          {LEADERBOARD.map(l => {
-            const isYou = l.name === 'You';
-            return (
-              <div key={l.rank} style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', backgroundColor: isYou ? Colors.primaryPale : 'transparent' }}>
-                <span style={{ width: 40, display: 'flex', justifyContent: 'center' }}>{l.Icon ? <l.Icon size={18} color={l.color} /> : <span style={{ fontWeight: Weight.bold, fontSize: 14 }}>#{l.rank}</span>}</span>
-                <span style={{ flex: 1, fontSize: Font.body, color: isYou ? Colors.primary : Colors.ink, fontWeight: isYou ? Weight.bold : Weight.regular }}>{l.name}</span>
-                <span style={{ fontWeight: Weight.bold, color: isYou ? Colors.primary : Colors.inkSecondary }}>{l.points} pts</span>
-              </div>
-            );
-          })}
-        </Card>
 
         {/* Activity Summary */}
         <SectionHeader title={t.profile.activitySummary} />
