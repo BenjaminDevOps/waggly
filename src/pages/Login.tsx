@@ -91,16 +91,15 @@ export function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      const { SignInWithApple } = await import('@capacitor-community/apple-sign-in');
-      const result = await SignInWithApple.authorize({
-        clientId: 'com.ministeredesapp.waggly',
-        redirectURI: '',
-        scopes: 'email name',
+      const { AppleSignIn, SignInScope } = await import('@capawesome/capacitor-apple-sign-in');
+      await AppleSignIn.initialize({ clientId: 'com.ministeredesapp.waggly' });
+      const result = await AppleSignIn.signIn({
+        scopes: [SignInScope.Email, SignInScope.FullName],
       });
       const provider = new OAuthProvider('apple.com');
       const credential = provider.credential({
-        idToken: result.response.identityToken,
-        rawNonce: result.response.authorizationCode,
+        idToken: result.idToken,
+        rawNonce: result.authorizationCode,
       });
       await signInWithCredential(auth, credential);
     } catch (err: any) {
