@@ -91,20 +91,28 @@ export function LoginPage() {
     setLoading(true);
     setError('');
     try {
+      const { Capacitor } = await import('@capacitor/core');
       const { AppleSignIn, SignInScope } = await import('@capawesome/capacitor-apple-sign-in');
-      await AppleSignIn.initialize({ clientId: 'com.ministeredesapp.waggly' });
+
+      // initialize() is only needed for web — skip on native iOS
+      if (!Capacitor.isNativePlatform()) {
+        await AppleSignIn.initialize({ clientId: 'com.ministeredesapp.waggly' });
+      }
+
       const result = await AppleSignIn.signIn({
         scopes: [SignInScope.Email, SignInScope.FullName],
       });
+
       const provider = new OAuthProvider('apple.com');
-      const credential = provider.credential({
-        idToken: result.idToken,
-        rawNonce: result.authorizationCode,
-      });
+      // rawNonce must be omitted if no nonce was passed to signIn()
+      const credential = provider.credential({ idToken: result.idToken });
       await signInWithCredential(auth, credential);
     } catch (err: any) {
-      if (err?.code !== '1001' && !err?.message?.includes('cancel')) {
-        setError(err?.message || 'Apple Sign In failed.');
+      const msg: string = err?.message ?? '';
+      const code: string = err?.code ?? '';
+      // Ignore user cancellation
+      if (code !== '1001' && !msg.toLowerCase().includes('cancel') && !msg.toLowerCase().includes('dismiss')) {
+        setError(msg || 'Apple Sign In failed.');
       }
       setLoading(false);
     }
