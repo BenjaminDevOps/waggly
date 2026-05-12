@@ -301,7 +301,6 @@ export interface Translations {
     hasAccount: string;
     orContinueWith: string;
     googleSignIn: string;
-    appleSignIn: string;
     forgotPassword: string;
     resetPasswordSent: string;
     passwordMismatch: string;

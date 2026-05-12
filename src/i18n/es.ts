@@ -274,7 +274,6 @@ export const es: Translations = {
     hasAccount: '¿Ya tienes cuenta?',
     orContinueWith: 'O continuar con',
     googleSignIn: 'Continuar con Google',
-    appleSignIn: 'Continuar con Apple',
     forgotPassword: '¿Olvidaste tu contraseña?',
     resetPasswordSent: '¡Correo de recuperación enviado!',
     passwordMismatch: 'Las contraseñas no coinciden',
