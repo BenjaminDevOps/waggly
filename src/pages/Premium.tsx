@@ -12,7 +12,8 @@ import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import {
   PREMIUM_PLANS,
-  purchasePremium, restorePurchases,
+  purchasePremium, restorePurchases, diagnoseRevenueCat,
+  type DiagnosticStep,
 } from '../services/purchaseService';
 
 const FEATURE_ICONS = [Sparkles, Zap, Shield, Crown, Star];
@@ -25,6 +26,8 @@ export function PremiumPage() {
   const [loading, setLoading] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [message, setMessage] = useState('');
+  const [diagSteps, setDiagSteps] = useState<DiagnosticStep[]>([]);
+  const [diagRunning, setDiagRunning] = useState(false);
 
   const features = [
     { title: t.premiumPage.unlimitedDiagnoses, desc: t.premiumPage.unlimitedDiagnosesDesc },
@@ -186,6 +189,40 @@ export function PremiumPage() {
             <button onClick={() => navigate('/terms')} style={{ fontSize: Font.xs, color: Colors.primary, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer' }}>{t.profile.termsOfService}</button>
             <button onClick={async () => { try { const { Browser } = await import('@capacitor/browser'); await Browser.open({ url: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/' }); } catch { window.open('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/', '_blank'); } }} style={{ fontSize: Font.xs, color: Colors.inkTertiary, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer' }}>EULA</button>
           </div>
+
+          <button
+            onClick={async () => {
+              setDiagRunning(true);
+              setDiagSteps([]);
+              try {
+                const results = await diagnoseRevenueCat();
+                setDiagSteps(results);
+              } catch (e: any) {
+                setDiagSteps([{ label: 'RC-00', status: 'error', detail: e?.message || String(e) }]);
+              }
+              setDiagRunning(false);
+            }}
+            disabled={diagRunning}
+            style={{ marginTop: Spacing.xl, fontSize: Font.xs, color: Colors.inkTertiary, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+          >
+            {diagRunning ? 'Diagnostic en cours...' : 'Diagnostic RevenueCat'}
+          </button>
+
+          {diagSteps.length > 0 && (
+            <div style={{ marginTop: Spacing.md, textAlign: 'left', backgroundColor: Colors.surface, borderRadius: Radius.md, padding: Spacing.md, border: `1px solid ${Colors.hairline}` }}>
+              {diagSteps.map((step) => (
+                <div key={step.label} style={{ display: 'flex', gap: 8, padding: '6px 0', borderBottom: `1px solid ${Colors.hairlineLight}`, alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: 14, flexShrink: 0 }}>
+                    {step.status === 'ok' ? '✅' : step.status === 'warn' ? '⚠️' : step.status === 'error' ? '❌' : '⏳'}
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 12, fontWeight: Weight.bold, color: Colors.ink, fontFamily: 'monospace' }}>{step.label}</div>
+                    <div style={{ fontSize: 11, color: step.status === 'error' ? Colors.error : Colors.inkSecondary, wordBreak: 'break-word', fontFamily: 'monospace' }}>{step.detail}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -242,3 +242,132 @@ export function getRemainingDiagnoses(isPremium: boolean, aiDiagnosisUsed: numbe
   if (isPremium) return -1;
   return Math.max(0, freeLimit - aiDiagnosisUsed);
 }
+
+export interface DiagnosticStep {
+  label: string;
+  status: 'ok' | 'warn' | 'error' | 'pending';
+  detail: string;
+}
+
+export async function diagnoseRevenueCat(): Promise<DiagnosticStep[]> {
+  const steps: DiagnosticStep[] = [];
+
+  // 1. Platform
+  const native = isNativePlatform();
+  steps.push({
+    label: 'RC-01 Platform',
+    status: native ? 'ok' : 'error',
+    detail: native ? 'Native iOS detected' : 'NOT native — purchases disabled in browser/simulator web view',
+  });
+  if (!native) return steps;
+
+  // 2. API Key
+  const apiKey = import.meta.env.VITE_REVENUECAT_API_KEY || '';
+  const keyValid = !!apiKey && apiKey !== 'appl_YOUR_REVENUECAT_API_KEY';
+  steps.push({
+    label: 'RC-02 API Key',
+    status: keyValid ? 'ok' : 'error',
+    detail: keyValid
+      ? `Key: ${apiKey.slice(0, 12)}...`
+      : 'MISSING — set VITE_REVENUECAT_API_KEY in .env',
+  });
+  if (!keyValid) return steps;
+
+  // 3. Plugin import
+  let Purchases: any = null;
+  try {
+    const mod = await withTimeout(
+      import('@revenuecat/purchases-capacitor'),
+      10000,
+      'import plugin',
+    );
+    Purchases = mod.Purchases;
+    steps.push({ label: 'RC-03 Plugin Import', status: 'ok', detail: 'Plugin loaded' });
+  } catch (e: any) {
+    steps.push({ label: 'RC-03 Plugin Import', status: 'error', detail: `FAILED: ${e?.message || String(e)}` });
+    return steps;
+  }
+
+  // 4. Configure
+  try {
+    await Purchases.configure({ apiKey });
+    steps.push({ label: 'RC-04 Configure', status: 'ok', detail: 'RevenueCat configured' });
+  } catch (e: any) {
+    steps.push({ label: 'RC-04 Configure', status: 'error', detail: `FAILED: ${e?.code || ''} ${e?.message || String(e)}` });
+    return steps;
+  }
+
+  // 5. Get offerings
+  let offerings: any = null;
+  try {
+    offerings = await withTimeout(Purchases.getOfferings(), 15000, 'getOfferings');
+    const current = offerings?.current;
+    if (!current) {
+      steps.push({
+        label: 'RC-05 Offerings',
+        status: 'error',
+        detail: 'No current offering — create one in RevenueCat dashboard → Offerings → set as Current',
+      });
+      return steps;
+    }
+    steps.push({
+      label: 'RC-05 Offerings',
+      status: 'ok',
+      detail: `Current: "${current.identifier}"`,
+    });
+  } catch (e: any) {
+    steps.push({ label: 'RC-05 Offerings', status: 'error', detail: `FAILED: ${e?.code || ''} ${e?.message || String(e)}` });
+    return steps;
+  }
+
+  // 6. Packages
+  const packages = offerings.current?.availablePackages ?? [];
+  if (packages.length === 0) {
+    steps.push({
+      label: 'RC-06 Packages',
+      status: 'error',
+      detail: 'No packages in offering — add products in RevenueCat dashboard → Offerings → Packages',
+    });
+    return steps;
+  }
+  const pkgList = packages.map((p: any) =>
+    `${p.packageType}: ${p.product?.identifier} (${p.product?.priceString ?? '?'})`,
+  ).join(' | ');
+  steps.push({ label: 'RC-06 Packages', status: 'ok', detail: pkgList });
+
+  // 7. Product IDs match
+  const productIds = packages.map((p: any) => p.product?.identifier);
+  const monthlyMatch = productIds.includes(PRODUCTS.premiumMonthly);
+  const yearlyMatch = productIds.includes(PRODUCTS.premiumYearly);
+  if (!monthlyMatch && !yearlyMatch) {
+    steps.push({
+      label: 'RC-07 Product Match',
+      status: 'warn',
+      detail: `No exact match. Expected: ${PRODUCTS.premiumMonthly} or ${PRODUCTS.premiumYearly}. Got: ${productIds.join(', ')}. Will fallback to packageType.`,
+    });
+  } else {
+    steps.push({
+      label: 'RC-07 Product Match',
+      status: 'ok',
+      detail: `Monthly: ${monthlyMatch ? 'YES' : 'NO'}, Yearly: ${yearlyMatch ? 'YES' : 'NO'}`,
+    });
+  }
+
+  // 8. Customer info
+  try {
+    const info: any = await withTimeout(Purchases.getCustomerInfo(), 10000, 'getCustomerInfo');
+    const active = info?.customerInfo?.entitlements?.active;
+    const activeKeys = active ? Object.keys(active) : [];
+    steps.push({
+      label: 'RC-08 Customer Info',
+      status: 'ok',
+      detail: activeKeys.length > 0
+        ? `Active entitlements: ${activeKeys.join(', ')}`
+        : 'No active entitlements (user is not premium)',
+    });
+  } catch (e: any) {
+    steps.push({ label: 'RC-08 Customer Info', status: 'warn', detail: `Could not fetch: ${e?.message || String(e)}` });
+  }
+
+  return steps;
+}
