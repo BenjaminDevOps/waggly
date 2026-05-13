@@ -173,7 +173,9 @@ export async function purchasePremium(
     }
 
     l(`Purchasing: ${pkg.product?.identifier} (${pkg.packageType})...`);
+    const purchaseStart = Date.now();
     const result = await Purchases.purchasePackage({ aPackage: pkg });
+    l(`purchasePackage completed in ${Date.now() - purchaseStart}ms`);
     l('Purchase completed, checking entitlements...');
 
     if (result?.customerInfo?.entitlements?.active?.premium) {

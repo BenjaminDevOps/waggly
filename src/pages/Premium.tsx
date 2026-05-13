@@ -50,7 +50,7 @@ export function PremiumPage() {
       const result = await Promise.race([
         purchasePremium(selectedPlan, firebaseUser.uid),
         new Promise<{ success: false; message: string }>((resolve) =>
-          setTimeout(() => resolve({ success: false, message: 'Request timed out after 20s.' }), 20000),
+          setTimeout(() => resolve({ success: false, message: 'Payment timed out. If you were charged, use "Restore Purchases" to recover your subscription.' }), 120000),
         ),
       ]);
       setMessage(result.message);
