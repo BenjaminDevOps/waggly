@@ -3,8 +3,8 @@ import { doc, updateDoc, increment } from 'firebase/firestore';
 import { COLLECTIONS } from '../constants/app';
 
 export const PRODUCTS = {
-  premiumMonthly: 'com.ministeredesapp.waggly.premium.monthly',
-  premiumYearly: 'com.ministeredesapp.waggly.premium.yearly',
+  premiumMonthly: 'waggly_001_month',
+  premiumYearly: 'waggly_001_year',
 } as const;
 
 export interface PremiumPlan {
@@ -20,13 +20,13 @@ export const PREMIUM_PLANS: PremiumPlan[] = [
   {
     id: PRODUCTS.premiumMonthly,
     name: 'Monthly',
-    price: '$4.99',
+    price: '4,99 €',
     period: '/month',
   },
   {
     id: PRODUCTS.premiumYearly,
     name: 'Yearly',
-    price: '$29.99',
+    price: '29,99 €',
     period: '/year',
     savings: 'Save 50%',
     recommended: true,
