@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Diamond, Check, Sparkles, Shield, Crown, Zap, Star, RefreshCw,
@@ -10,11 +10,7 @@ import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
-import {
-  PREMIUM_PLANS,
-  preloadOfferings, purchasePreloaded, restorePurchases, diagnoseRevenueCat,
-  type DiagnosticStep,
-} from '../services/purchaseService';
+import { PREMIUM_PLANS, purchasePremium, restorePurchases } from '../services/purchaseService';
 
 const FEATURE_ICONS = [Sparkles, Zap, Shield, Crown, Star];
 
@@ -26,14 +22,6 @@ export function PremiumPage() {
   const [loading, setLoading] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [message, setMessage] = useState('');
-  const [diagSteps, setDiagSteps] = useState<DiagnosticStep[]>([]);
-  const [diagRunning, setDiagRunning] = useState(false);
-  const packagesRef = useRef<any[]>([]);
-
-  useEffect(() => {
-    if (!firebaseUser) return;
-    preloadOfferings().then(({ packages }) => { packagesRef.current = packages; });
-  }, [firebaseUser]);
 
   const features = [
     { title: t.premiumPage.unlimitedDiagnoses, desc: t.premiumPage.unlimitedDiagnosesDesc },
@@ -53,25 +41,7 @@ export function PremiumPage() {
     setLoading(true);
     setMessage('');
     try {
-      let packages = packagesRef.current;
-      if (packages.length === 0) {
-        const { packages: freshPkgs } = await preloadOfferings();
-        packages = freshPkgs;
-        packagesRef.current = freshPkgs;
-      }
-
-      const isYearly = selectedPlan.includes('yearly');
-      const pkg = packages.find((p: any) => p.product?.identifier === selectedPlan)
-        ?? packages.find((p: any) => p.packageType === (isYearly ? 'ANNUAL' : 'MONTHLY'))
-        ?? packages[0]
-        ?? null;
-
-      if (!pkg) {
-        setMessage('No products available. Please check your connection and try again.');
-        return;
-      }
-
-      const result = await purchasePreloaded(pkg, firebaseUser.uid);
+      const result = await purchasePremium(selectedPlan, firebaseUser.uid);
       setMessage(result.message);
       if (result.success) setTimeout(() => navigate(-1), 1500);
     } catch (e: any) {
@@ -86,12 +56,7 @@ export function PremiumPage() {
     setRestoring(true);
     setMessage('');
     try {
-      const result = await Promise.race([
-        restorePurchases(firebaseUser.uid),
-        new Promise<{ success: false; message: string }>((resolve) =>
-          setTimeout(() => resolve({ success: false, message: 'Restore timed out.' }), 15000),
-        ),
-      ]);
+      const result = await restorePurchases(firebaseUser.uid);
       setMessage(result.message);
     } catch (e: any) {
       setMessage(e?.message || 'An unexpected error occurred.');
@@ -193,7 +158,6 @@ export function PremiumPage() {
           </Card>
         )}
 
-
         <Button
           label={loading ? t.premiumPage.processing : t.premiumPage.subscribeNow}
           onPress={handlePurchase}
@@ -205,50 +169,16 @@ export function PremiumPage() {
 
         <button className="btn-press" onClick={handleRestore} disabled={restoring} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: Spacing.md, color: Colors.primary, fontSize: Font.body, fontWeight: Weight.semibold, cursor: 'pointer', background: 'none', border: 'none' }}>
           <RefreshCw size={16} color={Colors.primary} className={restoring ? 'spin' : ''} />
-          {t.premiumPage.restorePurchases}
+          {restoring ? t.common.loading : t.premiumPage.restorePurchases}
         </button>
 
         <div style={{ textAlign: 'center', paddingBottom: Spacing.xxl }}>
           <p style={{ fontSize: Font.xs, color: Colors.inkTertiary, lineHeight: 1.6, margin: 0 }}>{t.premiumPage.paymentDisclaimer}</p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: Spacing.lg, marginTop: Spacing.md }}>
-            <button onClick={() => navigate('/privacy')} style={{ fontSize: Font.xs, color: Colors.primary, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer' }}>{t.profile.privacyPolicy}</button>
-            <button onClick={() => navigate('/terms')} style={{ fontSize: Font.xs, color: Colors.primary, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer' }}>{t.profile.termsOfService}</button>
-            <button onClick={async () => { try { const { Browser } = await import('@capacitor/browser'); await Browser.open({ url: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/' }); } catch { window.open('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/', '_blank'); } }} style={{ fontSize: Font.xs, color: Colors.inkTertiary, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer' }}>EULA</button>
+            <button onClick={() => navigate('/privacy')} style={{ fontSize: Font.xs, color: Colors.primary, background: 'none', border: 'none', cursor: 'pointer' }}>{t.profile.privacyPolicy}</button>
+            <button onClick={() => navigate('/terms')} style={{ fontSize: Font.xs, color: Colors.primary, background: 'none', border: 'none', cursor: 'pointer' }}>{t.profile.termsOfService}</button>
+            <button onClick={async () => { try { const { Browser } = await import('@capacitor/browser'); await Browser.open({ url: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/' }); } catch { window.open('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/', '_blank'); } }} style={{ fontSize: Font.xs, color: Colors.inkTertiary, background: 'none', border: 'none', cursor: 'pointer' }}>EULA</button>
           </div>
-
-          <button
-            onClick={async () => {
-              setDiagRunning(true);
-              setDiagSteps([]);
-              try {
-                const results = await diagnoseRevenueCat();
-                setDiagSteps(results);
-              } catch (e: any) {
-                setDiagSteps([{ label: 'RC-00', status: 'error', detail: e?.message || String(e) }]);
-              }
-              setDiagRunning(false);
-            }}
-            disabled={diagRunning}
-            style={{ marginTop: Spacing.xl, fontSize: Font.xs, color: Colors.inkTertiary, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
-          >
-            {diagRunning ? 'Diagnostic en cours...' : 'Diagnostic RevenueCat'}
-          </button>
-
-          {diagSteps.length > 0 && (
-            <div style={{ marginTop: Spacing.md, textAlign: 'left', backgroundColor: Colors.surface, borderRadius: Radius.md, padding: Spacing.md, border: `1px solid ${Colors.hairline}` }}>
-              {diagSteps.map((step) => (
-                <div key={step.label} style={{ display: 'flex', gap: 8, padding: '6px 0', borderBottom: `1px solid ${Colors.hairlineLight}`, alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: 14, flexShrink: 0 }}>
-                    {step.status === 'ok' ? '✅' : step.status === 'warn' ? '⚠️' : step.status === 'error' ? '❌' : '⏳'}
-                  </span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: Weight.bold, color: Colors.ink, fontFamily: 'monospace' }}>{step.label}</div>
-                    <div style={{ fontSize: 11, color: step.status === 'error' ? Colors.error : Colors.inkSecondary, wordBreak: 'break-word', fontFamily: 'monospace' }}>{step.detail}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </div>
