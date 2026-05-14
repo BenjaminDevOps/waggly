@@ -59,5 +59,16 @@
 	<string>Waggly uses your location to track walk routes with your pet.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.366401967888-sqoh4eefs97c54v7ti52tr36v1jmgglk</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
