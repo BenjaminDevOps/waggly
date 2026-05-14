@@ -265,6 +265,7 @@ export interface Translations {
     unlockDesc: string;
     subscribeNow: string;
     processing: string;
+    loading: string;
     restorePurchases: string;
     bestValue: string;
     monthly: string;

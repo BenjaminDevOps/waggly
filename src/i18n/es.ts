@@ -241,6 +241,7 @@ export const es: Translations = {
     unlockDesc: 'Saca el máximo partido a Waggly con diagnósticos IA ilimitados y funciones exclusivas.',
     subscribeNow: 'Suscribirse ahora',
     processing: 'Procesando...',
+    loading: 'Cargando...',
     restorePurchases: 'Restaurar compras',
     bestValue: 'MEJOR PRECIO',
     monthly: 'Mensual',
