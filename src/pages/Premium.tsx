@@ -29,14 +29,10 @@ export function PremiumPage() {
   const [diagSteps, setDiagSteps] = useState<DiagnosticStep[]>([]);
   const [diagRunning, setDiagRunning] = useState(false);
   const packagesRef = useRef<any[]>([]);
-  const [offeringsReady, setOfferingsReady] = useState(false);
 
   useEffect(() => {
     if (!firebaseUser) return;
-    preloadOfferings().then(({ packages }) => {
-      packagesRef.current = packages;
-      setOfferingsReady(true);
-    });
+    preloadOfferings().then(({ packages }) => { packagesRef.current = packages; });
   }, [firebaseUser]);
 
   const features = [
@@ -199,11 +195,11 @@ export function PremiumPage() {
 
 
         <Button
-          label={loading ? t.premiumPage.processing : !offeringsReady ? t.common.loading : t.premiumPage.subscribeNow}
+          label={loading ? t.premiumPage.processing : t.premiumPage.subscribeNow}
           onPress={handlePurchase}
           variant="primary"
           size="large"
-          loading={loading || !offeringsReady}
+          loading={loading}
           icon={<Diamond size={20} color={Colors.inkInverse} />}
         />
 
