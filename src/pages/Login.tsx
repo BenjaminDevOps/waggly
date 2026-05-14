@@ -92,7 +92,6 @@ export function LoginPage() {
     setError('');
     try {
       const { SocialLogin } = await import('@capgo/capacitor-social-login');
-      await SocialLogin.initialize({ google: { webClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID } });
       const result = await SocialLogin.login({ provider: 'google', options: {} });
       const idToken = (result.result as { idToken?: string })?.idToken;
       const credential = GoogleAuthProvider.credential(idToken ?? null);

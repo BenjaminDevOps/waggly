@@ -17,8 +17,7 @@ import { EditProfilePage } from './pages/EditProfile';
 import { ContactPage } from './pages/Contact';
 import { LoginPage } from './pages/Login';
 import { initializePurchases } from './services/purchaseService';
-import { useI18n } from './i18n';
-import { useAuth } from './hooks/useAuth';
+import { useI18n } from './i18n';import { useAuth } from './hooks/useAuth';
 import { useBadgeChecker } from './hooks/useBadges';
 
 const tabDefs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof useI18n>['t']['tabs'] }[] = [
@@ -41,6 +40,13 @@ export default function App() {
   const { t } = useI18n();
   const { firebaseUser, loading } = useAuth();
   useBadgeChecker();
+  useEffect(() => {
+    import('@capgo/capacitor-social-login').then(({ SocialLogin }) => {
+      SocialLogin.initialize({ google: { webClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID } })
+        .catch(() => {});
+    }).catch(() => {});
+  }, []);
+
   useEffect(() => {
     if (firebaseUser) {
       initializePurchases(firebaseUser.uid);
