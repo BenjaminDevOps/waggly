@@ -74,21 +74,12 @@ export async function restorePurchases(
 
   try {
     const { NativePurchases } = await import('@capgo/native-purchases');
-    const result: any = await NativePurchases.restorePurchases();
-    const transactions: any[] = Array.isArray(result) ? result : (result?.transactions ?? []);
-    const productIds: string[] = [PRODUCTS.premiumMonthly, PRODUCTS.premiumYearly];
-    const hasPremium = transactions.some(
-      (t: any) => productIds.includes(t.productIdentifier ?? t.productId ?? ''),
-    );
-
-    if (hasPremium) {
-      await setPremiumStatus(userId, true);
-      return { success: true, message: 'Premium restored successfully!' };
-    }
-    return { success: false, message: 'No active subscriptions found.' };
+    await NativePurchases.restorePurchases();
+    await setPremiumStatus(userId, true);
+    return { success: true, message: 'Premium restored successfully!' };
   } catch (error: any) {
     console.error('[Purchase] Restore error:', error);
-    return { success: false, message: 'Failed to restore purchases.' };
+    return { success: false, message: error?.message || 'No active subscriptions found.' };
   }
 }
 
