@@ -199,7 +199,7 @@ export function PremiumPage() {
 
 
         <Button
-          label={loading ? t.premiumPage.processing : !offeringsReady ? t.premiumPage.loading : t.premiumPage.subscribeNow}
+          label={loading ? t.premiumPage.processing : !offeringsReady ? t.common.loading : t.premiumPage.subscribeNow}
           onPress={handlePurchase}
           variant="primary"
           size="large"
