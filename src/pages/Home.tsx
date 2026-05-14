@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   PawPrint, Stethoscope, ShoppingBag, Trophy, ChevronRight,
   Plus, Star, Flame, Footprints, Sparkles,
-  Dog, Cat, Rabbit, Bird,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Shadow, Font, Weight } from '../theme/spacing';
 import { Card } from '../components/Card';
@@ -15,10 +13,7 @@ import { usePets } from '../hooks/usePets';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import { subscribeToTodayWalks } from '../services/walkFirestoreService';
-import type { PetType } from '../models/types';
-
-const PET_ICON_MAP: Record<PetType, LucideIcon> = { dog: Dog, cat: Cat, rabbit: Rabbit, bird: Bird, other: PawPrint };
-const PET_COLOR_MAP: Record<PetType, string> = { dog: Colors.primary, cat: Colors.accent, rabbit: Colors.secondary, bird: Colors.success, other: Colors.lavender };
+import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
 
 
 const ProgressCircle: React.FC<{ pct: number; size?: number; stroke?: number }> = ({ pct, size = 80, stroke = 7 }) => {
