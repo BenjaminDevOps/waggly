@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Diamond, Check, Sparkles, Shield, Crown, Zap, Star, RefreshCw,
@@ -12,7 +12,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import {
   PREMIUM_PLANS,
-  purchasePremium, restorePurchases, diagnoseRevenueCat,
+  preloadOfferings, purchasePreloaded, restorePurchases, diagnoseRevenueCat,
   type DiagnosticStep,
 } from '../services/purchaseService';
 
@@ -28,6 +28,16 @@ export function PremiumPage() {
   const [message, setMessage] = useState('');
   const [diagSteps, setDiagSteps] = useState<DiagnosticStep[]>([]);
   const [diagRunning, setDiagRunning] = useState(false);
+  const packagesRef = useRef<any[]>([]);
+  const [offeringsReady, setOfferingsReady] = useState(false);
+
+  useEffect(() => {
+    if (!firebaseUser) return;
+    preloadOfferings().then(({ packages }) => {
+      packagesRef.current = packages;
+      setOfferingsReady(true);
+    });
+  }, [firebaseUser]);
 
   const features = [
     { title: t.premiumPage.unlimitedDiagnoses, desc: t.premiumPage.unlimitedDiagnosesDesc },
@@ -47,12 +57,25 @@ export function PremiumPage() {
     setLoading(true);
     setMessage('');
     try {
-      const result = await Promise.race([
-        purchasePremium(selectedPlan, firebaseUser.uid),
-        new Promise<{ success: false; message: string }>((resolve) =>
-          setTimeout(() => resolve({ success: false, message: 'Payment timed out. If you were charged, use "Restore Purchases" to recover your subscription.' }), 120000),
-        ),
-      ]);
+      let packages = packagesRef.current;
+      if (packages.length === 0) {
+        const { packages: freshPkgs } = await preloadOfferings();
+        packages = freshPkgs;
+        packagesRef.current = freshPkgs;
+      }
+
+      const isYearly = selectedPlan.includes('yearly');
+      const pkg = packages.find((p: any) => p.product?.identifier === selectedPlan)
+        ?? packages.find((p: any) => p.packageType === (isYearly ? 'ANNUAL' : 'MONTHLY'))
+        ?? packages[0]
+        ?? null;
+
+      if (!pkg) {
+        setMessage('No products available. Please check your connection and try again.');
+        return;
+      }
+
+      const result = await purchasePreloaded(pkg, firebaseUser.uid);
       setMessage(result.message);
       if (result.success) setTimeout(() => navigate(-1), 1500);
     } catch (e: any) {
@@ -175,7 +198,14 @@ export function PremiumPage() {
         )}
 
 
-        <Button label={loading ? t.premiumPage.processing : t.premiumPage.subscribeNow} onPress={handlePurchase} variant="primary" size="large" loading={loading} icon={<Diamond size={20} color={Colors.inkInverse} />} />
+        <Button
+          label={loading ? t.premiumPage.processing : !offeringsReady ? t.premiumPage.loading : t.premiumPage.subscribeNow}
+          onPress={handlePurchase}
+          variant="primary"
+          size="large"
+          loading={loading || !offeringsReady}
+          icon={<Diamond size={20} color={Colors.inkInverse} />}
+        />
 
         <button className="btn-press" onClick={handleRestore} disabled={restoring} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: Spacing.md, color: Colors.primary, fontSize: Font.body, fontWeight: Weight.semibold, cursor: 'pointer', background: 'none', border: 'none' }}>
           <RefreshCw size={16} color={Colors.primary} className={restoring ? 'spin' : ''} />
