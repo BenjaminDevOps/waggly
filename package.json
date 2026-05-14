@@ -22,7 +22,7 @@
     "@capacitor/geolocation": "^8.2.0",
     "@capacitor/ios": "^8.3.0",
     "@capacitor/share": "^8.0.1",
-    "@capawesome/capacitor-google-sign-in": "^0.1.2",
+    "@capgo/capacitor-social-login": "^8.0.0",
     "@capgo/capacitor-pedometer": "^8.0.26",
     "@google/generative-ai": "^0.21.0",
     "@revenuecat/purchases-capacitor": "^13.0.1",

@@ -91,12 +91,11 @@ export function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      const { GoogleSignIn } = await import('@capawesome/capacitor-google-sign-in');
-      await GoogleSignIn.initialize({
-        clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-      });
-      const result = await GoogleSignIn.signIn();
-      const credential = GoogleAuthProvider.credential(result.idToken);
+      const { SocialLogin } = await import('@capgo/capacitor-social-login');
+      await SocialLogin.initialize({ google: { webClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID } });
+      const result = await SocialLogin.login({ provider: 'google', options: {} });
+      const idToken = result.result?.idToken;
+      const credential = GoogleAuthProvider.credential(idToken ?? null);
       await signInWithCredential(auth, credential);
     } catch (err: any) {
       const msg: string = err?.message ?? '';
