@@ -1,28 +1,11 @@
-import 'package:google_generative_ai/google_generative_ai.dart';
-
-/// Gemini AI configuration for veterinary diagnosis
+/// AI configuration — DeepSeek backend (OpenAI-compatible)
 class GeminiConfig {
-  static const String apiKey = 'YOUR_GEMINI_API_KEY';
-  static const String modelName = 'gemini-2.5-lite';
+  static const String apiKey = 'YOUR_DEEPSEEK_API_KEY';
+  static const String modelName = 'deepseek-v4-flash';
+  static const String baseUrl = 'https://api.deepseek.com/v1';
 
-  static GenerativeModel getModel() {
-    return GenerativeModel(
-      model: modelName,
-      apiKey: apiKey,
-      generationConfig: GenerationConfig(
-        temperature: 0.7,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 2048,
-      ),
-      safetySettings: [
-        SafetySetting(HarmCategory.harassment, HarmBlockThreshold.medium),
-        SafetySetting(HarmCategory.hateSpeech, HarmBlockThreshold.medium),
-        SafetySetting(HarmCategory.sexuallyExplicit, HarmBlockThreshold.medium),
-        SafetySetting(HarmCategory.dangerousContent, HarmBlockThreshold.medium),
-      ],
-    );
-  }
+  static const double temperature = 0.7;
+  static const int maxTokens = 2048;
 
   /// System prompt for veterinary diagnosis
   static const String systemPrompt = '''

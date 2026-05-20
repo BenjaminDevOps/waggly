@@ -43,8 +43,7 @@ dependencies:
   firebase_storage: ^12.3.6
   firebase_analytics: ^11.3.8
 
-  # Gemini AI
-  google_generative_ai: ^0.4.6
+  # DeepSeek AI (OpenAI-compatible API, uses http package)
 
   # State Management
   provider: ^6.1.2

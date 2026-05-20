@@ -1,17 +1,11 @@
+import 'dart:convert';
 import 'dart:typed_data';
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:http/http.dart' as http;
 import '../../core/config/gemini_config.dart';
 import '../models/diagnosis_model.dart';
 
-/// Gemini AI service for veterinary diagnosis
+/// AI service for veterinary diagnosis — powered by DeepSeek
 class GeminiService {
-  late final GenerativeModel _model;
-
-  GeminiService() {
-    _model = GeminiConfig.getModel();
-  }
-
-  /// Analyze pet symptoms and provide diagnosis
   Future<DiagnosisResult> analyzePetSymptoms({
     required String petType,
     required String petAge,
@@ -19,50 +13,59 @@ class GeminiService {
     List<Uint8List>? images,
   }) async {
     try {
-      final prompt = _buildDiagnosisPrompt(
+      final userPrompt = _buildDiagnosisPrompt(
         petType: petType,
         petAge: petAge,
         symptoms: symptoms,
+        hasImages: images != null && images.isNotEmpty,
       );
 
-      final content = <Content>[];
-      final parts = <Part>[];
+      final response = await http.post(
+        Uri.parse('${GeminiConfig.baseUrl}/chat/completions'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${GeminiConfig.apiKey}',
+        },
+        body: jsonEncode({
+          'model': GeminiConfig.modelName,
+          'messages': [
+            {'role': 'system', 'content': GeminiConfig.systemPrompt},
+            {'role': 'user', 'content': userPrompt},
+          ],
+          'temperature': GeminiConfig.temperature,
+          'max_tokens': GeminiConfig.maxTokens,
+        }),
+      );
 
-      // Add system prompt and user query
-      parts.add(TextPart(GeminiConfig.systemPrompt));
-      parts.add(TextPart(prompt));
-
-      // Add images if provided
-      if (images != null && images.isNotEmpty) {
-        for (final image in images) {
-          parts.add(DataPart('image/jpeg', image));
-        }
+      if (response.statusCode != 200) {
+        throw Exception('API error ${response.statusCode}: ${response.body}');
       }
 
-      content.add(Content.multi(parts));
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final responseText =
+          (data['choices'] as List).first['message']['content'] as String? ?? '';
 
-      // Generate response
-      final response = await _model.generateContent(content);
-      final responseText = response.text ?? '';
-
-      // Parse response
       return _parseResponse(responseText);
     } catch (e) {
       throw Exception('Failed to analyze symptoms: $e');
     }
   }
 
-  /// Build diagnosis prompt
   String _buildDiagnosisPrompt({
     required String petType,
     required String petAge,
     required String symptoms,
+    required bool hasImages,
   }) {
+    final imageNote = hasImages
+        ? '\nNote: The owner has provided photos, but image analysis is not available in this mode. Base your assessment on the symptoms described.\n'
+        : '';
+
     return '''
 Pet Information:
 - Type: $petType
 - Age: $petAge
-
+$imageNote
 Symptoms Reported:
 $symptoms
 
@@ -77,31 +80,26 @@ Format your response clearly with these sections.
 ''';
   }
 
-  /// Parse Gemini response into structured data
   DiagnosisResult _parseResponse(String response) {
-    // Simple parsing logic - can be enhanced with regex
     DiagnosisSeverity severity = DiagnosisSeverity.medium;
     List<String> possibleConditions = [];
     List<String> recommendations = [];
     bool requiresVetVisit = false;
 
-    // Parse severity
-    if (response.toLowerCase().contains('emergency') ||
-        response.toLowerCase().contains('severe')) {
+    final lower = response.toLowerCase();
+
+    if (lower.contains('emergency') || lower.contains('severe')) {
       severity = DiagnosisSeverity.emergency;
       requiresVetVisit = true;
-    } else if (response.toLowerCase().contains('high')) {
+    } else if (lower.contains('high')) {
       severity = DiagnosisSeverity.high;
       requiresVetVisit = true;
-    } else if (response.toLowerCase().contains('medium') ||
-        response.toLowerCase().contains('moderate')) {
+    } else if (lower.contains('medium') || lower.contains('moderate')) {
       severity = DiagnosisSeverity.medium;
-    } else if (response.toLowerCase().contains('low') ||
-        response.toLowerCase().contains('mild')) {
+    } else if (lower.contains('low') || lower.contains('mild')) {
       severity = DiagnosisSeverity.low;
     }
 
-    // Simple extraction (in production, use better parsing)
     final lines = response.split('\n');
     bool inConditions = false;
     bool inRecommendations = false;
@@ -126,10 +124,9 @@ Format your response clearly with these sections.
       }
     }
 
-    // Check if vet visit is mentioned
-    if (response.toLowerCase().contains('see a vet') ||
-        response.toLowerCase().contains('veterinar') ||
-        response.toLowerCase().contains('consult a professional')) {
+    if (lower.contains('see a vet') ||
+        lower.contains('veterinar') ||
+        lower.contains('consult a professional')) {
       requiresVetVisit = true;
     }
 
