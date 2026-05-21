@@ -1,9 +1,8 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { DiagnosisSeverity } from '../models/types';
 import type { Locale } from '../i18n';
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY ?? '';
-const genAI = new GoogleGenerativeAI(API_KEY);
+const API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY ?? '';
+const DEEPSEEK_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 const LANGUAGE_NAMES: Record<Locale, string> = {
   en: 'English',
@@ -134,28 +133,30 @@ export async function analyzePetSymptoms(params: {
 }): Promise<DiagnosisResult> {
   const locale: Locale = params.locale ?? 'en';
 
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
-    safetySettings: [
-      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-    ],
-    generationConfig: {
-      temperature: 0.7,
-      topK: 40,
-      topP: 0.95,
-      maxOutputTokens: 2048,
+  const res = await fetch(DEEPSEEK_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_KEY}`,
     },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: [
+        { role: 'system', content: buildSystemPrompt(locale) },
+        { role: 'user', content: buildUserPrompt(params, locale) },
+      ],
+      temperature: 0.7,
+      max_tokens: 2048,
+    }),
   });
 
-  const systemPrompt = buildSystemPrompt(locale);
-  const userPrompt = buildUserPrompt(params, locale);
-  const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`DeepSeek API error ${res.status}: ${err}`);
+  }
 
-  const result = await model.generateContent(fullPrompt);
-  const response = result.response.text();
+  const data = await res.json();
+  const response: string = data.choices?.[0]?.message?.content ?? '';
   return parseResponse(response, locale);
 }
 
