@@ -231,6 +231,11 @@ export const fr: Translations = {
     signOut: 'Déconnexion',
     signOutConfirm: 'Êtes-vous sûr de vouloir vous déconnecter ?',
     language: 'Langue',
+    deleteAccount: 'Supprimer le compte',
+    deleteAccountTitle: 'Supprimer le compte ?',
+    deleteAccountConfirm: 'Cette action est permanente et irréversible. Toutes vos données seront supprimées.',
+    deleteAccountPasswordLabel: 'Entrez votre mot de passe pour confirmer',
+    deleteAccountError: 'Mot de passe incorrect. Veuillez réessayer.',
   },
   premiumPage: {
     title: 'Waggly Premium',

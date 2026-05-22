@@ -231,6 +231,11 @@ export const es: Translations = {
     signOut: 'Cerrar sesión',
     signOutConfirm: '¿Estás seguro de que quieres cerrar sesión?',
     language: 'Idioma',
+    deleteAccount: 'Eliminar cuenta',
+    deleteAccountTitle: '¿Eliminar cuenta?',
+    deleteAccountConfirm: 'Esta acción es permanente e irreversible. Todos tus datos serán eliminados.',
+    deleteAccountPasswordLabel: 'Ingresa tu contraseña para confirmar',
+    deleteAccountError: 'Contraseña incorrecta. Por favor, inténtalo de nuevo.',
   },
   premiumPage: {
     title: 'Waggly Premium',

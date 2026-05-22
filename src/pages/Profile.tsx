@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Diamond, ChevronRight, Shield, HelpCircle, LogOut, Lock, Stethoscope, Footprints, Crown, Medal, PawPrint, Flame, Star as StarIcon, Award, Building2, Trophy, Target, FileText } from 'lucide-react';
+import { User, Diamond, ChevronRight, Shield, HelpCircle, LogOut, Lock, Stethoscope, Footprints, Crown, Medal, PawPrint, Flame, Star as StarIcon, Award, Building2, Trophy, Target, FileText, Trash2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
@@ -25,11 +25,15 @@ const LOCALES: Locale[] = ['en', 'fr', 'es'];
 
 export function ProfilePage() {
   const navigate = useNavigate();
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, signOut, deleteAccount } = useAuth();
   const { pets } = usePets();
   const { t, locale, setLocale } = useI18n();
   const [selectedBadge, setSelectedBadge] = useState<{ name: string; description: string } | null>(null);
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const totalPoints = user?.totalPoints ?? 0;
   const streak = user?.dailyStreak ?? 0;
@@ -184,6 +188,10 @@ export function ProfilePage() {
             <LogOut size={22} color={Colors.error} />
             <span style={{ flex: 1, fontSize: Font.body, color: Colors.error, textAlign: 'left' }}>{t.profile.signOut}</span>
           </button>
+          <button className="btn-press" onClick={() => { setDeletePassword(''); setDeleteError(''); setShowDeleteConfirm(true); }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 16, width: '100%', borderTop: `1px solid ${Colors.hairlineLight}`, cursor: 'pointer' }}>
+            <Trash2 size={22} color={Colors.error} />
+            <span style={{ flex: 1, fontSize: Font.body, color: Colors.error, textAlign: 'left' }}>{t.profile.deleteAccount}</span>
+          </button>
         </Card>
         <div style={{ height: 40 }} />
       </div>
@@ -205,6 +213,44 @@ export function ProfilePage() {
             <div style={{ display: 'flex', gap: 12 }}>
               <button onClick={() => setShowSignOutConfirm(false)} style={{ flex: 1, padding: '12px 0', borderRadius: Radius.md, backgroundColor: Colors.surfaceSecondary, color: Colors.ink, fontSize: Font.body, fontWeight: Weight.semibold, border: 'none', cursor: 'pointer' }}>{t.common.cancel}</button>
               <button onClick={() => { setShowSignOutConfirm(false); signOut(); }} style={{ flex: 1, padding: '12px 0', borderRadius: Radius.md, backgroundColor: Colors.error, color: Colors.inkInverse, fontSize: Font.body, fontWeight: Weight.bold, border: 'none', cursor: 'pointer' }}>{t.profile.signOut}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteConfirm && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: Colors.overlay, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: 32 }} onClick={() => !deleteLoading && setShowDeleteConfirm(false)}>
+          <div style={{ backgroundColor: Colors.surface, borderRadius: Radius.xl, padding: 32, maxWidth: 320, width: '100%' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+              <Trash2 size={24} color={Colors.error} />
+              <span style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.error }}>{t.profile.deleteAccountTitle}</span>
+            </div>
+            <p style={{ fontSize: Font.body, color: Colors.ink, lineHeight: 1.5, marginBottom: 20 }}>{t.profile.deleteAccountConfirm}</p>
+            <div style={{ fontSize: Font.sm, fontWeight: Weight.semibold, color: Colors.inkSecondary, marginBottom: 8 }}>{t.profile.deleteAccountPasswordLabel}</div>
+            <input
+              type="password"
+              value={deletePassword}
+              onChange={e => { setDeletePassword(e.target.value); setDeleteError(''); }}
+              style={{ width: '100%', padding: '10px 14px', borderRadius: Radius.md, border: `1.5px solid ${deleteError ? Colors.error : Colors.hairline}`, fontSize: Font.body, backgroundColor: Colors.surface, color: Colors.ink, outline: 'none', boxSizing: 'border-box' }}
+            />
+            {deleteError && <div style={{ fontSize: Font.sm, color: Colors.error, marginTop: 6, fontWeight: Weight.semibold }}>{deleteError}</div>}
+            <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+              <button onClick={() => setShowDeleteConfirm(false)} disabled={deleteLoading} style={{ flex: 1, padding: '12px 0', borderRadius: Radius.md, backgroundColor: Colors.surfaceSecondary, color: Colors.ink, fontSize: Font.body, fontWeight: Weight.semibold, border: 'none', cursor: 'pointer' }}>{t.common.cancel}</button>
+              <button
+                onClick={async () => {
+                  if (!deletePassword) { setDeleteError(t.profile.deleteAccountError); return; }
+                  setDeleteLoading(true);
+                  try {
+                    await deleteAccount(deletePassword);
+                  } catch {
+                    setDeleteError(t.profile.deleteAccountError);
+                    setDeleteLoading(false);
+                  }
+                }}
+                disabled={deleteLoading}
+                style={{ flex: 1, padding: '12px 0', borderRadius: Radius.md, backgroundColor: Colors.error, color: Colors.inkInverse, fontSize: Font.body, fontWeight: Weight.bold, border: 'none', cursor: deleteLoading ? 'not-allowed' : 'pointer', opacity: deleteLoading ? 0.7 : 1 }}>
+                {deleteLoading ? t.common.loading : t.profile.deleteAccount}
+              </button>
             </div>
           </div>
         </div>

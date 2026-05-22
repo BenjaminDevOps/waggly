@@ -231,6 +231,11 @@ export const en: Translations = {
     signOut: 'Sign Out',
     signOutConfirm: 'Are you sure you want to sign out?',
     language: 'Language',
+    deleteAccount: 'Delete Account',
+    deleteAccountTitle: 'Delete Account?',
+    deleteAccountConfirm: 'This action is permanent and cannot be undone. All your data will be deleted.',
+    deleteAccountPasswordLabel: 'Enter your password to confirm',
+    deleteAccountError: 'Incorrect password. Please try again.',
   },
   premiumPage: {
     title: 'Waggly Premium',

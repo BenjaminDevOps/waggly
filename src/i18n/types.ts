@@ -253,6 +253,11 @@ export interface Translations {
     signOut: string;
     signOutConfirm: string;
     language: string;
+    deleteAccount: string;
+    deleteAccountTitle: string;
+    deleteAccountConfirm: string;
+    deleteAccountPasswordLabel: string;
+    deleteAccountError: string;
   };
 
   // Premium page

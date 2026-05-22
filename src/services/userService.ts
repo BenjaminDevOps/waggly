@@ -4,6 +4,7 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  deleteDoc,
   increment,
   arrayUnion,
   onSnapshot,
@@ -63,6 +64,11 @@ export async function addBadge(
   await updateDoc(userRef, {
     badges: arrayUnion(badgeId),
   });
+}
+
+export async function deleteUserData(userId: string): Promise<void> {
+  const userRef = doc(db, COLLECTIONS.users, userId);
+  await deleteDoc(userRef);
 }
 
 export function subscribeToUser(

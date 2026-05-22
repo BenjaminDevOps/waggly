@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, signOut as firebaseSignOut, type User as FirebaseUser } from 'firebase/auth';
+import { onAuthStateChanged, signOut as firebaseSignOut, deleteUser, reauthenticateWithCredential, EmailAuthProvider, type User as FirebaseUser } from 'firebase/auth';
 import { auth } from '../services/firebase';
-import { getOrCreateUser, subscribeToUser } from '../services/userService';
+import { getOrCreateUser, subscribeToUser, deleteUserData } from '../services/userService';
 import type { User } from '../models/types';
 
 interface AuthContextValue {
@@ -9,6 +9,7 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  deleteAccount: (password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   loading: true,
   signOut: async () => {},
+  deleteAccount: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -66,8 +68,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setFirebaseUser(null);
   };
 
+  const deleteAccount = async (password: string) => {
+    if (!firebaseUser?.email) throw new Error('No authenticated user');
+    const credential = EmailAuthProvider.credential(firebaseUser.email, password);
+    await reauthenticateWithCredential(firebaseUser, credential);
+    await deleteUserData(firebaseUser.uid);
+    await deleteUser(firebaseUser);
+    setUser(null);
+    setFirebaseUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ firebaseUser, user, loading, signOut }}>
+    <AuthContext.Provider value={{ firebaseUser, user, loading, signOut, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );
