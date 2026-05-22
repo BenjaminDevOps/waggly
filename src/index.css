@@ -118,7 +118,8 @@ input,
 textarea,
 select {
   font-family: inherit;
-  font-size: inherit;
+  /* 16px minimum prevents iOS WKWebView auto-zoom on focus */
+  font-size: 16px;
   border: none;
   outline: none;
   -webkit-appearance: none;

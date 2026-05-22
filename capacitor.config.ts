@@ -10,6 +10,14 @@ const config: CapacitorConfig = {
   },
   ios: {
     contentInset: 'automatic',
+    scrollEnabled: true,
+  },
+  plugins: {
+    Keyboard: {
+      resize: 'body',
+      style: 'default',
+      resizeOnFullScreen: true,
+    },
   },
 };
 
