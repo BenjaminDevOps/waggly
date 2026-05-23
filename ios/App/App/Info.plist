@@ -57,6 +57,8 @@
 	<string>Waggly uses motion data to track steps during walks with your pet.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Waggly uses your location to track walk routes with your pet.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Waggly uses your location to track walk routes with your pet.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>CFBundleURLTypes</key>
