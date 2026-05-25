@@ -15,6 +15,7 @@ let package = Package(
         .package(name: "CapacitorCamera", path: "../../../node_modules/@capacitor/camera"),
         .package(name: "CapacitorFilesystem", path: "../../../node_modules/@capacitor/filesystem"),
         .package(name: "CapacitorGeolocation", path: "../../../node_modules/@capacitor/geolocation"),
+        .package(name: "CapacitorKeyboard", path: "../../../node_modules/@capacitor/keyboard"),
         .package(name: "CapgoCapacitorPedometer", path: "../../../node_modules/@capgo/capacitor-pedometer"),
         .package(name: "CapgoNativePurchases", path: "../../../node_modules/@capgo/native-purchases")
     ],
@@ -27,6 +28,7 @@ let package = Package(
                 .product(name: "CapacitorCamera", package: "CapacitorCamera"),
                 .product(name: "CapacitorFilesystem", package: "CapacitorFilesystem"),
                 .product(name: "CapacitorGeolocation", package: "CapacitorGeolocation"),
+                .product(name: "CapacitorKeyboard", package: "CapacitorKeyboard"),
                 .product(name: "CapgoCapacitorPedometer", package: "CapgoCapacitorPedometer"),
                 .product(name: "CapgoNativePurchases", package: "CapgoNativePurchases")
             ]

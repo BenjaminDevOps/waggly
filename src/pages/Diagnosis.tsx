@@ -276,7 +276,7 @@ export function DiagnosisPage() {
           <SectionHeader title={t.diagnosis.describeSymptoms} />
           <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder={t.diagnosis.describePlaceholder} rows={4} style={{
             width: '100%', padding: Spacing.lg, borderRadius: Radius.md, border: `1px solid ${Colors.hairline}`,
-            backgroundColor: Colors.surface, fontSize: Font.body - 1, color: Colors.ink, resize: 'vertical',
+            backgroundColor: Colors.surface, fontSize: Font.body, color: Colors.ink, resize: 'none',
             fontFamily: 'inherit', lineHeight: 1.5, outline: 'none', boxSizing: 'border-box',
           }} />
         </div>

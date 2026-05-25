@@ -17,6 +17,7 @@ const config: CapacitorConfig = {
       resize: 'body',
       style: 'default',
       resizeOnFullScreen: true,
+      scrollAssist: false,
     },
   },
 };
