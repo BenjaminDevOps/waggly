@@ -36,16 +36,21 @@ export function PremiumPage() {
     [PREMIUM_PLANS[1].id]: { name: t.premiumPage.yearly, period: t.premiumPage.perYear, savings: t.premiumPage.savePct },
   };
 
+  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+
   const handlePurchase = async () => {
     if (!firebaseUser || loading) return;
     setLoading(true);
     setMessage('');
+    setMessageType('');
     try {
       const result = await purchasePremium(selectedPlan, firebaseUser.uid);
       setMessage(result.message);
+      setMessageType(result.success ? 'success' : 'error');
       if (result.success) setTimeout(() => navigate(-1), 1500);
     } catch (e: any) {
       setMessage(e?.message || 'An unexpected error occurred.');
+      setMessageType('error');
     } finally {
       setLoading(false);
     }
@@ -55,11 +60,14 @@ export function PremiumPage() {
     if (!firebaseUser || restoring) return;
     setRestoring(true);
     setMessage('');
+    setMessageType('');
     try {
       const result = await restorePurchases(firebaseUser.uid);
       setMessage(result.message);
+      setMessageType(result.success ? 'success' : 'error');
     } catch (e: any) {
       setMessage(e?.message || 'An unexpected error occurred.');
+      setMessageType('error');
     } finally {
       setRestoring(false);
     }
@@ -153,8 +161,8 @@ export function PremiumPage() {
         </div>
 
         {message && (
-          <Card style={{ backgroundColor: message.includes('Welcome') || message.includes('restored') || message.includes('Premium') ? Colors.successPale : Colors.secondaryPale, textAlign: 'center' as const }}>
-            <span style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: message.includes('Welcome') || message.includes('restored') || message.includes('Premium') ? Colors.success : Colors.ink }}>{message}</span>
+          <Card style={{ backgroundColor: messageType === 'success' ? Colors.successPale : Colors.secondaryPale, textAlign: 'center' as const }}>
+            <span style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: messageType === 'success' ? Colors.success : Colors.ink }}>{message}</span>
           </Card>
         )}
 
