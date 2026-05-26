@@ -26,6 +26,11 @@ class AppConstants {
   static const String keyStreak = 'daily_streak';
   static const String keyPoints = 'total_points';
 
+  // IAP Product IDs (must match App Store Connect exactly)
+  static const String productMonthly = 'com.waggly.premium.monthly';
+  static const String productYearly = 'com.waggly.premium.yearly';
+  static const Set<String> allProductIds = {productMonthly, productYearly};
+
   // Collections (Firestore)
   static const String collectionUsers = 'users';
   static const String collectionPets = 'pets';
