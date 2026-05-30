@@ -10,7 +10,7 @@ import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
-import { PREMIUM_PLANS, purchasePremium, restorePurchases } from '../services/purchaseService';
+import { PREMIUM_PLANS, purchasePremium, restorePurchases, getPlatform } from '../services/purchaseService';
 
 const FEATURE_ICONS = [Sparkles, Zap, Shield, Crown, Star];
 
@@ -185,7 +185,13 @@ export function PremiumPage() {
           <div style={{ display: 'flex', justifyContent: 'center', gap: Spacing.lg, marginTop: Spacing.md }}>
             <button onClick={() => navigate('/privacy')} style={{ fontSize: Font.xs, color: Colors.primary, background: 'none', border: 'none', cursor: 'pointer' }}>{t.profile.privacyPolicy}</button>
             <button onClick={() => navigate('/terms')} style={{ fontSize: Font.xs, color: Colors.primary, background: 'none', border: 'none', cursor: 'pointer' }}>{t.profile.termsOfService}</button>
-            <button onClick={async () => { try { const { Browser } = await import('@capacitor/browser'); await Browser.open({ url: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/' }); } catch { window.open('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/', '_blank'); } }} style={{ fontSize: Font.xs, color: Colors.inkTertiary, background: 'none', border: 'none', cursor: 'pointer' }}>EULA</button>
+            <button onClick={async () => {
+              const eulaUrl = getPlatform() === 'android'
+                ? 'https://play.google.com/about/play-terms/'
+                : 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
+              try { const { Browser } = await import('@capacitor/browser'); await Browser.open({ url: eulaUrl }); }
+              catch { window.open(eulaUrl, '_blank'); }
+            }} style={{ fontSize: Font.xs, color: Colors.inkTertiary, background: 'none', border: 'none', cursor: 'pointer' }}>EULA</button>
           </div>
         </div>
       </div>

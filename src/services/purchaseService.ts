@@ -44,6 +44,18 @@ function isNativePlatform(): boolean {
   }
 }
 
+export function getPlatform(): 'ios' | 'android' | 'web' {
+  try {
+    if (typeof (window as any).Capacitor === 'undefined') return 'web';
+    const p: string = (window as any).Capacitor.getPlatform();
+    if (p === 'ios') return 'ios';
+    if (p === 'android') return 'android';
+    return 'web';
+  } catch {
+    return 'web';
+  }
+}
+
 // Rejects after `ms` milliseconds with a timeout error.
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return Promise.race([
@@ -88,7 +100,7 @@ export async function purchasePremium(
   userId: string,
 ): Promise<{ success: boolean; message: string }> {
   if (!isNativePlatform()) {
-    return { success: false, message: 'In-app purchases are only available on iOS.' };
+    return { success: false, message: 'In-app purchases are only available on the mobile app.' };
   }
 
   try {
@@ -113,17 +125,18 @@ export async function restorePurchases(
   userId: string,
 ): Promise<{ success: boolean; message: string }> {
   if (!isNativePlatform()) {
-    return { success: false, message: 'Restore is only available on iOS.' };
+    return { success: false, message: 'Restore is only available on the mobile app.' };
   }
+
+  const platform = getPlatform();
 
   try {
     const { NativePurchases } = await import('@capgo/native-purchases');
     await withTimeout(NativePurchases.restorePurchases(), 30_000);
 
-    // Read the current premium status from Firestore instead of blindly setting it.
-    // StoreKit fires restored transactions which the plugin processes; if any active
-    // subscription is found the plugin updates the entitlements — we just check the
-    // result rather than granting premium unconditionally.
+    // Read premium status from Firestore — the plugin fires restored transactions
+    // which update the entitlements; we verify the result rather than granting
+    // premium unconditionally.
     const userRef = doc(db, COLLECTIONS.users, userId);
     const snap = await getDoc(userRef);
     const isPremiumNow: boolean = snap.exists() ? (snap.data().isPremium ?? false) : false;
@@ -131,7 +144,8 @@ export async function restorePurchases(
     if (isPremiumNow) {
       return { success: true, message: 'Premium restored successfully!' };
     }
-    return { success: false, message: 'No active subscriptions found for this Apple ID.' };
+    const storeLabel = platform === 'android' ? 'Google Account' : 'Apple ID';
+    return { success: false, message: `No active subscriptions found for this ${storeLabel}.` };
   } catch (error: any) {
     console.error('[Purchase] Restore error:', error);
     return { success: false, message: friendlyError(error) };
