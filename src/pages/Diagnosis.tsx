@@ -17,6 +17,7 @@ import { useI18n } from '../i18n';
 import { analyzePetSymptoms, type DiagnosisResult } from '../services/gemini';
 import { addPoints } from '../services/userService';
 import { incrementDiagnosisUsage, canUseDiagnosis, getRemainingDiagnoses } from '../services/purchaseService';
+import { requestAppReview } from '../services/reviewService';
 import { openVetMap } from '../services/locationService';
 import { addHealthRecord } from '../services/healthRecordService';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
@@ -71,8 +72,13 @@ export function DiagnosisPage() {
       setResult(res);
       setShowResults(true);
       if (firebaseUser) {
+        const isFirstDiagnosis = (user?.aiDiagnosisUsed ?? 0) === 0;
         await addPoints(firebaseUser.uid, 25);
         await incrementDiagnosisUsage(firebaseUser.uid);
+        if (isFirstDiagnosis) {
+          // Give the user 2 s to read their results before the review dialog appears
+          setTimeout(requestAppReview, 2000);
+        }
       }
     } catch (e: any) {
       setError(e.message || 'Failed to analyze. Check your API key.');

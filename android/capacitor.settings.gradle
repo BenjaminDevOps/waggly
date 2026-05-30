@@ -25,3 +25,6 @@ project(':capgo-capacitor-pedometer').projectDir = new File('../node_modules/@ca
 
 include ':capgo-native-purchases'
 project(':capgo-native-purchases').projectDir = new File('../node_modules/@capgo/native-purchases/android')
+
+include ':capacitor-rate-app'
+project(':capacitor-rate-app').projectDir = new File('../node_modules/capacitor-rate-app/android')
