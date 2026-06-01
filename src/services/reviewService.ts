@@ -1,23 +1,13 @@
-import { getPlatform } from './purchaseService';
+import { AppReview } from '@capawesome/capacitor-app-review';
 
-/**
- * Request an App Store / Google Play review.
- * - iOS  → SKStoreReviewController.requestReview()
- * - Android → Google Play In-App Review API
- * - Web  → no-op (silently ignored)
- *
- * Apple/Google may decide not to show the dialog even when requested
- * (rate-limiting, already reviewed, etc.) — this is expected behaviour.
- */
+const REVIEW_KEY = 'waggly_review_requested';
+
 export async function requestAppReview(): Promise<void> {
-  const platform = getPlatform();
-  if (platform === 'web') return;
-
+  if (localStorage.getItem(REVIEW_KEY)) return;
   try {
-    const { RateApp } = await import('capacitor-rate-app');
-    await RateApp.requestReview();
-  } catch (e) {
-    // Silently ignore — review prompt is non-critical
-    console.warn('[Review] requestReview failed:', e);
+    await AppReview.requestReview();
+    localStorage.setItem(REVIEW_KEY, '1');
+  } catch {
+    // Silently fail — SKStoreReviewController is rate-limited by iOS (3×/year max)
   }
 }

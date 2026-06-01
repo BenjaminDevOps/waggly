@@ -76,7 +76,6 @@ export function DiagnosisPage() {
         await addPoints(firebaseUser.uid, 25);
         await incrementDiagnosisUsage(firebaseUser.uid);
         if (isFirstDiagnosis) {
-          // Give the user 2 s to read their results before the review dialog appears
           setTimeout(requestAppReview, 2000);
         }
       }

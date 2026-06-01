@@ -18,9 +18,9 @@ let package = Package(
         .package(name: "CapacitorGeolocation", path: "../../../node_modules/@capacitor/geolocation"),
         .package(name: "CapacitorKeyboard", path: "../../../node_modules/@capacitor/keyboard"),
         .package(name: "CapacitorShare", path: "../../../node_modules/@capacitor/share"),
+        .package(name: "CapawesomeCapacitorAppReview", path: "../../../node_modules/@capawesome/capacitor-app-review"),
         .package(name: "CapgoCapacitorPedometer", path: "../../../node_modules/@capgo/capacitor-pedometer"),
-        .package(name: "CapgoNativePurchases", path: "../../../node_modules/@capgo/native-purchases"),
-        .package(name: "CapacitorRateApp", path: "../../plugins/CapacitorRateApp")
+        .package(name: "CapgoNativePurchases", path: "../../../node_modules/@capgo/native-purchases")
     ],
     targets: [
         .target(
@@ -34,9 +34,9 @@ let package = Package(
                 .product(name: "CapacitorGeolocation", package: "CapacitorGeolocation"),
                 .product(name: "CapacitorKeyboard", package: "CapacitorKeyboard"),
                 .product(name: "CapacitorShare", package: "CapacitorShare"),
+                .product(name: "CapawesomeCapacitorAppReview", package: "CapawesomeCapacitorAppReview"),
                 .product(name: "CapgoCapacitorPedometer", package: "CapgoCapacitorPedometer"),
-                .product(name: "CapgoNativePurchases", package: "CapgoNativePurchases"),
-                .product(name: "CapacitorRateApp", package: "CapacitorRateApp")
+                .product(name: "CapgoNativePurchases", package: "CapgoNativePurchases")
             ]
         )
     ]
