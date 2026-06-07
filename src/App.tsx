@@ -43,10 +43,7 @@ export default function App() {
   const [localeChosen, setLocaleChosen] = useState(() => hasChosenLocale());
   useBadgeChecker();
 
-  // First launch — ask the user to pick a language before anything else
-  if (!localeChosen) {
-    return <LanguageSelectionPage onDone={() => setLocaleChosen(true)} />;
-  }
+  // Streak update — must be declared before any conditional return (Rules of Hooks)
   useEffect(() => {
     if (firebaseUser) {
       import('./services/userService').then(({ updateStreak }) => {
@@ -59,6 +56,11 @@ export default function App() {
       });
     }
   }, [firebaseUser]);
+
+  // First launch — ask the user to pick a language before anything else
+  if (!localeChosen) {
+    return <LanguageSelectionPage onDone={() => setLocaleChosen(true)} />;
+  }
   const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms', '/edit-profile', '/contact'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
 
   // Loading state — branded spinner while Firebase auth initializes
