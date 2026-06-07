@@ -24,14 +24,20 @@ function getInitialLocale(): Locale {
     if (stored && (stored === 'en' || stored === 'fr' || stored === 'es')) {
       return stored;
     }
-    // Detect from browser
-    const browserLang = navigator.language.slice(0, 2).toLowerCase();
-    if (browserLang === 'fr') return 'fr';
-    if (browserLang === 'es') return 'es';
   } catch {
     // ignore
   }
   return 'en';
+}
+
+/** Returns true when the user has already explicitly chosen a language. */
+export function hasChosenLocale(): boolean {
+  try {
+    const stored = localStorage.getItem('waggly_locale');
+    return stored === 'en' || stored === 'fr' || stored === 'es';
+  } catch {
+    return false;
+  }
 }
 
 interface I18nContextValue {

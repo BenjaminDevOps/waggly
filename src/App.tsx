@@ -1,5 +1,5 @@
 import { Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Home, PawPrint, Stethoscope, Footprints, ShoppingBag, User } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { HomePage } from './pages/Home';
@@ -16,7 +16,8 @@ import { TermsPage } from './pages/Terms';
 import { EditProfilePage } from './pages/EditProfile';
 import { ContactPage } from './pages/Contact';
 import { LoginPage } from './pages/Login';
-import { useI18n } from './i18n';
+import { LanguageSelectionPage } from './pages/LanguageSelection';
+import { useI18n, hasChosenLocale } from './i18n';
 import { useAuth } from './hooks/useAuth';
 import { useBadgeChecker } from './hooks/useBadges';
 
@@ -39,7 +40,13 @@ export default function App() {
   const location = useLocation();
   const { t } = useI18n();
   const { firebaseUser, loading } = useAuth();
+  const [localeChosen, setLocaleChosen] = useState(() => hasChosenLocale());
   useBadgeChecker();
+
+  // First launch — ask the user to pick a language before anything else
+  if (!localeChosen) {
+    return <LanguageSelectionPage onDone={() => setLocaleChosen(true)} />;
+  }
   useEffect(() => {
     if (firebaseUser) {
       import('./services/userService').then(({ updateStreak }) => {
