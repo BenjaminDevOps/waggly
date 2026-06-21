@@ -88,7 +88,7 @@ async function verifyProductExists(productId: string): Promise<boolean> {
   try {
     const { NativePurchases } = await import('@capgo/native-purchases');
     if (typeof (NativePurchases as any).getProducts !== 'function') return true;
-    const result = await withTimeout(
+    const result: any = await withTimeout(
       (NativePurchases as any).getProducts({ productIdentifiers: [productId] }),
       10_000,
     );
