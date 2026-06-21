@@ -29,6 +29,7 @@ export function WalkPage() {
   const [weeklySteps, setWeeklySteps] = useState<number[]>([0, 0, 0, 0, 0, 0, 0]);
   const [showSummary, setShowSummary] = useState(false);
   const [useNativePedometer, setUseNativePedometer] = useState(false);
+  const [pedometerError, setPedometerError] = useState<string | null>(null);
   const dailyGoal = 5000;
   const earnedBadges = (user?.badges ?? []) as string[];
   const hasBadge = (id: string) => earnedBadges.includes(id);
@@ -104,6 +105,7 @@ export function WalkPage() {
       walkStartRef.current = Date.now();
       timerRef.current = setInterval(() => setSeconds(Math.floor((Date.now() - walkStartRef.current) / 1000)), 1000);
 
+      setPedometerError(null);
       const pedometerStarted = await startPedometer((state) => {
         setSteps(state.steps);
         if (state.distanceMeters > 0) {
@@ -111,16 +113,20 @@ export function WalkPage() {
         }
       });
 
+      if (!pedometerStarted) {
+        // Native step counter unavailable — rely on GPS distance estimation only.
+        // Never use random values: that would silently corrupt walk data.
+        setPedometerError('gps-only');
+        console.warn('[Walk] Native pedometer unavailable — GPS step estimation active');
+      }
+
       startWalkTracking((gpsState) => {
         setGpsDistanceKm(gpsState.distanceKm);
         if (!pedometerStarted) {
+          // GPS-derived step estimate (1 312 steps/km) as honest fallback
           setSteps(gpsState.steps);
         }
       });
-
-      if (!pedometerStarted) {
-        stepsRef.current = setInterval(() => setSteps(s => s + Math.floor(Math.random() * 3) + 1), 600);
-      }
     }
   }, [isWalking]);
 
@@ -191,6 +197,22 @@ export function WalkPage() {
           );
         })}
       </div>
+
+      {/* GPS-only warning when native pedometer is unavailable */}
+      {pedometerError === 'gps-only' && !isWalking && (
+        <div style={{
+          display: 'flex', alignItems: 'flex-start', gap: Spacing.sm,
+          padding: Spacing.md, marginBottom: Spacing.lg,
+          backgroundColor: Colors.warningPale, borderRadius: Radius.md,
+          border: `1px solid ${Colors.warning}40`,
+        }}>
+          <MapPin size={16} color={Colors.warning} style={{ flexShrink: 0, marginTop: 2 }} />
+          <span style={{ fontSize: Font.sm, color: Colors.ink, lineHeight: 1.5 }}>
+            Step sensor unavailable — steps estimated from GPS distance.
+            Grant <strong>Physical Activity</strong> permission in Settings for accurate counting.
+          </span>
+        </div>
+      )}
 
       {/* Start/Stop */}
       <button className="btn-press" onClick={toggleWalk} style={{

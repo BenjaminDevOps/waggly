@@ -25,7 +25,7 @@ import { FREEMIUM } from '../constants/app';
 
 export function DiagnosisPage() {
   const navigate = useNavigate();
-  const { pets } = usePets();
+  const { pets, loading: petsLoading } = usePets();
   const { firebaseUser, user } = useAuth();
   const { t, locale } = useI18n();
   const [selectedPet, setSelectedPet] = useState('');
@@ -232,7 +232,14 @@ export function DiagnosisPage() {
 
         <div>
           <SectionHeader title={t.diagnosis.selectPet} />
-          {pets.length === 0 ? (
+          {petsLoading ? (
+            <Card style={{ textAlign: 'center' as const, padding: Spacing.xl }}>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: Spacing.sm }}>
+                <PawPrint size={20} color={Colors.inkTertiary} />
+                <span style={{ color: Colors.inkSecondary, fontSize: Font.body }}>{t.common.loading}</span>
+              </div>
+            </Card>
+          ) : pets.length === 0 ? (
             <Card style={{ textAlign: 'center' as const, padding: Spacing.xl }}>
               <PawPrint size={28} color={Colors.inkTertiary} style={{ margin: '0 auto' }} />
               <p style={{ color: Colors.inkSecondary, fontSize: Font.body, marginTop: Spacing.sm }}>{t.diagnosis.addPetFirst}</p>
@@ -305,7 +312,12 @@ export function DiagnosisPage() {
           label={loading ? t.diagnosis.analyzing : t.diagnosis.analyzeSymptoms}
           onPress={handleAnalyze}
           variant="primary" size="large" loading={loading}
-          disabled={pets.length === 0 || (selectedSymptoms.length === 0 && description.length === 0) || !canUseDiagnosis(user?.isPremium ?? false, user?.aiDiagnosisUsed ?? 0, FREEMIUM.freeAiDiagnosisLimit)}
+          disabled={
+            petsLoading ||
+            pets.length === 0 ||
+            (selectedSymptoms.length === 0 && description.length === 0) ||
+            !canUseDiagnosis(user?.isPremium ?? false, user?.aiDiagnosisUsed ?? 0, FREEMIUM.freeAiDiagnosisLimit)
+          }
           icon={<Sparkles size={20} color={Colors.inkInverse} />}
         />
       </div>
