@@ -3,8 +3,8 @@ import { doc, updateDoc, increment, getDoc } from 'firebase/firestore';
 import { COLLECTIONS } from '../constants/app';
 
 export const PRODUCTS = {
-  premiumMonthly: 'waggly_001_month',
-  premiumYearly: 'waggly_001_year',
+  premiumMonthly: 'month_001_waggly',
+  premiumYearly: 'year_001_waggly',
 } as const;
 
 export interface PremiumPlan {
