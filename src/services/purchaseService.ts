@@ -133,9 +133,17 @@ function friendlyError(error: any, platform: 'ios' | 'android' | 'web'): string 
       `Please ensure the product is active in ${store} and try again later.`
     );
   }
-  if (msg.includes('billing unavailable') || code === 'billing_unavailable') {
+  if (msg.includes('billing unavailable') || code === 'billing_unavailable' || code === '3') {
     return 'Google Play Billing is not available on this device or account. ' +
       'Make sure you are signed in with a Google account that has access to the Play Store.';
+  }
+  if (
+    msg.includes('service') ||
+    msg.includes('temporarily') ||
+    code === 'service_unavailable' ||
+    code === '2'
+  ) {
+    return 'Google Play is temporarily unavailable. Please wait a moment and try again.';
   }
   if (msg.includes('not entitled') || msg.includes('not signed in')) {
     const store = platform === 'android' ? 'Google Play' : 'App Store';
@@ -199,6 +207,11 @@ export async function purchasePremium(
     await setPremiumStatus(userId, true);
     return { success: true, message: 'Welcome to Waggly Premium!' };
   } catch (error: any) {
+    const code: string = (error?.code ?? '').toLowerCase();
+    // Reset billing init so the next attempt re-connects the client
+    if (code === '2' || code === 'service_unavailable' || code === '3' || code === 'billing_unavailable') {
+      billingInitialized = false;
+    }
     if (!isCancellation(error)) {
       console.error('[Purchase] Error:', error);
     }
