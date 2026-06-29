@@ -4,7 +4,7 @@ android {
     namespace = "com.ministeredesapp.waggly"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.ministeredesapp.waggly"
+        applicationId "com.ministeredesapplications.waggly"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
