@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/localization/app_language.dart';
+import '../../../core/localization/language_provider.dart';
+import '../../../core/localization/nac_strings.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../ai_diagnosis/screens/ai_diagnosis_screen.dart';
+import '../../care_checklist/screens/care_checklist_screen.dart';
 import '../../pets/screens/pets_screen.dart';
-import '../../shop/screens/shop_screen.dart';
 import '../../profile/screens/profile_screen.dart';
+import '../../shop/screens/shop_screen.dart';
+import '../../species_guide/screens/species_guide_screen.dart';
 
 /// Main home screen with bottom navigation
 class HomeScreen extends ConsumerStatefulWidget {
@@ -17,50 +22,52 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const DashboardScreen(),
-    const PetsScreen(),
-    const AiDiagnosisScreen(),
-    const ShopScreen(),
-    const ProfileScreen(),
-  ];
+  void _goToTab(int index) {
+    setState(() => _currentIndex = index);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final lang = ref.watch(languageProvider);
+
+    final screens = [
+      DashboardScreen(onNavigateToTab: _goToTab),
+      const PetsScreen(),
+      const AiDiagnosisScreen(),
+      const ShopScreen(),
+      const ProfileScreen(),
+    ];
+
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: screens[_currentIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        destinations: const [
+        onDestinationSelected: _goToTab,
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home),
+            label: NacStrings.of(lang, 'nav_home'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.pets_outlined),
-            selectedIcon: Icon(Icons.pets),
-            label: 'Pets',
+            icon: const Icon(Icons.pets_outlined),
+            selectedIcon: const Icon(Icons.pets),
+            label: NacStrings.of(lang, 'nav_pets'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.medical_services_outlined),
-            selectedIcon: Icon(Icons.medical_services),
-            label: 'AI Diagnosis',
+            icon: const Icon(Icons.medical_services_outlined),
+            selectedIcon: const Icon(Icons.medical_services),
+            label: NacStrings.of(lang, 'nav_diagnosis'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.shopping_bag_outlined),
-            selectedIcon: Icon(Icons.shopping_bag),
-            label: 'Shop',
+            icon: const Icon(Icons.shopping_bag_outlined),
+            selectedIcon: const Icon(Icons.shopping_bag),
+            label: NacStrings.of(lang, 'nav_shop'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outlined),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
+            icon: const Icon(Icons.person_outlined),
+            selectedIcon: const Icon(Icons.person),
+            label: NacStrings.of(lang, 'nav_profile'),
           ),
         ],
       ),
@@ -70,14 +77,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
 /// Dashboard screen with gamification elements
 class DashboardScreen extends ConsumerWidget {
-  const DashboardScreen({super.key});
+  final ValueChanged<int> onNavigateToTab;
+
+  const DashboardScreen({super.key, required this.onNavigateToTab});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(languageProvider);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Waggly'),
+        title: Text(NacStrings.of(lang, 'app_name')),
         actions: [
+          PopupMenuButton<AppLanguage>(
+            tooltip: NacStrings.of(lang, 'language_picker_title'),
+            initialValue: lang,
+            onSelected: (value) => ref.read(languageProvider.notifier).state = value,
+            itemBuilder: (context) => AppLanguage.values
+                .map(
+                  (value) => PopupMenuItem(
+                    value: value,
+                    child: Text('${value.flag}  ${value.label}'),
+                  ),
+                )
+                .toList(),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Center(child: Text(lang.flag, style: const TextStyle(fontSize: 22))),
+            ),
+          ),
           // Points Display
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -114,21 +142,21 @@ class DashboardScreen extends ConsumerWidget {
                 gradient: AppTheme.primaryGradient,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Welcome back! 👋',
-                    style: TextStyle(
+                    NacStrings.of(lang, 'home_welcome'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    'Keep your pets healthy and happy!',
-                    style: TextStyle(
+                    NacStrings.of(lang, 'home_subtitle'),
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
                     ),
@@ -153,20 +181,20 @@ class DashboardScreen extends ConsumerWidget {
                       child: const Text('🔥', style: TextStyle(fontSize: 32)),
                     ),
                     const SizedBox(width: 16),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '7 Day Streak!',
-                            style: TextStyle(
+                            NacStrings.of(lang, 'home_streak_title'),
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            'Keep checking your pets daily',
-                            style: TextStyle(
+                            NacStrings.of(lang, 'home_streak_subtitle'),
+                            style: const TextStyle(
                               color: Colors.grey,
                               fontSize: 14,
                             ),
@@ -185,9 +213,9 @@ class DashboardScreen extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Quick Actions
-            const Text(
-              'Quick Actions',
-              style: TextStyle(
+            Text(
+              NacStrings.of(lang, 'home_quick_actions'),
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -199,18 +227,45 @@ class DashboardScreen extends ConsumerWidget {
                 Expanded(
                   child: _QuickActionCard(
                     icon: Icons.medical_services,
-                    label: 'AI Diagnosis',
+                    label: NacStrings.of(lang, 'action_diagnosis'),
                     color: AppTheme.primaryColor,
-                    onTap: () {},
+                    onTap: () => onNavigateToTab(2),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _QuickActionCard(
                     icon: Icons.pets,
-                    label: 'Add Pet',
+                    label: NacStrings.of(lang, 'action_add_pet'),
                     color: AppTheme.secondaryColor,
-                    onTap: () {},
+                    onTap: () => onNavigateToTab(1),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _QuickActionCard(
+                    icon: Icons.menu_book_outlined,
+                    label: NacStrings.of(lang, 'action_species_guide'),
+                    color: AppTheme.accentColor,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const SpeciesGuideScreen()),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _QuickActionCard(
+                    icon: Icons.checklist,
+                    label: NacStrings.of(lang, 'action_checklist'),
+                    color: AppTheme.successColor,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const CareChecklistScreen()),
+                    ),
                   ),
                 ),
               ],
@@ -222,17 +277,17 @@ class DashboardScreen extends ConsumerWidget {
                 Expanded(
                   child: _QuickActionCard(
                     icon: Icons.shopping_bag,
-                    label: 'Shop',
-                    color: AppTheme.accentColor,
-                    onTap: () {},
+                    label: NacStrings.of(lang, 'action_shop'),
+                    color: AppTheme.primaryColor,
+                    onTap: () => onNavigateToTab(3),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _QuickActionCard(
                     icon: Icons.emoji_events,
-                    label: 'Badges',
-                    color: AppTheme.successColor,
+                    label: NacStrings.of(lang, 'action_badges'),
+                    color: AppTheme.secondaryColor,
                     onTap: () {},
                   ),
                 ),

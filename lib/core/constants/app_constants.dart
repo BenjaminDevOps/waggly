@@ -1,9 +1,9 @@
-/// App-wide constants for Waggly
+/// App-wide constants for Waggly NAC
 class AppConstants {
   // App Info
-  static const String appName = 'Waggly';
+  static const String appName = 'Waggly NAC';
   static const String appVersion = '1.0.0';
-  static const String appTagline = '🐾 Your Pet\'s Health Companion';
+  static const String appTagline = '🦎 Your Exotic Pet\'s Health Companion';
 
   // Freemium Limits
   static const int freeAiDiagnosisLimit = 3;

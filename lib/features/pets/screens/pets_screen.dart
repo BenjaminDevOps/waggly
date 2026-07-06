@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/localization/language_provider.dart';
+import '../../../core/localization/nac_strings.dart';
 
-class PetsScreen extends StatelessWidget {
+class PetsScreen extends ConsumerWidget {
   const PetsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(languageProvider);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Pets'),
+        title: Text(NacStrings.of(lang, 'nav_pets')),
       ),
-      body: const Center(
-        child: Text('Pets Screen - Coming Soon'),
+      body: Center(
+        child: Text(NacStrings.of(lang, 'pets_coming_soon')),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {},
         icon: const Icon(Icons.add),
-        label: const Text('Add Pet'),
+        label: Text(NacStrings.of(lang, 'pets_add_button')),
       ),
     );
   }

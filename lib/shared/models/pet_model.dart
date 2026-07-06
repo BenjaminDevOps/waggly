@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum PetType { dog, cat, bird, rabbit, other }
+/// Exotic pet ("NAC" - Nouveaux Animaux de Compagnie) species categories.
+enum PetType { reptile, rodent, ferret, bird, fish, amphibian, invertebrate, other }
 
 enum PetGender { male, female, unknown }
 
