@@ -1,7 +1,7 @@
 export const APP = {
-  name: 'Waggly',
+  name: 'Waggly NAC',
   version: '1.0.0',
-  tagline: 'Your Pet\'s Health Companion',
+  tagline: 'Your Exotic Pet\'s Health Companion',
 };
 
 export const FREEMIUM = {

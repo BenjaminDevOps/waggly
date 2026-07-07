@@ -1,34 +1,37 @@
 import React, { useState, useMemo } from 'react';
 import { Search, X, Star, ShoppingCart, ExternalLink } from 'lucide-react';
-import { StatusBadge } from '../components/Badge';
 import { Button } from '../components/Button';
-import { Colors, Gradients } from '../theme/colors';
+import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { useI18n } from '../i18n';
+import type { PetType } from '../models/types';
 
-type PetFilter = 'all' | 'dog' | 'cat' | 'nac';
-type ShopCategory = 'food' | 'toys' | 'health' | 'accessories' | 'grooming' | 'training';
+type PetFilter = 'all' | PetType;
+type ShopCategory = 'terrariums' | 'substrate' | 'heatingLighting' | 'food' | 'accessories';
 
-interface Product { id: string; name: string; desc: string; price: number; original?: number; rating: number; reviews: number; category: ShopCategory; pets: string[]; featured: boolean; isNew: boolean; affiliateUrl?: string; imageUrl?: string; }
+interface Product { id: string; name: string; desc: string; price: number; original?: number; rating: number; reviews: number; category: ShopCategory; pets: PetType[]; featured: boolean; isNew: boolean; affiliateUrl?: string; imageUrl?: string; }
 
 // To add a product: paste your amzn.to short link directly in affiliateUrl.
 // Short links (amzn.to) already contain your affiliate tag — do NOT append ?tag=
 // For long links (amazon.fr/dp/XXX), append ?tag=your-tag-21
 // To add images: right-click the product image on Amazon → "Copy image address" → paste in imageUrl
 const PRODUCTS: Product[] = [
-  { id: '1', name: 'IAMS', desc: 'Nourriture pour chat Premium', price: 14.29, original: 19.99, rating: 4.8, reviews: 2340, category: 'food', pets: ['cat'], featured: true, isNew: false, affiliateUrl: 'https://amzn.to/42ekQkW', imageUrl: 'https://images-eu.ssl-images-amazon.com/images/P/B07LBLFMQD.01._SCLZZZZZZZ_SX500_.jpg' },
-  { id: '2', name: 'Jouet Puzzle Interactif', desc: 'Stimulation mentale pour chiens et chats', price: 19.99, rating: 4.6, reviews: 890, category: 'toys', pets: ['dog', 'cat'], featured: true, isNew: true, affiliateUrl: '', imageUrl: 'https://images-eu.ssl-images-amazon.com/images/P/B0CT5F22G5.01._SCLZZZZZZZ_SX500_.jpg' },
-  { id: '3', name: 'FURminator Brosse', desc: 'Brosse de toilettage professionnelle', price: 29.99, original: 39.99, rating: 4.9, reviews: 5420, category: 'grooming', pets: ['dog', 'cat'], featured: false, isNew: false, affiliateUrl: '', imageUrl: 'https://images-eu.ssl-images-amazon.com/images/P/B07PRYWTD1.01._SCLZZZZZZZ_SX500_.jpg' },
-  { id: '4', name: 'Collier Seresto', desc: 'Protection anti-puces et tiques 8 mois', price: 54.99, rating: 4.7, reviews: 3210, category: 'health', pets: ['dog'], featured: true, isNew: false, affiliateUrl: '', imageUrl: 'https://images-eu.ssl-images-amazon.com/images/P/B0089608H2.01._SCLZZZZZZZ_SX500_.jpg' },
-  { id: '5', name: 'Friandises Whiskas', desc: 'Friandises croustillantes pour chats', price: 12.99, original: 15.99, rating: 4.5, reviews: 1560, category: 'food', pets: ['cat'], featured: false, isNew: false, affiliateUrl: '', imageUrl: 'https://images-eu.ssl-images-amazon.com/images/P/B00CZ66WFO.01._SCLZZZZZZZ_SX500_.jpg' },
-  { id: '6', name: 'Collier LED', desc: 'Collier lumineux rechargeable', price: 14.99, rating: 4.4, reviews: 780, category: 'accessories', pets: ['dog'], featured: false, isNew: true, affiliateUrl: '', imageUrl: 'https://images-eu.ssl-images-amazon.com/images/P/B07X9L6SXY.01._SCLZZZZZZZ_SX500_.jpg' },
-  { id: '7', name: 'Kit Clicker', desc: 'Kit d\'éducation canine', price: 9.99, rating: 4.3, reviews: 450, category: 'training', pets: ['dog', 'cat'], featured: false, isNew: false, affiliateUrl: '', imageUrl: 'https://images-eu.ssl-images-amazon.com/images/P/B00ARBI0MC.01._SCLZZZZZZZ_SX500_.jpg' },
-  { id: '8', name: 'Foin Timothy', desc: 'Foin premium pour lapins', price: 16.99, original: 19.99, rating: 4.7, reviews: 920, category: 'food', pets: ['rabbit'], featured: false, isNew: false, affiliateUrl: '', imageUrl: 'https://images-eu.ssl-images-amazon.com/images/P/B004S7U6U0.01._SCLZZZZZZZ_SX500_.jpg' },
-  { id: '9', name: 'Bâtonnets Dentaires', desc: 'Friandises nettoyantes pour chiens', price: 22.99, rating: 4.6, reviews: 1890, category: 'health', pets: ['dog'], featured: true, isNew: false, affiliateUrl: '', imageUrl: 'https://images-eu.ssl-images-amazon.com/images/P/B0173NA0AG.01._SCLZZZZZZZ_SX500_.jpg' },
-  { id: '10', name: 'Arbre à Chat', desc: 'Tour multi-niveaux pour chat', price: 69.99, original: 89.99, rating: 4.8, reviews: 3450, category: 'accessories', pets: ['cat'], featured: true, isNew: false, affiliateUrl: '', imageUrl: 'https://images-eu.ssl-images-amazon.com/images/P/B08XTMNMMZ.01._SCLZZZZZZZ_SX500_.jpg' },
+  { id: '1', name: 'Terrarium en verre 45x45x60cm', desc: 'Terrarium ventilé avec portes coulissantes, idéal reptiles', price: 89.99, original: 109.99, rating: 4.7, reviews: 340, category: 'terrariums', pets: ['reptile'], featured: true, isNew: false },
+  { id: '2', name: 'Kit rampe UVB 10.0 + support', desc: 'Éclairage UVB indispensable à la synthèse de vitamine D3', price: 34.99, rating: 4.6, reviews: 210, category: 'heatingLighting', pets: ['reptile'], featured: true, isNew: false },
+  { id: '3', name: 'Tapis chauffant terrarium', desc: 'Chauffage de fond thermostatable pour point chaud', price: 18.99, original: 24.99, rating: 4.5, reviews: 560, category: 'heatingLighting', pets: ['reptile', 'amphibian', 'invertebrate'], featured: false, isNew: false },
+  { id: '4', name: 'Substrat fibre de coco 5kg', desc: 'Substrat fouisseur naturel, retient bien l\'humidité', price: 12.99, rating: 4.4, reviews: 180, category: 'substrate', pets: ['reptile', 'amphibian', 'invertebrate'], featured: false, isNew: true },
+  { id: '5', name: 'Litière chanvre pour rongeurs', desc: 'Litière absorbante et peu poussiéreuse 10L', price: 9.99, rating: 4.6, reviews: 430, category: 'substrate', pets: ['rodent'], featured: false, isNew: false },
+  { id: '6', name: 'Foin Timothy premium 1kg', desc: 'Foin de qualité supérieure riche en fibres', price: 8.99, original: 11.99, rating: 4.7, reviews: 920, category: 'food', pets: ['rodent'], featured: false, isNew: false },
+  { id: '7', name: 'Grillons vivants nourrissants (x50)', desc: 'Proies vivantes gut-loaded pour reptiles et amphibiens', price: 6.99, rating: 4.5, reviews: 150, category: 'food', pets: ['reptile', 'amphibian', 'invertebrate'], featured: false, isNew: false },
+  { id: '8', name: 'Croquettes furet haute protéine', desc: 'Alimentation carnée adaptée aux besoins du furet', price: 24.99, rating: 4.8, reviews: 310, category: 'food', pets: ['ferret'], featured: true, isNew: false },
+  { id: '9', name: 'Hamac 3 niveaux pour furet', desc: 'Hamac suspendu confortable pour cage multi-niveaux', price: 15.99, rating: 4.6, reviews: 260, category: 'accessories', pets: ['ferret'], featured: false, isNew: true },
+  { id: '10', name: 'Assortiment de perchoirs naturels', desc: 'Perchoirs de diamètres variés pour la santé des pattes', price: 13.99, rating: 4.5, reviews: 190, category: 'accessories', pets: ['bird'], featured: false, isNew: false },
+  { id: '11', name: 'Filtre externe aquarium 240L/h', desc: 'Filtration silencieuse pour aquariums jusqu\'à 60L', price: 39.99, original: 49.99, rating: 4.7, reviews: 410, category: 'terrariums', pets: ['fish'], featured: true, isNew: false },
+  { id: '12', name: 'Thermomètre-hygromètre digital', desc: 'Sonde double pour surveiller température et humidité', price: 11.99, rating: 4.6, reviews: 380, category: 'heatingLighting', pets: ['reptile', 'amphibian', 'invertebrate', 'fish'], featured: false, isNew: false },
 ];
 
-const CATEGORIES: ShopCategory[] = ['food', 'toys', 'health', 'accessories', 'grooming', 'training'];
+const CATEGORIES: ShopCategory[] = ['terrariums', 'substrate', 'heatingLighting', 'food', 'accessories'];
+const PET_FILTERS: PetFilter[] = ['all', 'reptile', 'rodent', 'ferret', 'bird', 'fish', 'amphibian', 'invertebrate'];
 // Labels are set dynamically via i18n in the component
 
 export function ShopPage() {
@@ -40,13 +43,20 @@ export function ShopPage() {
 
   const filtered = useMemo(() => PRODUCTS.filter(p => {
     if (catFilter && p.category !== catFilter) return false;
-    if (petFilter !== 'all') {
-      if (petFilter === 'nac') { if (!p.pets.includes('rabbit') && !p.pets.includes('bird')) return false; }
-      else if (!p.pets.includes(petFilter)) return false;
-    }
+    if (petFilter !== 'all' && !p.pets.includes(petFilter)) return false;
     if (search) { const q = search.toLowerCase(); return p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q); }
     return true;
   }), [search, petFilter, catFilter]);
+
+  const petLabels: Record<PetFilter, string> = {
+    all: t.shop.all, reptile: t.shop.reptiles, rodent: t.shop.rodents, ferret: t.shop.ferrets,
+    bird: t.shop.birds, fish: t.shop.fish, amphibian: t.shop.amphibians, invertebrate: t.shop.invertebrates,
+    other: t.addPet.other,
+  };
+  const catLabels: Record<ShopCategory, string> = {
+    terrariums: t.shop.terrariums, substrate: t.shop.substrate, heatingLighting: t.shop.heatingLighting,
+    food: t.shop.food, accessories: t.shop.accessories,
+  };
 
   return (
     <div style={{ backgroundColor: Colors.background, minHeight: '100vh' }}>
@@ -59,18 +69,16 @@ export function ShopPage() {
       </div>
 
       <div style={{ display: 'flex', gap: 8, padding: '0 16px', overflowX: 'auto', marginBottom: 8 }}>
-        {(['all', 'dog', 'cat', 'nac'] as PetFilter[]).map(f => {
-          const labels: Record<PetFilter, string> = { all: t.shop.all, dog: t.shop.dogs, cat: t.shop.cats, nac: t.shop.nac };
-          return <Chip key={f} label={labels[f]} active={petFilter === f} onClick={() => setPetFilter(f)} />;
-        })}
+        {PET_FILTERS.map(f => (
+          <Chip key={f} label={petLabels[f]} active={petFilter === f} onClick={() => setPetFilter(f)} />
+        ))}
       </div>
 
       <div style={{ display: 'flex', gap: 8, padding: '0 16px', overflowX: 'auto', marginBottom: 16 }}>
         <Chip label={t.shop.all} active={!catFilter} onClick={() => setCatFilter(null)} />
-        {CATEGORIES.map(c => {
-          const catLabels: Record<ShopCategory, string> = { food: t.shop.food, toys: t.shop.toys, health: t.shop.health, accessories: t.shop.accessories, grooming: t.shop.grooming, training: t.shop.training };
-          return <Chip key={c} label={catLabels[c]} active={catFilter === c} onClick={() => setCatFilter(c)} />;
-        })}
+        {CATEGORIES.map(c => (
+          <Chip key={c} label={catLabels[c]} active={catFilter === c} onClick={() => setCatFilter(c)} />
+        ))}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, padding: '0 16px' }}>

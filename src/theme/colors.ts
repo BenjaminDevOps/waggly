@@ -36,11 +36,14 @@ export const Colors = {
   hairlineLight: '#F0EDE8',
   overlay: 'rgba(45, 45, 58, 0.4)',
   overlayLight: 'rgba(45, 45, 58, 0.08)',
-  dog: '#5B5EA6',
-  cat: '#D4726A',
+  reptile: '#5B5EA6',
+  rodent: '#D4726A',
+  ferret: '#A594C9',
   bird: '#6EAF7B',
-  rabbit: '#E8985E',
-  other: '#A594C9',
+  fish: '#7DB8D4',
+  amphibian: '#7EC8B0',
+  invertebrate: '#9D9DAF',
+  other: '#E8985E',
 };
 
 export const Gradients = {

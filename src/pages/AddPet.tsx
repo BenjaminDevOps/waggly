@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Camera, Dog, Cat, Bird, Rabbit, PawPrint } from 'lucide-react';
+import { ArrowLeft, Camera, Turtle, Rat, Squirrel, Bird, Fish, Waves, Bug, PawPrint } from 'lucide-react';
 import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { Button } from '../components/Button';
@@ -11,10 +11,13 @@ import { captureAndUpload } from '../services/photoService';
 import type { PetGender, PetType } from '../models/types';
 
 const petTypeIcons = [
-  { key: 'dog', Icon: Dog },
-  { key: 'cat', Icon: Cat },
+  { key: 'reptile', Icon: Turtle },
+  { key: 'rodent', Icon: Rat },
+  { key: 'ferret', Icon: Squirrel },
   { key: 'bird', Icon: Bird },
-  { key: 'rabbit', Icon: Rabbit },
+  { key: 'fish', Icon: Fish },
+  { key: 'amphibian', Icon: Waves },
+  { key: 'invertebrate', Icon: Bug },
   { key: 'other', Icon: PawPrint },
 ] as const;
 
@@ -44,7 +47,7 @@ export function AddPetPage() {
   const navigate = useNavigate();
   const { firebaseUser } = useAuth();
   const { t } = useI18n();
-  const [selectedType, setSelectedType] = useState('dog');
+  const [selectedType, setSelectedType] = useState('reptile');
   const [selectedGender, setSelectedGender] = useState('');
   const [name, setName] = useState('');
   const [breed, setBreed] = useState('');
@@ -55,7 +58,8 @@ export function AddPetPage() {
   const [saving, setSaving] = useState(false);
 
   const petTypeLabels: Record<string, string> = {
-    dog: t.addPet.dog, cat: t.addPet.cat, bird: t.addPet.bird, rabbit: t.addPet.rabbit, other: t.addPet.other,
+    reptile: t.addPet.reptile, rodent: t.addPet.rodent, ferret: t.addPet.ferret, bird: t.addPet.bird,
+    fish: t.addPet.fish, amphibian: t.addPet.amphibian, invertebrate: t.addPet.invertebrate, other: t.addPet.other,
   };
 
   const handleSave = async () => {
@@ -125,12 +129,12 @@ export function AddPetPage() {
         {/* Pet Type */}
         <div>
           <span style={labelStyle}>{t.addPet.petType}</span>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
             {petTypeIcons.map(({ key, Icon }) => {
               const isActive = selectedType === key;
               return (
                 <button key={key} className="btn-press" onClick={() => setSelectedType(key)} style={{
-                  flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                  flex: '1 1 calc(25% - 8px)', minWidth: 70, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
                   padding: `14px ${Spacing.xs}px`, borderRadius: Radius.md,
                   backgroundColor: isActive ? Colors.primaryPale : Colors.surface,
                   border: isActive ? `2px solid ${Colors.primary}` : `1.5px solid ${Colors.hairline}`, cursor: 'pointer',

@@ -1,5 +1,6 @@
 // ==================== PET ====================
-export type PetType = 'dog' | 'cat' | 'bird' | 'rabbit' | 'other';
+// NAC = "Nouveaux Animaux de Compagnie" (exotic / non-traditional pets)
+export type PetType = 'reptile' | 'rodent' | 'ferret' | 'bird' | 'fish' | 'amphibian' | 'invertebrate' | 'other';
 export type PetGender = 'male' | 'female' | 'unknown';
 
 export interface Pet {
@@ -18,19 +19,25 @@ export interface Pet {
 }
 
 export const PET_EMOJI: Record<PetType, string> = {
-  dog: '\u{1F415}',
-  cat: '\u{1F408}',
+  reptile: '\u{1F98E}',
+  rodent: '\u{1F439}',
+  ferret: '\u{1F9A1}',
   bird: '\u{1F426}',
-  rabbit: '\u{1F430}',
+  fish: '\u{1F420}',
+  amphibian: '\u{1F438}',
+  invertebrate: '\u{1F577}\u{FE0F}',
   other: '\u{1F43E}',
 };
 
 export const PET_COLORS: Record<PetType, string> = {
-  dog: '#6366F1',
-  cat: '#EC4899',
+  reptile: '#6366F1',
+  rodent: '#EC4899',
+  ferret: '#8B5CF6',
   bird: '#10B981',
-  rabbit: '#F59E0B',
-  other: '#8B5CF6',
+  fish: '#0EA5E9',
+  amphibian: '#22C55E',
+  invertebrate: '#78716C',
+  other: '#F59E0B',
 };
 
 // ==================== HEALTH RECORD ====================

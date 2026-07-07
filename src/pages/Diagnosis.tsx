@@ -38,9 +38,9 @@ export function DiagnosisPage() {
   const [saving, setSaving] = useState(false);
 
   const symptomChips = [
-    t.diagnosis.vomiting, t.diagnosis.diarrhea, t.diagnosis.scratching, t.diagnosis.limping,
-    t.diagnosis.notEating, t.diagnosis.coughing, t.diagnosis.sneezing, t.diagnosis.lethargy,
-    t.diagnosis.hairLoss, t.diagnosis.eyeDischarge, t.diagnosis.swelling, t.diagnosis.badBreath,
+    t.diagnosis.lossOfAppetite, t.diagnosis.lethargy, t.diagnosis.abnormalShedding, t.diagnosis.swelling,
+    t.diagnosis.discharge, t.diagnosis.breathingDifficulty, t.diagnosis.abnormalDroppings, t.diagnosis.skinChanges,
+    t.diagnosis.weightLoss, t.diagnosis.vomiting, t.diagnosis.limping, t.diagnosis.reducedActivity,
   ];
 
   const SEVERITY_CONFIG: Record<string, { label: string; subtitle: string; colors: [string, string] }> = {
@@ -64,7 +64,7 @@ export function DiagnosisPage() {
     const pet = pets.find(p => p.id === selectedPet);
     try {
       const res = await analyzePetSymptoms({
-        petType: pet?.type || 'dog',
+        petType: pet?.type || 'reptile',
         petAge: (() => { if (pet?.birthDate) { const age = Math.floor((Date.now() - new Date(pet.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)); return `${age} years, ${pet.breed || pet.type}`; } return pet?.breed || 'unknown'; })(),
         symptoms: [...selectedSymptoms, description].filter(Boolean).join(', '),
         locale,

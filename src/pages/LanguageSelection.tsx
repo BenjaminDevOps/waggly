@@ -51,7 +51,7 @@ export function LanguageSelectionPage({ onDone }: Props) {
           fontSize: 38, fontWeight: 800, color: '#fff',
           margin: '0 0 10px', letterSpacing: '-0.5px',
         }}>
-          Waggly
+          Waggly NAC
         </h1>
 
         <p style={{

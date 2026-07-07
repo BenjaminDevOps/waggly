@@ -1,6 +1,6 @@
 import { Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Home, PawPrint, Stethoscope, Footprints, ShoppingBag, User } from 'lucide-react';
+import { Home, PawPrint, Stethoscope, BookOpen, ShoppingBag, User } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { HomePage } from './pages/Home';
 import { PetsPage } from './pages/Pets';
@@ -8,6 +8,8 @@ import { AddPetPage } from './pages/AddPet';
 import { PetDetailPage } from './pages/PetDetail';
 import { DiagnosisPage } from './pages/Diagnosis';
 import { WalkPage } from './pages/Walk';
+import { SpeciesGuidePage } from './pages/SpeciesGuide';
+import { CareChecklistPage } from './pages/CareChecklist';
 import { ShopPage } from './pages/Shop';
 import { ProfilePage } from './pages/Profile';
 import { PremiumPage } from './pages/Premium';
@@ -25,7 +27,7 @@ const tabDefs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof us
   { path: '/', icon: Home, key: 'home' },
   { path: '/pets', icon: PawPrint, key: 'pets' },
   { path: '/diagnosis', icon: Stethoscope, key: 'diagnosis' },
-  { path: '/walk', icon: Footprints, key: 'walk' },
+  { path: '/species-guide', icon: BookOpen, key: 'guide' },
   { path: '/shop', icon: ShoppingBag, key: 'shop' },
   { path: '/profile', icon: User, key: 'profile' },
 ];
@@ -61,7 +63,7 @@ export default function App() {
   if (!localeChosen) {
     return <LanguageSelectionPage onDone={() => setLocaleChosen(true)} />;
   }
-  const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms', '/edit-profile', '/contact'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
+  const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms', '/edit-profile', '/contact', '/checklist'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
 
   // Loading state — branded spinner while Firebase auth initializes
   if (loading) {
@@ -108,6 +110,8 @@ export default function App() {
         <Route path="/pet/:id" element={<PetDetailPage />} />
         <Route path="/diagnosis" element={<DiagnosisPage />} />
         <Route path="/walk" element={<WalkPage />} />
+        <Route path="/species-guide" element={<SpeciesGuidePage />} />
+        <Route path="/checklist" element={<CareChecklistPage />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/premium" element={<PremiumPage />} />

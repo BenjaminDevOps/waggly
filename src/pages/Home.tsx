@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   PawPrint, Stethoscope, ShoppingBag, Trophy, ChevronRight,
-  Plus, Star, Flame, Footprints, Sparkles,
+  Plus, Star, Flame, ClipboardList, BookOpen, Sparkles,
 } from 'lucide-react';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Shadow, Font, Weight } from '../theme/spacing';
@@ -12,7 +12,7 @@ import { SectionHeader } from '../components/SectionHeader';
 import { usePets } from '../hooks/usePets';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
-import { subscribeToTodayWalks } from '../services/walkFirestoreService';
+import { CHECKLIST_ITEM_KEYS, getChecklistState } from '../services/checklistService';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
 
 
@@ -37,19 +37,14 @@ export function HomePage() {
   const { user, loading: authLoading } = useAuth();
   const { t } = useI18n();
 
-  const { firebaseUser } = useAuth();
-  const [todaySteps, setTodaySteps] = useState(0);
-  const dailyGoal = 5000;
-  const walkPct = Math.min(todaySteps / dailyGoal, 1);
+  const [checklistDone, setChecklistDone] = useState(0);
+  const checklistTotal = CHECKLIST_ITEM_KEYS.length;
+  const checklistPct = Math.min(checklistDone / checklistTotal, 1);
 
   useEffect(() => {
-    if (!firebaseUser) return;
-    const unsubscribe = subscribeToTodayWalks(firebaseUser.uid, (walks) => {
-      const total = walks.reduce((sum, w) => sum + (w.steps || 0), 0);
-      setTodaySteps(total);
-    });
-    return unsubscribe;
-  }, [firebaseUser]);
+    const state = getChecklistState();
+    setChecklistDone(CHECKLIST_ITEM_KEYS.filter(k => state[k]).length);
+  }, []);
 
   const userPoints = user?.totalPoints ?? 0;
   const userStreak = user?.dailyStreak ?? 0;
@@ -66,7 +61,7 @@ export function HomePage() {
           }}>
             <span style={{ color: Colors.inkInverse, fontWeight: Weight.heavy, fontSize: 18 }}>W</span>
           </div>
-          <span style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.ink, letterSpacing: -0.3 }}>Waggly</span>
+          <span style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.ink, letterSpacing: -0.3 }}>Waggly NAC</span>
         </div>
         <div style={{ display: 'flex', gap: Spacing.sm }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.xs, backgroundColor: Colors.secondaryPale, borderRadius: 999, padding: `${Spacing.xs}px ${Spacing.md}px` }}>
@@ -167,6 +162,8 @@ export function HomePage() {
             {([
               { icon: Stethoscope, label: t.home.aiDiagnosis, color: Colors.accent, bg: Colors.accentPale, path: '/diagnosis' },
               { icon: PawPrint, label: t.home.addPet, color: Colors.primary, bg: Colors.primaryPale, path: '/add-pet' },
+              { icon: BookOpen, label: t.home.speciesGuide, color: Colors.mint, bg: Colors.mintPale, path: '/species-guide' },
+              { icon: ClipboardList, label: t.checklist.title, color: Colors.sky, bg: Colors.skyPale, path: '/checklist' },
               { icon: ShoppingBag, label: t.home.shop, color: Colors.secondary, bg: Colors.secondaryPale, path: '/shop' },
               { icon: Trophy, label: t.home.badges, color: Colors.success, bg: Colors.successPale, path: '/profile' },
             ] as const).map(a => (
@@ -185,24 +182,26 @@ export function HomePage() {
           </div>
         </div>
 
-        {/* Today's Walk */}
+        {/* Today's Care */}
         <div>
-          <SectionHeader title={t.home.todaysWalk} />
-          <Card className="card-interactive" onClick={() => navigate('/walk')} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: Spacing.xl }}>
+          <SectionHeader title={t.home.todaysCare} />
+          <Card className="card-interactive" onClick={() => navigate('/checklist')} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: Spacing.xl }}>
             <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
-              <ProgressCircle pct={walkPct} />
+              <ProgressCircle pct={checklistPct} />
               <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.primary }}>{Math.round(walkPct * 100)}%</span>
+                <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.primary }}>{Math.round(checklistPct * 100)}%</span>
               </div>
             </div>
             <div style={{ flex: 1 }}>
-              <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.semibold, color: Colors.ink }}>{todaySteps.toLocaleString()} {t.common.steps.toLowerCase()}</span>
+              <span style={{ fontSize: Font.bodyLarge, fontWeight: Weight.semibold, color: Colors.ink }}>
+                {t.home.careProgress.replace('{done}', String(checklistDone)).replace('{total}', String(checklistTotal))}
+              </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.xs, marginTop: Spacing.xs }}>
-                <Footprints size={14} color={Colors.inkTertiary} />
-                <span style={{ fontSize: Font.sm, color: Colors.inkTertiary }}>{t.home.ofDailyGoal.replace('{goal}', dailyGoal.toLocaleString())}</span>
+                <ClipboardList size={14} color={Colors.inkTertiary} />
+                <span style={{ fontSize: Font.sm, color: Colors.inkTertiary }}>{t.checklist.subtitle}</span>
               </div>
               <div style={{ marginTop: 10, height: 6, borderRadius: 3, backgroundColor: Colors.primaryPale, overflow: 'hidden' }}>
-                <div style={{ width: `${Math.round(walkPct * 100)}%`, height: '100%', borderRadius: 3, background: `linear-gradient(90deg, ${Gradients.primary[0]}, ${Gradients.primary[1]})` }} />
+                <div style={{ width: `${Math.round(checklistPct * 100)}%`, height: '100%', borderRadius: 3, background: `linear-gradient(90deg, ${Gradients.primary[0]}, ${Gradients.primary[1]})` }} />
               </div>
             </div>
             <ChevronRight size={20} color={Colors.inkTertiary} />

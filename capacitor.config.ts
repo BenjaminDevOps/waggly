@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.ministeredesapp.waggly',
-  appName: 'Waggly',
+  appName: 'Waggly NAC',
   webDir: 'dist',
   server: {
     androidScheme: 'https',

@@ -31,7 +31,7 @@ export interface Translations {
     home: string;
     pets: string;
     diagnosis: string;
-    walk: string;
+    guide: string;
     shop: string;
     profile: string;
   };
@@ -44,10 +44,11 @@ export interface Translations {
     myPets: string;
     noPetsYet: string;
     addPet: string;
-    todaysWalk: string;
-    ofDailyGoal: string;
+    todaysCare: string;
+    careProgress: string;
     quickActions: string;
     aiDiagnosis: string;
+    speciesGuide: string;
     shop: string;
     badges: string;
     goToShop: string;
@@ -80,10 +81,13 @@ export interface Translations {
     microchipId: string;
     microchipPlaceholder: string;
     savePet: string;
-    dog: string;
-    cat: string;
+    reptile: string;
+    rodent: string;
+    ferret: string;
     bird: string;
-    rabbit: string;
+    fish: string;
+    amphibian: string;
+    invertebrate: string;
     other: string;
   };
 
@@ -157,18 +161,43 @@ export interface Translations {
     emergency: string;
     emergencyDesc: string;
     // Symptom chips
-    vomiting: string;
-    diarrhea: string;
-    scratching: string;
-    limping: string;
-    notEating: string;
-    coughing: string;
-    sneezing: string;
+    lossOfAppetite: string;
     lethargy: string;
-    hairLoss: string;
-    eyeDischarge: string;
+    abnormalShedding: string;
     swelling: string;
-    badBreath: string;
+    discharge: string;
+    breathingDifficulty: string;
+    abnormalDroppings: string;
+    skinChanges: string;
+    weightLoss: string;
+    vomiting: string;
+    limping: string;
+    reducedActivity: string;
+  };
+
+  // Species Guide page
+  speciesGuide: {
+    title: string;
+    subtitle: string;
+    examples: string;
+    habitat: string;
+    diet: string;
+    temperature: string;
+    maintenance: string;
+  };
+
+  // Care Checklist page
+  checklist: {
+    title: string;
+    subtitle: string;
+    completed: string;
+    pointsEarned: string;
+    itemHabitat: string;
+    itemWater: string;
+    itemTemperature: string;
+    itemFood: string;
+    itemObservation: string;
+    itemEnrichment: string;
   };
 
   // Walk page
@@ -213,15 +242,18 @@ export interface Translations {
     searchProducts: string;
     noProducts: string;
     all: string;
-    dogs: string;
-    cats: string;
-    nac: string;
+    reptiles: string;
+    rodents: string;
+    ferrets: string;
+    birds: string;
+    fish: string;
+    amphibians: string;
+    invertebrates: string;
+    terrariums: string;
+    substrate: string;
+    heatingLighting: string;
     food: string;
-    toys: string;
-    health: string;
     accessories: string;
-    grooming: string;
-    training: string;
     viewOnAmazon: string;
     reviews: string;
     earnPoints: string;

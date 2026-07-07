@@ -1,20 +1,26 @@
-import { Dog, Cat, Bird, Rabbit, PawPrint } from 'lucide-react';
+import { Turtle, Rat, Squirrel, Bird, Fish, Waves, Bug, PawPrint } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { PetType } from '../models/types';
 import { Colors } from '../theme/colors';
 
 export const PET_ICON_MAP: Record<PetType, LucideIcon> = {
-  dog: Dog,
-  cat: Cat,
+  reptile: Turtle,
+  rodent: Rat,
+  ferret: Squirrel,
   bird: Bird,
-  rabbit: Rabbit,
+  fish: Fish,
+  amphibian: Waves,
+  invertebrate: Bug,
   other: PawPrint,
 };
 
 export const PET_COLOR_MAP: Record<PetType, string> = {
-  dog: Colors.primary,
-  cat: Colors.accent,
+  reptile: Colors.primary,
+  rodent: Colors.accent,
+  ferret: Colors.lavender,
   bird: Colors.success,
-  rabbit: Colors.secondary,
-  other: Colors.lavender,
+  fish: Colors.sky,
+  amphibian: Colors.mint,
+  invertebrate: Colors.inkTertiary,
+  other: Colors.secondary,
 };
