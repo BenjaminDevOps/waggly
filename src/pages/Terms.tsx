@@ -26,8 +26,8 @@ export function TermsPage() {
 
         <h2 style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink, marginTop: 24 }}>2. Description of Service</h2>
         <p>
-          Waggly is a pet health companion app that provides pet profile management, health record tracking,
-          AI-powered symptom analysis, walk tracking, and gamification features.
+          Waggly NAC is an exotic pet health companion app that provides pet profile management, health record
+          tracking, AI-powered symptom analysis, species care guides, and gamification features.
         </p>
 
         <h2 style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink, marginTop: 24 }}>3. AI Diagnosis Disclaimer</h2>

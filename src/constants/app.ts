@@ -14,16 +14,9 @@ export const POINTS = {
   vetVisit: 50,
   dailyStreak: 5,
   weeklyStreak: 25,
-  walk: 10,
   diagnosis: 10,
   shopPurchase: 15,
   badgeEarned: 50,
-};
-
-export const WALK = {
-  defaultDailyGoal: 5000,
-  averageStrideMeters: 0.7,
-  caloriesPerStep: 0.04,
 };
 
 export const COLLECTIONS = {
@@ -33,7 +26,6 @@ export const COLLECTIONS = {
   diagnoses: 'diagnoses',
   badges: 'badges',
   shopItems: 'shop_items',
-  walks: 'walks',
 };
 
 export const AFFILIATE = {

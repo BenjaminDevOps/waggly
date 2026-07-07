@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Diamond, ChevronRight, Shield, HelpCircle, LogOut, Lock, Stethoscope, Footprints, Crown, Medal, PawPrint, Flame, Star as StarIcon, Award, Building2, Trophy, Target, FileText, Trash2 } from 'lucide-react';
+import { User, Diamond, ChevronRight, Shield, HelpCircle, LogOut, Lock, Stethoscope, ClipboardList, Crown, PawPrint, Flame, Star as StarIcon, Award, Building2, Trophy, FileText, Trash2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
@@ -11,6 +11,7 @@ import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { useAuth } from '../hooks/useAuth';
 import { usePets } from '../hooks/usePets';
 import { useI18n, LOCALE_LABELS, LOCALE_FLAGS, type Locale } from '../i18n';
+import { CHECKLIST_ITEM_KEYS, getChecklistState } from '../services/checklistService';
 
 const AVATAR_EMOJI: Record<string, string> = {
   dog1: '\u{1F436}', cat1: '\u{1F431}', rabbit1: '\u{1F430}', bird1: '\u{1F426}',
@@ -19,7 +20,7 @@ const AVATAR_EMOJI: Record<string, string> = {
 };
 
 const BADGE_ICON_MAP: Record<string, LucideIcon> = {
-  PawPrint, Stethoscope, Flame, 'Star': StarIcon, Award, Diamond, Crown, Building2, Trophy, Footprints, Target, Medal,
+  PawPrint, Stethoscope, Flame, 'Star': StarIcon, Award, Diamond, Crown, Building2, Trophy,
 };
 const LOCALES: Locale[] = ['en', 'fr', 'es'];
 
@@ -38,6 +39,8 @@ export function ProfilePage() {
   const totalPoints = user?.totalPoints ?? 0;
   const streak = user?.dailyStreak ?? 0;
   const earnedBadges = (user?.badges ?? []) as BadgeId[];
+  const checklistState = getChecklistState();
+  const careTasksDone = CHECKLIST_ITEM_KEYS.filter(k => checklistState[k]).length;
   const level = Math.floor(totalPoints / 200) + 1;
   const xpInLevel = totalPoints % 200;
   const xpNeeded = 200;
@@ -160,7 +163,7 @@ export function ProfilePage() {
         <SectionHeader title={t.profile.activitySummary} />
         <Card style={{ marginBottom: 28 }}>
           {[{ icon: Stethoscope, label: t.profile.aiDiagnoses, value: String(user?.aiDiagnosisUsed ?? 0), color: Colors.primary },
-            { icon: Footprints, label: t.profile.walks, value: String(user?.totalPoints ? Math.floor((user.totalPoints) / 10) : 0), color: Colors.success },
+            { icon: ClipboardList, label: t.profile.careTasks, value: `${careTasksDone}/${CHECKLIST_ITEM_KEYS.length}`, color: Colors.success },
             { icon: Shield, label: t.profile.healthRecords, value: '-', color: Colors.accent },
           ].map((item, i, arr) => (
             <React.Fragment key={item.label}>

@@ -31,14 +31,14 @@ export function PrivacyPage() {
         pet-related information you voluntarily enter.</p>
         <p><strong style={{ color: Colors.ink }}>AI Diagnosis Data:</strong> Symptoms and descriptions you submit for AI analysis
         are sent to Google Gemini API for processing. We do not store the raw AI responses long-term.</p>
-        <p><strong style={{ color: Colors.ink }}>Walk Data:</strong> Step counts, distances, and duration of walks tracked within the app.</p>
+        <p><strong style={{ color: Colors.ink }}>Care Checklist Data:</strong> Daily care task completion, stored locally on your device.</p>
         <p><strong style={{ color: Colors.ink }}>Usage Data:</strong> General analytics about app usage patterns to improve our service.</p>
 
         <h2 style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink, marginTop: 24 }}>3. How We Use Your Information</h2>
         <ul style={{ paddingLeft: 20 }}>
-          <li>Provide and maintain the Waggly app services</li>
+          <li>Provide and maintain the Waggly NAC app services</li>
           <li>Process AI-powered symptom analysis via Google Gemini</li>
-          <li>Track your pet's health history and walk activity</li>
+          <li>Track your pet's health history and care activity</li>
           <li>Manage gamification features (points, badges, streaks)</li>
           <li>Process subscriptions and in-app purchases via Apple</li>
           <li>Improve and optimize the app experience</li>

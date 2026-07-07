@@ -106,29 +106,13 @@ export interface Diagnosis {
   createdAt: string;
 }
 
-// ==================== WALK ====================
-export interface Walk {
-  id: string;
-  userId: string;
-  petId?: string;
-  petName?: string;
-  startTime: string;
-  endTime?: string;
-  steps: number;
-  distanceKm: number;
-  durationMinutes: number;
-  caloriesBurned: number;
-  pointsEarned: number;
-}
-
 // ==================== SHOP ====================
 export type ShopCategory =
+  | 'terrariums'
+  | 'substrate'
+  | 'heatingLighting'
   | 'food'
-  | 'toys'
-  | 'health'
-  | 'accessories'
-  | 'grooming'
-  | 'training';
+  | 'accessories';
 
 export interface ShopItem {
   id: string;
@@ -146,12 +130,11 @@ export interface ShopItem {
 }
 
 export const SHOP_EMOJI: Record<ShopCategory, string> = {
-  food: '\u{1F356}',
-  toys: '\u{1F9F8}',
-  health: '\u{1F48A}',
+  terrariums: '\u{1F3E0}',
+  substrate: '\u{1F33F}',
+  heatingLighting: '\u2600\uFE0F',
+  food: '\u{1F997}',
   accessories: '\u{1F380}',
-  grooming: '\u2702\uFE0F',
-  training: '\u{1F3AF}',
 };
 
 // ==================== USER & GAMIFICATION ====================
@@ -177,10 +160,7 @@ export type BadgeId =
   | 'points500'
   | 'points1000'
   | 'vetVisit5'
-  | 'healthChampion'
-  | 'firstWalk'
-  | 'walker5k'
-  | 'marathonWalker';
+  | 'healthChampion';
 
 export interface Badge {
   id: BadgeId;
@@ -199,7 +179,4 @@ export const BADGES: Badge[] = [
   { id: 'points1000', name: '1000 Points', description: 'Earned 1000 points', icon: 'Crown' },
   { id: 'vetVisit5', name: '5 Vet Visits', description: 'Recorded 5 vet visits', icon: 'Building2' },
   { id: 'healthChampion', name: 'Health Champion', description: 'Maintained excellent pet health', icon: 'Trophy' },
-  { id: 'firstWalk', name: 'First Walk', description: 'Completed your first walk with your pet', icon: 'Footprints' },
-  { id: 'walker5k', name: '5K Walker', description: 'Walked 5,000 steps in a single day', icon: 'Target' },
-  { id: 'marathonWalker', name: 'Marathon Walker', description: 'Walked a total of 42 km', icon: 'Medal' },
 ];

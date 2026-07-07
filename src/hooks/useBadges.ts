@@ -2,22 +2,14 @@ import { useEffect, useRef } from 'react';
 import { useAuth } from './useAuth';
 import { usePets } from './usePets';
 import { checkAndAwardBadges } from '../services/badgeService';
-import { subscribeToWalks } from '../services/walkFirestoreService';
 import { subscribeToHealthRecords } from '../services/healthRecordService';
-import type { Walk, HealthRecord } from '../models/types';
+import type { HealthRecord } from '../models/types';
 
 export function useBadgeChecker() {
   const { firebaseUser, user } = useAuth();
   const { pets } = usePets();
-  const walksRef = useRef<Walk[]>([]);
   const recordsRef = useRef<HealthRecord[]>([]);
   const checkedRef = useRef(false);
-
-  useEffect(() => {
-    if (!firebaseUser) return;
-    const unsub = subscribeToWalks(firebaseUser.uid, (w) => { walksRef.current = w; });
-    return unsub;
-  }, [firebaseUser]);
 
   useEffect(() => {
     if (!firebaseUser || pets.length === 0) return;
@@ -40,7 +32,6 @@ export function useBadgeChecker() {
       checkAndAwardBadges(firebaseUser.uid, {
         user,
         pets,
-        walks: walksRef.current,
         records: recordsRef.current,
       }).catch(console.error);
     }, 3000);
@@ -55,7 +46,6 @@ export function useBadgeChecker() {
       checkAndAwardBadges(firebaseUser.uid, {
         user,
         pets,
-        walks: walksRef.current,
         records: recordsRef.current,
       }).catch(console.error);
     }, 60000);

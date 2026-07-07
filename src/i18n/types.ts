@@ -31,7 +31,7 @@ export interface Translations {
     home: string;
     pets: string;
     diagnosis: string;
-    guide: string;
+    care: string;
     shop: string;
     profile: string;
   };
@@ -200,42 +200,6 @@ export interface Translations {
     itemEnrichment: string;
   };
 
-  // Walk page
-  walk: {
-    title: string;
-    walkingWith: string;
-    startWalk: string;
-    stopWalk: string;
-    currentWalk: string;
-    goalReached: string;
-    todaysSummary: string;
-    totalSteps: string;
-    kmWalked: string;
-    calories: string;
-    thisWeek: string;
-    achievements: string;
-    firstWalk: string;
-    firstWalkDesc: string;
-    fiveKSteps: string;
-    fiveKStepsDesc: string;
-    sevenDayStreak: string;
-    sevenDayStreakDesc: string;
-    marathonWalker: string;
-    marathonWalkerDesc: string;
-    greatWalk: string;
-    distance: string;
-    time: string;
-    pointsEarned: string;
-    // Days
-    mon: string;
-    tue: string;
-    wed: string;
-    thu: string;
-    fri: string;
-    sat: string;
-    sun: string;
-  };
-
   // Shop page
   shop: {
     title: string;
@@ -273,7 +237,7 @@ export interface Translations {
     leaderboard: string;
     activitySummary: string;
     aiDiagnoses: string;
-    walks: string;
+    careTasks: string;
     healthRecords: string;
     shopVisits: string;
     account: string;

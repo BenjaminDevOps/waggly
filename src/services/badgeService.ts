@@ -1,12 +1,11 @@
 import { db } from './firebase';
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { COLLECTIONS } from '../constants/app';
-import type { User, BadgeId, Pet, Walk, HealthRecord } from '../models/types';
+import type { User, BadgeId, Pet, HealthRecord } from '../models/types';
 
 interface BadgeContext {
   user: User;
   pets: Pet[];
-  walks: Walk[];
   records: HealthRecord[];
 }
 
@@ -22,12 +21,6 @@ const BADGE_CHECKS: Record<BadgeId, BadgeCheck> = {
   points1000: (ctx) => ctx.user.totalPoints >= 1000,
   vetVisit5: (ctx) => ctx.records.filter(r => r.type === 'vetVisit').length >= 5,
   healthChampion: (ctx) => ctx.records.length >= 10,
-  firstWalk: (ctx) => ctx.walks.length >= 1,
-  walker5k: (ctx) => ctx.walks.some(w => w.steps >= 5000),
-  marathonWalker: (ctx) => {
-    const totalKm = ctx.walks.reduce((sum, w) => sum + (w.distanceKm || 0), 0);
-    return totalKm >= 42;
-  },
 };
 
 export async function checkAndAwardBadges(

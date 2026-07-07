@@ -163,7 +163,6 @@ export function HomePage() {
               { icon: Stethoscope, label: t.home.aiDiagnosis, color: Colors.accent, bg: Colors.accentPale, path: '/diagnosis' },
               { icon: PawPrint, label: t.home.addPet, color: Colors.primary, bg: Colors.primaryPale, path: '/add-pet' },
               { icon: BookOpen, label: t.home.speciesGuide, color: Colors.mint, bg: Colors.mintPale, path: '/species-guide' },
-              { icon: ClipboardList, label: t.checklist.title, color: Colors.sky, bg: Colors.skyPale, path: '/checklist' },
               { icon: ShoppingBag, label: t.home.shop, color: Colors.secondary, bg: Colors.secondaryPale, path: '/shop' },
               { icon: Trophy, label: t.home.badges, color: Colors.success, bg: Colors.successPale, path: '/profile' },
             ] as const).map(a => (
