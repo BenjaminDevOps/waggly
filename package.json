@@ -10,8 +10,12 @@
     "cap-add-ios": "npx cap add ios",
     "cap-sync": "npx cap sync",
     "cap-open-ios": "npx cap open ios",
+    "cap-open-android": "npx cap open android",
     "ios": "npm run build && npx cap sync ios && npx cap open ios",
-    "assets:generate": "npx capacitor-assets generate --ios"
+    "android": "npm run build && npx cap sync android && npx cap open android",
+    "assets:generate": "npx capacitor-assets generate",
+    "assets:generate:ios": "npx capacitor-assets generate --ios",
+    "assets:generate:android": "npx capacitor-assets generate --android"
   },
   "dependencies": {
     "@capacitor/android": "^8.3.4",
