@@ -70,23 +70,23 @@ export default function App() {
       <div style={{
         minHeight: '100vh', display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
-        backgroundColor: '#FAF8F5', gap: 20,
+        backgroundColor: '#FAF4E8', gap: 20,
       }}>
         <div style={{
           width: 72, height: 72, borderRadius: 20,
-          background: 'linear-gradient(135deg, #5B5EA6, #7B7FCC)',
+          background: 'linear-gradient(135deg, #3B2360, #54357F)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 8px 32px rgba(91,94,166,0.25)',
+          boxShadow: '0 8px 32px rgba(59,35,96,0.3)',
           animation: 'scaleIn 0.4s ease both',
         }}>
           <PawPrint size={36} color="#fff" style={{ animation: 'spin 1.5s linear infinite' }} />
         </div>
         <div style={{
-          width: 100, height: 4, borderRadius: 2, backgroundColor: '#E8E4DF', overflow: 'hidden',
+          width: 100, height: 4, borderRadius: 2, backgroundColor: '#E7E0EE', overflow: 'hidden',
         }}>
           <div style={{
             width: '40%', height: '100%', borderRadius: 2,
-            background: 'linear-gradient(90deg, #5B5EA6, #7B7FCC)',
+            background: 'linear-gradient(90deg, #3B2360, #54357F)',
             animation: 'splashLoading 1.4s ease-in-out infinite',
           }} />
         </div>
@@ -134,8 +134,8 @@ export default function App() {
             const active = location.pathname === path;
             return (
               <NavLink key={path} to={path} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, textDecoration: 'none' }}>
-                <Icon size={24} color={active ? '#5B5EA6' : '#9D9DAF'} strokeWidth={active ? 2.5 : 2} />
-                <span style={{ fontSize: 11, fontWeight: active ? 600 : 400, color: active ? '#5B5EA6' : '#9D9DAF' }}>{t.tabs[key]}</span>
+                <Icon size={24} color={active ? '#3B2360' : '#9D9DAF'} strokeWidth={active ? 2.5 : 2} />
+                <span style={{ fontSize: 11, fontWeight: active ? 600 : 400, color: active ? '#3B2360' : '#9D9DAF' }}>{t.tabs[key]}</span>
               </NavLink>
             );
           })}

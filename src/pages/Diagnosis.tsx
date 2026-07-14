@@ -45,7 +45,7 @@ export function DiagnosisPage() {
 
   const SEVERITY_CONFIG: Record<string, { label: string; subtitle: string; colors: [string, string] }> = {
     low: { label: t.diagnosis.lowConcern, subtitle: t.diagnosis.lowConcernDesc, colors: ['#6EAF7B', '#5B9E6B'] },
-    medium: { label: t.diagnosis.moderateConcern, subtitle: t.diagnosis.moderateConcernDesc, colors: ['#E8985E', '#D4726A'] },
+    medium: { label: t.diagnosis.moderateConcern, subtitle: t.diagnosis.moderateConcernDesc, colors: ['#E0AE4A', '#D4726A'] },
     high: { label: t.diagnosis.highConcern, subtitle: t.diagnosis.highConcernDesc, colors: ['#D4726A', '#C0504D'] },
     emergency: { label: t.diagnosis.emergency, subtitle: t.diagnosis.emergencyDesc, colors: ['#C0504D', '#A03030'] },
   };

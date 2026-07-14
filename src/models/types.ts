@@ -30,14 +30,14 @@ export const PET_EMOJI: Record<PetType, string> = {
 };
 
 export const PET_COLORS: Record<PetType, string> = {
-  reptile: '#6366F1',
-  rodent: '#EC4899',
-  ferret: '#8B5CF6',
-  bird: '#10B981',
-  fish: '#0EA5E9',
-  amphibian: '#22C55E',
-  invertebrate: '#78716C',
-  other: '#F59E0B',
+  reptile: '#3B2360',
+  rodent: '#D4726A',
+  ferret: '#A594C9',
+  bird: '#6EAF7B',
+  fish: '#7DB8D4',
+  amphibian: '#7EC8B0',
+  invertebrate: '#91819E',
+  other: '#E0AE4A',
 };
 
 // ==================== HEALTH RECORD ====================

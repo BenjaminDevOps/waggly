@@ -26,7 +26,7 @@ export function LanguageSelectionPage({ onDone }: Props) {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(160deg, #5B5EA6 0%, #7B7FCC 100%)',
+      background: 'linear-gradient(160deg, #3B2360 0%, #54357F 100%)',
       display: 'flex', flexDirection: 'column',
       maxWidth: 430, margin: '0 auto',
     }}>
@@ -87,13 +87,13 @@ export function LanguageSelectionPage({ onDone }: Props) {
               <div style={{ flex: 1 }}>
                 <div style={{
                   fontSize: 17, fontWeight: 700, lineHeight: 1.3,
-                  color: active ? '#5B5EA6' : '#fff',
+                  color: active ? '#3B2360' : '#fff',
                 }}>
                   {lang.native}
                 </div>
                 <div style={{
                   fontSize: 13, marginTop: 2,
-                  color: active ? '#7B7FCC' : 'rgba(255,255,255,0.6)',
+                  color: active ? '#7C5CBF' : 'rgba(255,255,255,0.6)',
                 }}>
                   {lang.subtitle}
                 </div>
@@ -102,8 +102,8 @@ export function LanguageSelectionPage({ onDone }: Props) {
               {/* Radio indicator */}
               <div style={{
                 width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-                border: `2px solid ${active ? '#5B5EA6' : 'rgba(255,255,255,0.45)'}`,
-                background: active ? '#5B5EA6' : 'transparent',
+                border: `2px solid ${active ? '#3B2360' : 'rgba(255,255,255,0.45)'}`,
+                background: active ? '#3B2360' : 'transparent',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'all 0.18s ease',
               }}>
@@ -130,7 +130,7 @@ export function LanguageSelectionPage({ onDone }: Props) {
           style={{
             width: '100%', height: 54, borderRadius: 16,
             background: selected ? '#fff' : 'rgba(255,255,255,0.22)',
-            color: selected ? '#5B5EA6' : 'rgba(255,255,255,0.45)',
+            color: selected ? '#3B2360' : 'rgba(255,255,255,0.45)',
             fontSize: 16, fontWeight: 700, border: 'none',
             cursor: selected ? 'pointer' : 'default',
             transition: 'all 0.2s ease',

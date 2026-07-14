@@ -137,7 +137,7 @@ export function PetDetailPage() {
       {/* Hero Header — extends into safe area */}
       <div
         style={{
-          background: `linear-gradient(135deg, ${Gradients.primary[0]}, ${Gradients.primary[1]}, #9B9EE6)`,
+          background: `linear-gradient(135deg, ${Gradients.primary[0]}, ${Gradients.primary[1]}, #9B7FC7)`,
           paddingTop: 'env(safe-area-inset-top, 20px)',
           borderRadius: `0 0 ${Radius.xxl}px ${Radius.xxl}px`,
         }}
