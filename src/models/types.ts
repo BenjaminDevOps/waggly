@@ -90,6 +90,23 @@ export const RECORD_LABELS: Record<RecordType, string> = {
   note: 'Note',
 };
 
+// ==================== NAC JOURNAL (shedding/behavior + habitat) ====================
+// Weight entries reuse HealthRecord with type: 'weight' — these two cover the
+// NAC-specific logs that don't fit the existing medical-record model.
+export type NacJournalEntryType = 'shedding' | 'habitat';
+
+export interface NacJournalEntry {
+  id: string;
+  petId: string;
+  userId: string;
+  type: NacJournalEntryType;
+  date: string;
+  note?: string;
+  temperatureC?: number;
+  humidityPct?: number;
+  createdAt: string;
+}
+
 // ==================== DIAGNOSIS ====================
 export type DiagnosisSeverity = 'low' | 'medium' | 'high' | 'emergency';
 

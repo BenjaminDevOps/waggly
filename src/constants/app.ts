@@ -26,6 +26,7 @@ export const COLLECTIONS = {
   diagnoses: 'diagnoses',
   badges: 'badges',
   shopItems: 'shop_items',
+  nacJournal: 'nac_journal_entries',
 };
 
 export const AFFILIATE = {

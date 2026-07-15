@@ -31,7 +31,7 @@ export interface Translations {
     home: string;
     pets: string;
     diagnosis: string;
-    care: string;
+    guide: string;
     shop: string;
     profile: string;
   };
@@ -198,6 +198,47 @@ export interface Translations {
     itemFood: string;
     itemObservation: string;
     itemEnrichment: string;
+  };
+
+  // Food Guide + Health Journal page
+  foodGuide: {
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    segmentFood: string;
+    segmentJournal: string;
+    allowed: string;
+    limit: string;
+    toxic: string;
+    noResults: string;
+    otherSpeciesNotice: string;
+  };
+
+  healthJournal: {
+    selectPet: string;
+    addPetFirst: string;
+    dateLabel: string;
+    save: string;
+    weightTitle: string;
+    weightSubtitle: string;
+    weightAdd: string;
+    weightValueLabel: string;
+    weightValuePlaceholder: string;
+    weightEntryTitle: string;
+    weightEmpty: string;
+    sheddingTitle: string;
+    sheddingSubtitle: string;
+    sheddingAdd: string;
+    sheddingNoteLabel: string;
+    sheddingNotePlaceholder: string;
+    sheddingEmpty: string;
+    habitatTitle: string;
+    habitatSubtitle: string;
+    habitatAdd: string;
+    habitatTempLabel: string;
+    habitatHumidityLabel: string;
+    habitatNoteLabel: string;
+    habitatEmpty: string;
   };
 
   // Shop page

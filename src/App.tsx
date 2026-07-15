@@ -1,6 +1,6 @@
 import { Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Home, PawPrint, Stethoscope, ClipboardList, ShoppingBag, User } from 'lucide-react';
+import { Home, PawPrint, Stethoscope, Salad, ShoppingBag, User } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { HomePage } from './pages/Home';
 import { PetsPage } from './pages/Pets';
@@ -9,6 +9,7 @@ import { PetDetailPage } from './pages/PetDetail';
 import { DiagnosisPage } from './pages/Diagnosis';
 import { SpeciesGuidePage } from './pages/SpeciesGuide';
 import { CareChecklistPage } from './pages/CareChecklist';
+import { FoodHealthGuidePage } from './pages/FoodHealthGuide';
 import { ShopPage } from './pages/Shop';
 import { ProfilePage } from './pages/Profile';
 import { PremiumPage } from './pages/Premium';
@@ -26,7 +27,7 @@ const tabDefs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof us
   { path: '/', icon: Home, key: 'home' },
   { path: '/pets', icon: PawPrint, key: 'pets' },
   { path: '/diagnosis', icon: Stethoscope, key: 'diagnosis' },
-  { path: '/checklist', icon: ClipboardList, key: 'care' },
+  { path: '/guide', icon: Salad, key: 'guide' },
   { path: '/shop', icon: ShoppingBag, key: 'shop' },
   { path: '/profile', icon: User, key: 'profile' },
 ];
@@ -62,7 +63,7 @@ export default function App() {
   if (!localeChosen) {
     return <LanguageSelectionPage onDone={() => setLocaleChosen(true)} />;
   }
-  const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms', '/edit-profile', '/contact', '/species-guide'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
+  const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms', '/edit-profile', '/contact', '/species-guide', '/checklist'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
 
   // Loading state — branded spinner while Firebase auth initializes
   if (loading) {
@@ -110,6 +111,7 @@ export default function App() {
         <Route path="/diagnosis" element={<DiagnosisPage />} />
         <Route path="/species-guide" element={<SpeciesGuidePage />} />
         <Route path="/checklist" element={<CareChecklistPage />} />
+        <Route path="/guide" element={<FoodHealthGuidePage />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/premium" element={<PremiumPage />} />
