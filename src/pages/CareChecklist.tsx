@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Brush, Droplet, Thermometer, Utensils, Eye, PawPrint, CheckCircle2, Circle } from 'lucide-react';
+import { ArrowLeft, Brush, Droplet, Thermometer, Utensils, Eye, PawPrint, CheckCircle2, Circle, Trophy } from 'lucide-react';
 import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { useI18n } from '../i18n';
-import { CHECKLIST_ITEM_KEYS, getChecklistState, setChecklistItemDone, type ChecklistItemKey } from '../services/checklistService';
+import { useAuth } from '../hooks/useAuth';
+import {
+  CHECKLIST_ITEM_KEYS, getChecklistState, setChecklistItemDone, getItemStreak, getPerfectDayStreak,
+  isChallengeCelebrated, markChallengeCelebrated, type ChecklistItemKey,
+} from '../services/checklistService';
+import { addPoints } from '../services/userService';
 import { POINTS } from '../constants/app';
+import { CHALLENGES, type ChallengeDef } from '../constants/challenges';
+import { ChallengeCelebration } from '../components/ChallengeCelebration';
 
 const ITEM_ICONS: Record<ChecklistItemKey, React.ElementType> = {
   itemHabitat: Brush,
@@ -19,26 +26,52 @@ const ITEM_ICONS: Record<ChecklistItemKey, React.ElementType> = {
 export function CareChecklistPage() {
   const navigate = useNavigate();
   const { t } = useI18n();
+  const { firebaseUser } = useAuth();
   const [state, setState] = useState(() => getChecklistState());
+  const [celebrationQueue, setCelebrationQueue] = useState<ChallengeDef[]>([]);
 
   const doneCount = CHECKLIST_ITEM_KEYS.filter(k => state[k]).length;
   const total = CHECKLIST_ITEM_KEYS.length;
   const pct = Math.min(doneCount / total, 1);
   const earnedPoints = doneCount * POINTS.healthCheck;
 
+  function awardChallenge(challenge: ChallengeDef) {
+    markChallengeCelebrated(challenge.id);
+    setCelebrationQueue((q) => [...q, challenge]);
+    if (firebaseUser) {
+      addPoints(firebaseUser.uid, challenge.xpReward).catch((e) => console.error('Error awarding challenge XP:', e));
+    }
+  }
+
   const toggle = (key: ChecklistItemKey) => {
     const next = !state[key];
     setChecklistItemDone(key, next);
     setState(prev => ({ ...prev, [key]: next }));
+
+    if (!next) return; // only check for newly-completed challenges when marking done
+
+    for (const challenge of CHALLENGES) {
+      if (isChallengeCelebrated(challenge.id)) continue;
+      if (challenge.itemKey === key) {
+        if (getItemStreak(key) === challenge.targetDays) awardChallenge(challenge);
+      } else if (challenge.itemKey === 'perfectDay') {
+        if (getPerfectDayStreak() === challenge.targetDays) awardChallenge(challenge);
+      }
+    }
   };
 
   return (
     <div className="fade-in" style={{ minHeight: '100vh', backgroundColor: Colors.background, paddingBottom: Spacing.xxl }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.md, padding: `${Spacing.lg}px ${Spacing.xl}px` }}>
-        <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: Spacing.xs }}>
-          <ArrowLeft size={22} color={Colors.ink} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${Spacing.lg}px ${Spacing.xl}px` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.md }}>
+          <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: Spacing.xs }}>
+            <ArrowLeft size={22} color={Colors.ink} />
+          </button>
+          <span style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink }}>{t.checklist.title}</span>
+        </div>
+        <button onClick={() => navigate('/challenges')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: Spacing.xs, display: 'flex' }}>
+          <Trophy size={22} color={Colors.secondary} />
         </button>
-        <span style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink }}>{t.checklist.title}</span>
       </div>
 
       <div style={{ padding: `0 ${Spacing.xl}px`, display: 'flex', flexDirection: 'column', gap: Spacing.xl }}>
@@ -94,6 +127,13 @@ export function CareChecklistPage() {
           })}
         </div>
       </div>
+
+      {celebrationQueue.length > 0 && (
+        <ChallengeCelebration
+          challenge={celebrationQueue[0]}
+          onClose={() => setCelebrationQueue((q) => q.slice(1))}
+        />
+      )}
     </div>
   );
 }

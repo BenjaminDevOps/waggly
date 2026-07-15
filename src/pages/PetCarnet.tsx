@@ -193,8 +193,8 @@ export function PetCarnetPage() {
 
         {/* Wellbeing score */}
         <div>
-          <SectionHeader title={t.carnet.wellbeingTitle} />
-          <Card style={{ display: 'flex', alignItems: 'center', gap: Spacing.lg }}>
+          <SectionHeader title={t.carnet.wellbeingTitle} actionLabel={t.challenges.title} onAction={() => navigate('/challenges')} />
+          <Card className="card-interactive" onClick={() => navigate('/challenges')} style={{ display: 'flex', alignItems: 'center', gap: Spacing.lg }}>
             <div style={{ fontSize: 40 }}>{PET_EMOJI[pet.type]}</div>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>

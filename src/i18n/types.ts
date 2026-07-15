@@ -316,6 +316,24 @@ export interface Translations {
     addAppointment: string;
   };
 
+  // Wellbeing challenges
+  challenges: {
+    title: string;
+    subtitle: string;
+    progressLabel: string;
+    completed: string;
+    celebrationTitle: string;
+    celebrationSubtitle: string;
+    xpEarned: string;
+    habitat7: string;
+    water7: string;
+    temperature7: string;
+    food7: string;
+    observation7: string;
+    enrichment7: string;
+    perfectWeek: string;
+  };
+
   // Shop page
   shop: {
     title: string;

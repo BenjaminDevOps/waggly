@@ -197,6 +197,17 @@ img {
   from { width: 0; }
 }
 
+@keyframes confettiFall {
+  0%   { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(540deg); opacity: 0.9; }
+}
+
+@keyframes celebrationPop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 /* --- Animation Utility Classes --- */
 .fade-in {
   animation: fadeIn 0.4s ease both;
@@ -208,6 +219,18 @@ img {
 
 .scale-in {
   animation: scaleIn 0.35s var(--transition-spring) both;
+}
+
+.confetti-piece {
+  position: fixed;
+  top: 0;
+  width: 8px;
+  height: 14px;
+  pointer-events: none;
+  animation-name: confettiFall;
+  animation-timing-function: ease-in;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
 }
 
 /* --- Interactive Card --- */

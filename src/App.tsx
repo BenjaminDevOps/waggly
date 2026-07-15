@@ -13,6 +13,7 @@ import { AddPetPage } from './pages/AddPet';
 import { DiagnosisPage } from './pages/Diagnosis';
 import { SpeciesGuidePage } from './pages/SpeciesGuide';
 import { CareChecklistPage } from './pages/CareChecklist';
+import { ChallengesPage } from './pages/Challenges';
 import { FoodGuideBrowsePage } from './pages/FoodGuideBrowse';
 import { DiscoverPage } from './pages/Discover';
 import { ShopPage } from './pages/Shop';
@@ -125,7 +126,7 @@ export default function App() {
   if (!localeChosen) {
     return <LanguageSelectionPage onDone={() => setLocaleChosen(true)} />;
   }
-  const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms', '/edit-profile', '/contact', '/species-guide', '/checklist', '/aliments'].some(p => location.pathname.startsWith(p))
+  const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms', '/edit-profile', '/contact', '/species-guide', '/checklist', '/aliments', '/challenges'].some(p => location.pathname.startsWith(p))
     || location.pathname.match(/^\/carnet\/.+/);
 
   const isActive = (path: string) => (path === '/' ? location.pathname === '/' : location.pathname.startsWith(path));
@@ -180,6 +181,7 @@ export default function App() {
         <Route path="/diagnosis" element={<DiagnosisPage />} />
         <Route path="/species-guide" element={<SpeciesGuidePage />} />
         <Route path="/checklist" element={<CareChecklistPage />} />
+        <Route path="/challenges" element={<ChallengesPage />} />
         <Route path="/aliments" element={<FoodGuideBrowsePage />} />
         <Route path="/discover" element={<DiscoverPage />} />
         <Route path="/shop" element={<ShopPage />} />
