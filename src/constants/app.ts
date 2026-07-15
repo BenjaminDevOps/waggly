@@ -27,6 +27,7 @@ export const COLLECTIONS = {
   badges: 'badges',
   shopItems: 'shop_items',
   nacJournal: 'nac_journal_entries',
+  appointments: 'appointments',
 };
 
 export const AFFILIATE = {

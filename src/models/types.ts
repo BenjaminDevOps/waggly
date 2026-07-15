@@ -107,6 +107,19 @@ export interface NacJournalEntry {
   createdAt: string;
 }
 
+// ==================== APPOINTMENTS ====================
+export interface Appointment {
+  id: string;
+  petId: string;
+  userId: string;
+  date: string; // ISO date (yyyy-mm-dd)
+  time?: string; // HH:mm
+  vetName: string;
+  location?: string;
+  note?: string;
+  createdAt: string;
+}
+
 // ==================== DIAGNOSIS ====================
 export type DiagnosisSeverity = 'low' | 'medium' | 'high' | 'emergency';
 

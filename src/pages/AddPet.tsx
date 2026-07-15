@@ -75,7 +75,7 @@ export function AddPetPage() {
         microchipId: microchip || undefined,
         photoUrl: photoDownloadUrl,
       });
-      navigate('/pets');
+      navigate('/carnet');
     } catch (e) {
       console.error('Error adding pet:', e);
       setSaving(false);

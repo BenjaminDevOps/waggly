@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft, AlertTriangle, Sparkles, Info, CheckCircle, Phone, Star,
-  Trophy, PawPrint, MapPin,
+  Trophy, PawPrint, MapPin, Bot,
 } from 'lucide-react';
 import { Card } from '../components/Card';
 import { GradientCard } from '../components/GradientCard';
 import { SectionHeader } from '../components/SectionHeader';
 import { StatusBadge } from '../components/Badge';
 import { Button } from '../components/Button';
-import { Colors } from '../theme/colors';
+import { Colors, Gradients } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { usePets } from '../hooks/usePets';
 import { useAuth } from '../hooks/useAuth';
@@ -25,9 +25,12 @@ import { FREEMIUM } from '../constants/app';
 
 export function DiagnosisPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const preselectedPetId = searchParams.get('petId');
   const { pets } = usePets();
   const { firebaseUser, user } = useAuth();
   const { t, locale } = useI18n();
+  const [stage, setStage] = useState<'intro' | 'form'>('intro');
   const [selectedPet, setSelectedPet] = useState('');
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [description, setDescription] = useState('');
@@ -51,8 +54,13 @@ export function DiagnosisPage() {
   };
 
   useEffect(() => {
-    if (pets.length > 0 && !selectedPet) setSelectedPet(pets[0].id);
-  }, [pets, selectedPet]);
+    if (pets.length === 0) return;
+    if (preselectedPetId && pets.some((p) => p.id === preselectedPetId)) {
+      setSelectedPet(preselectedPetId);
+    } else if (!selectedPet) {
+      setSelectedPet(pets[0].id);
+    }
+  }, [pets, preselectedPetId, selectedPet]);
 
   const toggleSymptom = (s: string) => {
     setSelectedSymptoms(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
@@ -87,9 +95,40 @@ export function DiagnosisPage() {
   };
 
   const handleBack = () => {
-    if (showResults) setShowResults(false);
-    else navigate(-1);
+    if (showResults) { setShowResults(false); return; }
+    if (stage === 'form') { setStage('intro'); return; }
+    navigate(-1);
   };
+
+  /* ── INTRO VIEW ── */
+  if (stage === 'intro' && !showResults) {
+    const pet = pets.find((p) => p.id === selectedPet);
+    const petName = pet?.name ?? t.tabs.pets;
+    return (
+      <div className="fade-in" style={{ backgroundColor: Colors.background, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.md, padding: `${Spacing.lg}px ${Spacing.xl}px` }}>
+          <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: Spacing.xs }}>
+            <ArrowLeft size={22} color={Colors.ink} />
+          </button>
+          <span style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink }}>{t.diagnosisIntro.title}</span>
+        </div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: Spacing.xl, gap: Spacing.xl }}>
+          <div style={{
+            width: 96, height: 96, borderRadius: Radius.xl,
+            background: `linear-gradient(135deg, ${Gradients.primary[0]}, ${Gradients.primary[1]})`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: Shadow.medium,
+          }}>
+            <Bot size={48} color="#fff" />
+          </div>
+          <h2 style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.ink, textAlign: 'center', margin: 0 }}>
+            {t.diagnosisIntro.question.replace('{name}', petName)}
+          </h2>
+          <Button label={t.diagnosisIntro.start} onPress={() => setStage('form')} variant="primary" size="large" icon={<Sparkles size={20} color="#fff" />} />
+          <p style={{ fontSize: Font.xs, color: Colors.inkTertiary, textAlign: 'center', margin: 0, maxWidth: 280 }}>{t.diagnosisIntro.disclaimer}</p>
+        </div>
+      </div>
+    );
+  }
 
   /* ── RESULTS VIEW ── */
   if (showResults && result) {

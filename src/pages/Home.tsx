@@ -97,7 +97,7 @@ export function HomePage() {
 
         {/* My Pets horizontal scroll */}
         <div>
-          <SectionHeader title={t.home.myPets} actionLabel={t.common.seeAll} onAction={() => navigate('/pets')} />
+          <SectionHeader title={t.home.myPets} actionLabel={t.common.seeAll} onAction={() => navigate('/carnet')} />
           <div style={{ display: 'flex', gap: Spacing.md, overflowX: 'auto', paddingBottom: Spacing.xs, marginRight: -Spacing.xl }}>
             {petsLoading ? (
               <div style={{ minWidth: 120, padding: Spacing.lg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -114,7 +114,7 @@ export function HomePage() {
               <div
                 key={p.id}
                 className="card-interactive"
-                onClick={() => navigate(`/pet/${p.id}`)}
+                onClick={() => navigate(`/carnet/${p.id}`)}
                 style={{
                   minWidth: 120, backgroundColor: Colors.surface, borderRadius: 20, padding: Spacing.lg,
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: Spacing.sm,

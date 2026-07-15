@@ -1,15 +1,20 @@
-import { Routes, Route, NavLink, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, NavLink, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Home, PawPrint, Stethoscope, Salad, ShoppingBag, User } from 'lucide-react';
+import { Home, PawPrint, Heart, Compass, User, Plus, X, Stethoscope, CalendarCheck } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { HomePage } from './pages/Home';
-import { PetsPage } from './pages/Pets';
+import { CarnetIndexPage } from './pages/CarnetIndex';
+import { PetCarnetPage } from './pages/PetCarnet';
+import { HealthTimelinePage } from './pages/HealthTimeline';
+import { PetFoodPage } from './pages/PetFood';
+import { PetHabitatPage } from './pages/PetHabitat';
+import { PetBehaviorPage } from './pages/PetBehavior';
 import { AddPetPage } from './pages/AddPet';
-import { PetDetailPage } from './pages/PetDetail';
 import { DiagnosisPage } from './pages/Diagnosis';
 import { SpeciesGuidePage } from './pages/SpeciesGuide';
 import { CareChecklistPage } from './pages/CareChecklist';
-import { FoodHealthGuidePage } from './pages/FoodHealthGuide';
+import { FoodGuideBrowsePage } from './pages/FoodGuideBrowse';
+import { DiscoverPage } from './pages/Discover';
 import { ShopPage } from './pages/Shop';
 import { ProfilePage } from './pages/Profile';
 import { PremiumPage } from './pages/Premium';
@@ -22,13 +27,16 @@ import { LanguageSelectionPage } from './pages/LanguageSelection';
 import { useI18n, hasChosenLocale } from './i18n';
 import { useAuth } from './hooks/useAuth';
 import { useBadgeChecker } from './hooks/useBadges';
+import { usePets } from './hooks/usePets';
+import { Colors } from './theme/colors';
+import { Spacing, Radius, Font, Weight } from './theme/spacing';
 
-const tabDefs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof useI18n>['t']['tabs'] }[] = [
+const leftTabs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof useI18n>['t']['tabs'] }[] = [
   { path: '/', icon: Home, key: 'home' },
-  { path: '/pets', icon: PawPrint, key: 'pets' },
-  { path: '/diagnosis', icon: Stethoscope, key: 'diagnosis' },
-  { path: '/guide', icon: Salad, key: 'guide' },
-  { path: '/shop', icon: ShoppingBag, key: 'shop' },
+  { path: '/carnet', icon: Heart, key: 'health' },
+];
+const rightTabs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof useI18n>['t']['tabs'] }[] = [
+  { path: '/discover', icon: Compass, key: 'discover' },
   { path: '/profile', icon: User, key: 'profile' },
 ];
 
@@ -38,11 +46,65 @@ function ScrollToTop() {
   return null;
 }
 
+function QuickAddSheet({ onClose }: { onClose: () => void }) {
+  const navigate = useNavigate();
+  const { pets } = usePets();
+  const { t } = useI18n();
+  const singlePetId = pets.length === 1 ? pets[0].id : null;
+
+  const actions = [
+    { icon: PawPrint, label: t.quickAdd.addPet, onPress: () => navigate('/add-pet') },
+    { icon: Heart, label: t.quickAdd.addHealthEntry, onPress: () => navigate(singlePetId ? `/carnet/${singlePetId}/health` : '/carnet') },
+    { icon: Stethoscope, label: t.quickAdd.startDiagnosis, onPress: () => navigate(singlePetId ? `/diagnosis?petId=${singlePetId}` : '/diagnosis') },
+    { icon: CalendarCheck, label: t.quickAdd.addAppointment, onPress: () => navigate(singlePetId ? `/carnet/${singlePetId}` : '/carnet') },
+  ];
+
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, backgroundColor: Colors.overlay, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: `0 ${Spacing.xl}px` }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="fade-in"
+        style={{ backgroundColor: Colors.surface, borderRadius: Radius.xxl, padding: Spacing.xl, width: '100%', maxWidth: 400, boxShadow: '0 24px 60px rgba(0,0,0,0.25)' }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.lg }}>
+          <span style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink }}>{t.quickAdd.title}</span>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: Spacing.xs }}>
+            <X size={22} color={Colors.inkSecondary} />
+          </button>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: Spacing.sm }}>
+          {actions.map((a) => (
+            <button
+              key={a.label}
+              className="card-interactive"
+              onClick={() => { a.onPress(); onClose(); }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: Spacing.md, width: '100%',
+                padding: Spacing.md, borderRadius: Radius.md, border: 'none', cursor: 'pointer',
+                backgroundColor: Colors.surfaceSecondary,
+              }}
+            >
+              <div style={{ width: 36, height: 36, borderRadius: Radius.sm, backgroundColor: Colors.primaryPale, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <a.icon size={18} color={Colors.primary} />
+              </div>
+              <span style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink, textAlign: 'left' }}>{a.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const location = useLocation();
   const { t } = useI18n();
   const { firebaseUser, loading } = useAuth();
   const [localeChosen, setLocaleChosen] = useState(() => hasChosenLocale());
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
   useBadgeChecker();
 
   // Streak update — must be declared before any conditional return (Rules of Hooks)
@@ -63,7 +125,10 @@ export default function App() {
   if (!localeChosen) {
     return <LanguageSelectionPage onDone={() => setLocaleChosen(true)} />;
   }
-  const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms', '/edit-profile', '/contact', '/species-guide', '/checklist'].some(p => location.pathname.startsWith(p)) || location.pathname.match(/^\/pet\//);
+  const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms', '/edit-profile', '/contact', '/species-guide', '/checklist', '/aliments'].some(p => location.pathname.startsWith(p))
+    || location.pathname.match(/^\/carnet\/.+/);
+
+  const isActive = (path: string) => (path === '/' ? location.pathname === '/' : location.pathname.startsWith(path));
 
   // Loading state — branded spinner while Firebase auth initializes
   if (loading) {
@@ -105,13 +170,18 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/pets" element={<PetsPage />} />
+        <Route path="/carnet" element={<CarnetIndexPage />} />
+        <Route path="/carnet/:petId" element={<PetCarnetPage />} />
+        <Route path="/carnet/:petId/health" element={<HealthTimelinePage />} />
+        <Route path="/carnet/:petId/food" element={<PetFoodPage />} />
+        <Route path="/carnet/:petId/habitat" element={<PetHabitatPage />} />
+        <Route path="/carnet/:petId/behavior" element={<PetBehaviorPage />} />
         <Route path="/add-pet" element={<AddPetPage />} />
-        <Route path="/pet/:id" element={<PetDetailPage />} />
         <Route path="/diagnosis" element={<DiagnosisPage />} />
         <Route path="/species-guide" element={<SpeciesGuidePage />} />
         <Route path="/checklist" element={<CareChecklistPage />} />
-        <Route path="/guide" element={<FoodHealthGuidePage />} />
+        <Route path="/aliments" element={<FoodGuideBrowsePage />} />
+        <Route path="/discover" element={<DiscoverPage />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/premium" element={<PremiumPage />} />
@@ -132,8 +202,31 @@ export default function App() {
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
           zIndex: 100,
         }}>
-          {tabDefs.map(({ path, icon: Icon, key }) => {
-            const active = location.pathname === path;
+          {leftTabs.map(({ path, icon: Icon, key }) => {
+            const active = isActive(path);
+            return (
+              <NavLink key={path} to={path} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, textDecoration: 'none' }}>
+                <Icon size={24} color={active ? '#3B2360' : '#9D9DAF'} strokeWidth={active ? 2.5 : 2} />
+                <span style={{ fontSize: 11, fontWeight: active ? 600 : 400, color: active ? '#3B2360' : '#9D9DAF' }}>{t.tabs[key]}</span>
+              </NavLink>
+            );
+          })}
+
+          <button
+            className="btn-press"
+            onClick={() => setShowQuickAdd(true)}
+            style={{
+              width: 48, height: 48, borderRadius: 24, marginTop: -18,
+              background: 'linear-gradient(135deg, #3B2360, #54357F)',
+              border: '4px solid #fff', boxShadow: '0 6px 16px rgba(59,35,96,0.4)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0,
+            }}
+          >
+            <Plus size={22} color="#fff" />
+          </button>
+
+          {rightTabs.map(({ path, icon: Icon, key }) => {
+            const active = isActive(path);
             return (
               <NavLink key={path} to={path} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, textDecoration: 'none' }}>
                 <Icon size={24} color={active ? '#3B2360' : '#9D9DAF'} strokeWidth={active ? 2.5 : 2} />
@@ -143,6 +236,8 @@ export default function App() {
           })}
         </nav>
       )}
+
+      {showQuickAdd && <QuickAddSheet onClose={() => setShowQuickAdd(false)} />}
     </div>
   );
 }

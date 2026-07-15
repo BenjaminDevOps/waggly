@@ -30,9 +30,8 @@ export interface Translations {
   tabs: {
     home: string;
     pets: string;
-    diagnosis: string;
-    guide: string;
-    shop: string;
+    health: string;
+    discover: string;
     profile: string;
   };
 
@@ -239,6 +238,82 @@ export interface Translations {
     habitatHumidityLabel: string;
     habitatNoteLabel: string;
     habitatEmpty: string;
+  };
+
+  // Pet Carnet page (new Santé tab landing)
+  carnet: {
+    navHealth: string;
+    navFood: string;
+    navHabitat: string;
+    navBehavior: string;
+    reminderTitle: string;
+    reminderNone: string;
+    reminderCta: string;
+    appointmentTitle: string;
+    appointmentNone: string;
+    appointmentAdd: string;
+    wellbeingTitle: string;
+    wellbeingLevel: string;
+  };
+
+  // Appointment add form
+  appointment: {
+    title: string;
+    vetNameLabel: string;
+    vetNamePlaceholder: string;
+    timeLabel: string;
+    locationLabel: string;
+    locationPlaceholder: string;
+    noteLabel: string;
+  };
+
+  // Unified health history timeline
+  healthTimeline: {
+    title: string;
+    filterAll: string;
+    filterTreatments: string;
+    filterWeight: string;
+    filterVaccines: string;
+    filterDocs: string;
+    historyTitle: string;
+    addEntry: string;
+    empty: string;
+    downloadReport: string;
+  };
+
+  // Simplified AI diagnosis intro screen
+  diagnosisIntro: {
+    title: string;
+    question: string;
+    start: string;
+    disclaimer: string;
+  };
+
+  // Discover tab
+  discover: {
+    title: string;
+    subtitle: string;
+    shopTitle: string;
+    shopDesc: string;
+    speciesGuideTitle: string;
+    speciesGuideDesc: string;
+    foodGuideTitle: string;
+    foodGuideDesc: string;
+    professionalsTitle: string;
+    professionalsSubtitle: string;
+    proVetsNac: string;
+    proPetSitting: string;
+    proGrooming: string;
+    proShops: string;
+  };
+
+  // Floating "+" quick-add sheet
+  quickAdd: {
+    title: string;
+    addPet: string;
+    addHealthEntry: string;
+    startDiagnosis: string;
+    addAppointment: string;
   };
 
   // Shop page
