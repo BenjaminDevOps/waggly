@@ -12,7 +12,7 @@ import {
 import { addPoints } from '../services/userService';
 import { POINTS } from '../constants/app';
 import { CHALLENGES, type ChallengeDef } from '../constants/challenges';
-import { ChallengeCelebration } from '../components/ChallengeCelebration';
+import { useCelebrations } from '../components/CelebrationProvider';
 
 const ITEM_ICONS: Record<ChecklistItemKey, React.ElementType> = {
   itemHabitat: Brush,
@@ -27,8 +27,8 @@ export function CareChecklistPage() {
   const navigate = useNavigate();
   const { t } = useI18n();
   const { firebaseUser } = useAuth();
+  const { celebrate } = useCelebrations();
   const [state, setState] = useState(() => getChecklistState());
-  const [celebrationQueue, setCelebrationQueue] = useState<ChallengeDef[]>([]);
 
   const doneCount = CHECKLIST_ITEM_KEYS.filter(k => state[k]).length;
   const total = CHECKLIST_ITEM_KEYS.length;
@@ -37,7 +37,13 @@ export function CareChecklistPage() {
 
   function awardChallenge(challenge: ChallengeDef) {
     markChallengeCelebrated(challenge.id);
-    setCelebrationQueue((q) => [...q, challenge]);
+    celebrate({
+      id: challenge.id,
+      emoji: challenge.emoji,
+      title: t.challenges[challenge.titleKey],
+      subtitle: t.challenges.celebrationSubtitle,
+      xpReward: challenge.xpReward,
+    });
     if (firebaseUser) {
       addPoints(firebaseUser.uid, challenge.xpReward).catch((e) => console.error('Error awarding challenge XP:', e));
     }
@@ -127,13 +133,6 @@ export function CareChecklistPage() {
           })}
         </div>
       </div>
-
-      {celebrationQueue.length > 0 && (
-        <ChallengeCelebration
-          challenge={celebrationQueue[0]}
-          onClose={() => setCelebrationQueue((q) => q.slice(1))}
-        />
-      )}
     </div>
   );
 }

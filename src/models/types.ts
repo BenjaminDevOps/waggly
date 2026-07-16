@@ -194,19 +194,19 @@ export type BadgeId =
 
 export interface Badge {
   id: BadgeId;
-  name: string;
-  description: string;
+  emoji: string;
   icon: string;
 }
 
+// Names/descriptions live in i18n (see `badges` namespace) so they stay localized.
 export const BADGES: Badge[] = [
-  { id: 'firstPet', name: 'First Pet', description: 'Added your first pet', icon: 'PawPrint' },
-  { id: 'firstDiagnosis', name: 'First Diagnosis', description: 'Used AI diagnosis for the first time', icon: 'Stethoscope' },
-  { id: 'streak7Days', name: '7 Day Streak', description: 'Logged in for 7 consecutive days', icon: 'Flame' },
-  { id: 'streak30Days', name: '30 Day Streak', description: 'Logged in for 30 consecutive days', icon: 'Star' },
-  { id: 'points100', name: '100 Points', description: 'Earned 100 points', icon: 'Award' },
-  { id: 'points500', name: '500 Points', description: 'Earned 500 points', icon: 'Diamond' },
-  { id: 'points1000', name: '1000 Points', description: 'Earned 1000 points', icon: 'Crown' },
-  { id: 'vetVisit5', name: '5 Vet Visits', description: 'Recorded 5 vet visits', icon: 'Building2' },
-  { id: 'healthChampion', name: 'Health Champion', description: 'Maintained excellent pet health', icon: 'Trophy' },
+  { id: 'firstPet', emoji: '\u{1F43E}', icon: 'PawPrint' },
+  { id: 'firstDiagnosis', emoji: '\u{1FA7A}', icon: 'Stethoscope' },
+  { id: 'streak7Days', emoji: '\u{1F525}', icon: 'Flame' },
+  { id: 'streak30Days', emoji: '⭐', icon: 'Star' },
+  { id: 'points100', emoji: '\u{1F3C5}', icon: 'Award' },
+  { id: 'points500', emoji: '\u{1F48E}', icon: 'Diamond' },
+  { id: 'points1000', emoji: '\u{1F451}', icon: 'Crown' },
+  { id: 'vetVisit5', emoji: '\u{1F3E5}', icon: 'Building2' },
+  { id: 'healthChampion', emoji: '\u{1F3C6}', icon: 'Trophy' },
 ];

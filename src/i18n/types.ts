@@ -316,10 +316,12 @@ export interface Translations {
     addAppointment: string;
   };
 
-  // Wellbeing challenges
+  // Wellbeing challenges + badges (unified "Rewards" hub)
   challenges: {
     title: string;
     subtitle: string;
+    tabChallenges: string;
+    tabBadges: string;
     progressLabel: string;
     completed: string;
     celebrationTitle: string;
@@ -332,6 +334,31 @@ export interface Translations {
     observation7: string;
     enrichment7: string;
     perfectWeek: string;
+  };
+
+  // Badge catalog (unlocked in the Rewards hub)
+  badges: {
+    earned: string;
+    locked: string;
+    celebrationSubtitle: string;
+    firstPetName: string;
+    firstPetDescription: string;
+    firstDiagnosisName: string;
+    firstDiagnosisDescription: string;
+    streak7DaysName: string;
+    streak7DaysDescription: string;
+    streak30DaysName: string;
+    streak30DaysDescription: string;
+    points100Name: string;
+    points100Description: string;
+    points500Name: string;
+    points500Description: string;
+    points1000Name: string;
+    points1000Description: string;
+    vetVisit5Name: string;
+    vetVisit5Description: string;
+    healthChampionName: string;
+    healthChampionDescription: string;
   };
 
   // Shop page

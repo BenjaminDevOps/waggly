@@ -165,7 +165,7 @@ export function HomePage() {
               { icon: BookOpen, label: t.home.speciesGuide, color: Colors.mint, bg: Colors.mintPale, path: '/species-guide' },
               { icon: ClipboardList, label: t.checklist.title, color: Colors.sky, bg: Colors.skyPale, path: '/checklist' },
               { icon: ShoppingBag, label: t.home.shop, color: Colors.secondary, bg: Colors.secondaryPale, path: '/shop' },
-              { icon: Trophy, label: t.home.badges, color: Colors.success, bg: Colors.successPale, path: '/profile' },
+              { icon: Trophy, label: t.home.badges, color: Colors.success, bg: Colors.successPale, path: '/challenges' },
             ] as const).map(a => (
               <Card
                 key={a.label}

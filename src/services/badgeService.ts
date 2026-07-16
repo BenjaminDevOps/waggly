@@ -2,6 +2,15 @@ import { db } from './firebase';
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { COLLECTIONS } from '../constants/app';
 import type { User, BadgeId, Pet, HealthRecord } from '../models/types';
+import type { Translations } from '../i18n/types';
+
+export function getBadgeName(t: Translations, id: BadgeId): string {
+  return t.badges[`${id}Name` as keyof Translations['badges']] as string;
+}
+
+export function getBadgeDescription(t: Translations, id: BadgeId): string {
+  return t.badges[`${id}Description` as keyof Translations['badges']] as string;
+}
 
 interface BadgeContext {
   user: User;

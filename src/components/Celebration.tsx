@@ -4,16 +4,22 @@ import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { Button } from './Button';
 import { Confetti } from './Confetti';
 import { useI18n } from '../i18n';
-import type { ChallengeDef } from '../constants/challenges';
+
+export interface Achievement {
+  id: string;
+  emoji: string;
+  title: string;
+  subtitle: string;
+  xpReward: number;
+}
 
 interface Props {
-  challenge: ChallengeDef;
-  petEmoji?: string;
+  achievement: Achievement;
   onClose: () => void;
 }
 
-/** "Bravo !" celebration screen shown the moment a challenge crosses its target. */
-export function ChallengeCelebration({ challenge, petEmoji, onClose }: Props) {
+/** "Bravo !" celebration screen shown whenever a challenge or badge is unlocked. */
+export function Celebration({ achievement, onClose }: Props) {
   const { t } = useI18n();
 
   return (
@@ -29,22 +35,22 @@ export function ChallengeCelebration({ challenge, petEmoji, onClose }: Props) {
             width: 96, height: 96, borderRadius: 48, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: `linear-gradient(135deg, ${Gradients.gold[0]}, ${Gradients.gold[1]})`, fontSize: 44,
           }}>
-            {petEmoji ?? challenge.emoji}
+            {achievement.emoji}
           </div>
           <h2 style={{ fontSize: Font.title1, fontWeight: Weight.heavy, color: Colors.ink, margin: '20px 0 4px' }}>
             {t.challenges.celebrationTitle}
           </h2>
           <p style={{ fontSize: Font.body, color: Colors.inkSecondary, margin: '0 0 4px' }}>
-            {t.challenges.celebrationSubtitle}
+            {achievement.subtitle}
           </p>
           <p style={{ fontSize: Font.bodyLarge, fontWeight: Weight.bold, color: Colors.ink, margin: '8px 0 20px' }}>
-            {t.challenges[challenge.titleKey]}
+            {achievement.title}
           </p>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 6, backgroundColor: Colors.secondaryPale,
             color: Colors.secondary, padding: '8px 18px', borderRadius: Radius.pill, fontWeight: Weight.bold, marginBottom: 24,
           }}>
-            ⭐ {t.challenges.xpEarned.replace('{xp}', String(challenge.xpReward))}
+            ⭐ {t.challenges.xpEarned.replace('{xp}', String(achievement.xpReward))}
           </div>
           <Button label={t.common.close} onPress={onClose} variant="primary" />
         </div>
