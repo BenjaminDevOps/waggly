@@ -12,7 +12,6 @@ import { useI18n } from '../i18n';
 import { useAuth } from '../hooks/useAuth';
 import { usePets } from '../hooks/usePets';
 import { subscribeToHealthRecords, addHealthRecord } from '../services/healthRecordService';
-import { generateHealthReport } from '../services/healthReportService';
 import type { HealthRecord, RecordType } from '../models/types';
 import type { LucideIcon } from 'lucide-react';
 
@@ -227,6 +226,7 @@ export function HealthTimelinePage() {
             if (!pet || generatingPdf) return;
             setGeneratingPdf(true);
             try {
+              const { generateHealthReport } = await import('../services/healthReportService');
               await generateHealthReport(pet, records, [], locale);
             } catch (e) {
               console.error('Error generating PDF:', e);
