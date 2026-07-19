@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>fr</string>
 	<key>CFBundleDisplayName</key>
-	<string>Waggly</string>
+	<string>Waggly NAC</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -50,18 +50,8 @@
 	<string>Waggly needs access to your photo library to upload pet photos and health records.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Waggly needs permission to save photos of your pet to your library.</string>
-	<key>NSMotionUsageDescription</key>
-	<string>Waggly uses motion data to track steps during walks with your pet.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Waggly uses your location to track walks and activity and help you find nearby veterinarians and pet services.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Waggly uses your location in the background to track walks, calculate activity and steps, and improve pet activity monitoring.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Waggly uses your location in the background to support walk tracking and activity monitoring features.</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>location</string>
-	</array>
+	<string>Waggly NAC uses your location to help you find nearby exotic pet veterinarians and services on the map.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 </dict>

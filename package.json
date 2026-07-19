@@ -28,6 +28,7 @@
     "@capacitor/ios": "^8.3.0",
     "@capacitor/keyboard": "^8.0.3",
     "@capacitor/share": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.3",
     "@capawesome/capacitor-app-review": "^8.0.1",
     "@capgo/native-purchases": "^8.0.0",
     "firebase": "^11.1.0",

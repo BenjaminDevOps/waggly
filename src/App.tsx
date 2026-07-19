@@ -108,6 +108,14 @@ export default function App() {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   useBadgeChecker();
 
+  // Native status bar — dark icons/text for the app's light background.
+  useEffect(() => {
+    if (typeof (window as any).Capacitor === 'undefined' || !(window as any).Capacitor.isNativePlatform()) return;
+    import('@capacitor/status-bar').then(({ StatusBar, Style }) => {
+      StatusBar.setStyle({ style: Style.Light }).catch(() => {});
+    }).catch(() => {});
+  }, []);
+
   // Streak update — must be declared before any conditional return (Rules of Hooks)
   useEffect(() => {
     if (firebaseUser) {
