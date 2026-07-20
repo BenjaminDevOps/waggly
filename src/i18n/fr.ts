@@ -23,6 +23,7 @@ export const fr: Translations = {
     free: 'gratuit',
     premium: 'Premium',
     of: 'sur',
+    pressBackAgainToExit: 'Appuyez à nouveau pour quitter',
   },
   tabs: {
     home: 'Accueil',
@@ -390,7 +391,8 @@ export const fr: Translations = {
     perMonth: '/mois',
     perYear: '/an',
     savePct: '-50%',
-    paymentDisclaimer: 'Le paiement sera débité de votre compte Apple ID lors de la confirmation. L\'abonnement se renouvelle automatiquement sauf annulation au moins 24h avant la fin de la période en cours. Gérez vos abonnements dans les Réglages de votre appareil.',
+    paymentDisclaimerApple: 'Le paiement sera débité de votre compte Apple ID lors de la confirmation. L\'abonnement se renouvelle automatiquement sauf annulation au moins 24h avant la fin de la période en cours. Gérez vos abonnements dans les Réglages de votre appareil.',
+    paymentDisclaimerGoogle: 'Le paiement sera débité de votre compte Google Play lors de la confirmation. L\'abonnement se renouvelle automatiquement sauf annulation au moins 24h avant la fin de la période en cours. Gérez vos abonnements dans l\'application Google Play Store.',
     unlimitedDiagnoses: 'Diagnostics IA illimités',
     unlimitedDiagnosesDesc: 'Aucune limite quotidienne d\'analyse',
     priorityAI: 'Réponses IA prioritaires',

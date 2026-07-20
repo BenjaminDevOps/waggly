@@ -24,6 +24,7 @@ export interface Translations {
     free: string;
     premium: string;
     of: string;
+    pressBackAgainToExit: string;
   };
 
   // Tab bar
@@ -434,7 +435,8 @@ export interface Translations {
     perMonth: string;
     perYear: string;
     savePct: string;
-    paymentDisclaimer: string;
+    paymentDisclaimerApple: string;
+    paymentDisclaimerGoogle: string;
     // Features
     unlimitedDiagnoses: string;
     unlimitedDiagnosesDesc: string;

@@ -23,6 +23,7 @@ export const es: Translations = {
     free: 'gratis',
     premium: 'Premium',
     of: 'de',
+    pressBackAgainToExit: 'Pulsa otra vez para salir',
   },
   tabs: {
     home: 'Inicio',
@@ -390,7 +391,8 @@ export const es: Translations = {
     perMonth: '/mes',
     perYear: '/año',
     savePct: '-50%',
-    paymentDisclaimer: 'El pago se cargará en tu cuenta de Apple ID al confirmar la compra. La suscripción se renueva automáticamente a menos que se cancele al menos 24h antes del final del periodo actual. Gestiona tus suscripciones en los Ajustes de tu dispositivo.',
+    paymentDisclaimerApple: 'El pago se cargará en tu cuenta de Apple ID al confirmar la compra. La suscripción se renueva automáticamente a menos que se cancele al menos 24h antes del final del periodo actual. Gestiona tus suscripciones en los Ajustes de tu dispositivo.',
+    paymentDisclaimerGoogle: 'El pago se cargará en tu cuenta de Google Play al confirmar la compra. La suscripción se renueva automáticamente a menos que se cancele al menos 24h antes del final del periodo actual. Gestiona tus suscripciones en la aplicación Google Play Store.',
     unlimitedDiagnoses: 'Diagnósticos IA ilimitados',
     unlimitedDiagnosesDesc: 'Sin límite diario de análisis',
     priorityAI: 'Respuestas IA prioritarias',

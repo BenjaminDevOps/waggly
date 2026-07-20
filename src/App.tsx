@@ -29,8 +29,13 @@ import { useI18n, hasChosenLocale } from './i18n';
 import { useAuth } from './hooks/useAuth';
 import { useBadgeChecker } from './hooks/useBadges';
 import { usePets } from './hooks/usePets';
+import { useToast } from './components/Toast';
 import { Colors } from './theme/colors';
 import { Spacing, Radius, Font, Weight } from './theme/spacing';
+
+function isNativePlatform(): boolean {
+  return typeof (window as any).Capacitor !== 'undefined' && (window as any).Capacitor.isNativePlatform();
+}
 
 const leftTabs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof useI18n>['t']['tabs'] }[] = [
   { path: '/', icon: Home, key: 'home' },
@@ -102,11 +107,52 @@ function QuickAddSheet({ onClose }: { onClose: () => void }) {
 
 export default function App() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useI18n();
   const { firebaseUser, loading } = useAuth();
+  const { showToast } = useToast();
   const [localeChosen, setLocaleChosen] = useState(() => hasChosenLocale());
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   useBadgeChecker();
+
+  // Native status bar — dark icons/text for the app's light background, and
+  // don't let the WebView draw under the status bar now that targetSdk 36
+  // enforces edge-to-edge by default on Android 15+.
+  useEffect(() => {
+    if (!isNativePlatform()) return;
+    import('@capacitor/status-bar').then(({ StatusBar, Style }) => {
+      StatusBar.setStyle({ style: Style.Light }).catch(() => {});
+      StatusBar.setOverlaysWebView({ overlay: false }).catch(() => {});
+    }).catch(() => {});
+  }, []);
+
+  // Android hardware/gesture back button: navigate back through in-app
+  // history when possible, otherwise require a second press to exit
+  // (Capacitor disables its default back handling once a listener is
+  // registered, so this fully replaces it).
+  useEffect(() => {
+    if (!isNativePlatform()) return;
+    let lastBackPress = 0;
+    let listenerHandle: { remove: () => void } | undefined;
+
+    import('@capacitor/app').then(({ App: CapApp }) => {
+      CapApp.addListener('backButton', ({ canGoBack }) => {
+        if (canGoBack) {
+          navigate(-1);
+          return;
+        }
+        const now = Date.now();
+        if (now - lastBackPress < 2000) {
+          CapApp.exitApp();
+        } else {
+          lastBackPress = now;
+          showToast('info', t.common.pressBackAgainToExit);
+        }
+      }).then((handle) => { listenerHandle = handle; });
+    }).catch(() => {});
+
+    return () => listenerHandle?.remove();
+  }, [navigate, showToast, t]);
 
   // Streak update — must be declared before any conditional return (Rules of Hooks)
   useEffect(() => {

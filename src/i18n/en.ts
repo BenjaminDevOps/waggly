@@ -23,6 +23,7 @@ export const en: Translations = {
     free: 'free',
     premium: 'Premium',
     of: 'of',
+    pressBackAgainToExit: 'Press back again to exit',
   },
   tabs: {
     home: 'Home',
@@ -390,7 +391,8 @@ export const en: Translations = {
     perMonth: '/month',
     perYear: '/year',
     savePct: 'Save 50%',
-    paymentDisclaimer: 'Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. You can manage subscriptions in your device Settings.',
+    paymentDisclaimerApple: 'Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. You can manage subscriptions in your device Settings.',
+    paymentDisclaimerGoogle: 'Payment will be charged to your Google Play account at confirmation of purchase. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. You can manage subscriptions in the Google Play Store app.',
     unlimitedDiagnoses: 'Unlimited AI Diagnoses',
     unlimitedDiagnosesDesc: 'No daily limit on symptom analysis',
     priorityAI: 'Priority AI Responses',

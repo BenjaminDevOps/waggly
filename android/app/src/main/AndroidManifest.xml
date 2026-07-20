@@ -52,10 +52,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29" />
 
-    <!-- Location (vet finder + walk tracking) -->
+    <!-- Location (find nearby vet) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <!-- Pedometer / step counter -->
-    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 </manifest>

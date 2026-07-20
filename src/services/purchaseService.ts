@@ -33,6 +33,11 @@ export const PREMIUM_PLANS: PremiumPlan[] = [
   },
 ];
 
+export interface LiveProductPricing {
+  priceString: string;
+  title: string;
+}
+
 function isNativePlatform(): boolean {
   try {
     return (
@@ -53,6 +58,37 @@ export function getPlatform(): 'ios' | 'android' | 'web' {
     return 'web';
   } catch {
     return 'web';
+  }
+}
+
+/**
+ * Fetches real, localized subscription prices from StoreKit / Google Play Billing.
+ *
+ * Store review checks that displayed prices match what Play Billing actually
+ * charges for the user's storefront — the static `PREMIUM_PLANS` prices are
+ * only a fallback (web preview, offline, or products not yet configured in
+ * Play Console / App Store Connect).
+ */
+export async function fetchProductPricing(): Promise<Record<string, LiveProductPricing> | null> {
+  if (!isNativePlatform()) return null;
+
+  try {
+    const { NativePurchases } = await import('@capgo/native-purchases');
+    const { products } = await withTimeout(
+      NativePurchases.getProducts({
+        productIdentifiers: [PRODUCTS.premiumMonthly, PRODUCTS.premiumYearly],
+      }),
+      15_000,
+    );
+
+    const pricing: Record<string, LiveProductPricing> = {};
+    for (const product of products) {
+      pricing[product.identifier] = { priceString: product.priceString, title: product.title };
+    }
+    return Object.keys(pricing).length > 0 ? pricing : null;
+  } catch (error) {
+    console.error('[Purchase] Failed to fetch live product pricing:', error);
+    return null;
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Diamond, Check, Sparkles, Shield, Crown, Zap, Star, RefreshCw,
@@ -10,7 +10,7 @@ import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
-import { PREMIUM_PLANS, purchasePremium, restorePurchases, getPlatform } from '../services/purchaseService';
+import { PREMIUM_PLANS, purchasePremium, restorePurchases, getPlatform, fetchProductPricing, type LiveProductPricing } from '../services/purchaseService';
 
 const FEATURE_ICONS = [Sparkles, Zap, Shield, Crown, Star];
 
@@ -22,6 +22,14 @@ export function PremiumPage() {
   const [loading, setLoading] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [message, setMessage] = useState('');
+  const [livePricing, setLivePricing] = useState<Record<string, LiveProductPricing> | null>(null);
+
+  // Real, localized StoreKit / Play Billing prices — falls back to the static
+  // catalog below when unavailable (web preview, offline, products not yet
+  // configured in App Store Connect / Play Console).
+  useEffect(() => {
+    fetchProductPricing().then(setLivePricing);
+  }, []);
 
   const features = [
     { title: t.premiumPage.unlimitedDiagnoses, desc: t.premiumPage.unlimitedDiagnosesDesc },
@@ -148,7 +156,9 @@ export function PremiumPage() {
                   </span>
                 )}
                 <div style={{ fontSize: Font.sm, fontWeight: Weight.semibold, color: Colors.inkSecondary }}>{labels?.name}</div>
-                <div style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: active ? Colors.primary : Colors.ink, marginTop: 4 }}>{plan.price}</div>
+                <div style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: active ? Colors.primary : Colors.ink, marginTop: 4 }}>
+                  {livePricing?.[plan.id]?.priceString ?? plan.price}
+                </div>
                 <div style={{ fontSize: Font.xs, color: Colors.inkTertiary }}>{labels?.period}</div>
                 {labels?.savings && (
                   <div style={{ fontSize: Font.xs, fontWeight: Weight.bold, color: Colors.success, marginTop: 6, backgroundColor: Colors.successPale, borderRadius: 8, padding: '2px 8px', display: 'inline-block' }}>
@@ -181,7 +191,9 @@ export function PremiumPage() {
         </button>
 
         <div style={{ textAlign: 'center', paddingBottom: Spacing.xxl }}>
-          <p style={{ fontSize: Font.xs, color: Colors.inkTertiary, lineHeight: 1.6, margin: 0 }}>{t.premiumPage.paymentDisclaimer}</p>
+          <p style={{ fontSize: Font.xs, color: Colors.inkTertiary, lineHeight: 1.6, margin: 0 }}>
+            {getPlatform() === 'android' ? t.premiumPage.paymentDisclaimerGoogle : t.premiumPage.paymentDisclaimerApple}
+          </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: Spacing.lg, marginTop: Spacing.md }}>
             <button onClick={() => navigate('/privacy')} style={{ fontSize: Font.xs, color: Colors.primary, background: 'none', border: 'none', cursor: 'pointer' }}>{t.profile.privacyPolicy}</button>
             <button onClick={() => navigate('/terms')} style={{ fontSize: Font.xs, color: Colors.primary, background: 'none', border: 'none', cursor: 'pointer' }}>{t.profile.termsOfService}</button>
