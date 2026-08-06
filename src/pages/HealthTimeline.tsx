@@ -301,7 +301,7 @@ export function HealthTimelinePage() {
 
             <div style={{ display: 'flex', gap: Spacing.md }}>
               <Button label={t.petDetail.cancel} onPress={() => setShowAdd(false)} variant="secondary" style={{ flex: 1 }} />
-              <Button label={t.petDetail.save} onPress={handleSave} variant="primary" loading={saving} style={{ flex: 1 }} />
+              <Button label={t.healthTimeline.saveEntry} onPress={handleSave} variant="primary" loading={saving} style={{ flex: 1 }} />
             </div>
           </div>
         </div>

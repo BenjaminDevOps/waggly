@@ -253,7 +253,7 @@ export function PetCarnetPage() {
 
             <div style={{ display: 'flex', gap: Spacing.md }}>
               <Button label={t.common.cancel} onPress={() => setShowAddAppt(false)} variant="secondary" style={{ flex: 1 }} />
-              <Button label={t.healthJournal.save} onPress={handleSaveAppointment} variant="primary" loading={savingAppt} disabled={!apptVet.trim()} style={{ flex: 1 }} />
+              <Button label={t.appointment.save} onPress={handleSaveAppointment} variant="primary" loading={savingAppt} disabled={!apptVet.trim()} style={{ flex: 1 }} />
             </div>
           </div>
         </div>

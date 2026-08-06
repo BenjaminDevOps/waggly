@@ -134,7 +134,7 @@ export function PetBehaviorPage() {
             </div>
             <div style={{ display: 'flex', gap: Spacing.md }}>
               <Button label={t.common.cancel} onPress={() => setShowAdd(false)} variant="secondary" style={{ flex: 1 }} />
-              <Button label={t.healthJournal.save} onPress={handleSave} variant="primary" loading={saving} disabled={!note.trim()} style={{ flex: 1 }} />
+              <Button label={t.healthJournal.sheddingSave} onPress={handleSave} variant="primary" loading={saving} disabled={!note.trim()} style={{ flex: 1 }} />
             </div>
           </div>
         </div>

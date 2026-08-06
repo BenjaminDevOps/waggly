@@ -239,6 +239,8 @@ export interface Translations {
     habitatHumidityLabel: string;
     habitatNoteLabel: string;
     habitatEmpty: string;
+    sheddingSave: string;
+    habitatSave: string;
   };
 
   // Pet Carnet page (new Santé tab landing)
@@ -266,6 +268,7 @@ export interface Translations {
     locationLabel: string;
     locationPlaceholder: string;
     noteLabel: string;
+    save: string;
   };
 
   // Unified health history timeline
@@ -280,6 +283,7 @@ export interface Translations {
     addEntry: string;
     empty: string;
     downloadReport: string;
+    saveEntry: string;
   };
 
   // Simplified AI diagnosis intro screen
