@@ -177,8 +177,11 @@ export default function App() {
   if (!localeChosen) {
     return <LanguageSelectionPage onDone={() => setLocaleChosen(true)} />;
   }
+  // /carnet/:petId is a tab destination in its own right — with a single pet
+  // /carnet redirects straight to it — so it keeps the tab bar. Only the
+  // deeper sub-pages (/carnet/:petId/health, /food...) hide it.
   const hideTabBar = ['/add-pet', '/premium', '/privacy', '/terms', '/edit-profile', '/contact', '/species-guide', '/checklist', '/aliments', '/challenges'].some(p => location.pathname.startsWith(p))
-    || location.pathname.match(/^\/carnet\/.+/);
+    || location.pathname.match(/^\/carnet\/[^/]+\/.+/);
 
   const isActive = (path: string) => (path === '/' ? location.pathname === '/' : location.pathname.startsWith(path));
 

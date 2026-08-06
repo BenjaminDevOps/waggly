@@ -7,7 +7,7 @@ import { Button } from '../components/Button';
 import { addPet } from '../services/petService';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
-import { captureAndUpload } from '../services/photoService';
+import { takePhoto, uploadPhotoOrFallback } from '../services/photoService';
 import type { PetGender, PetType } from '../models/types';
 
 const petTypeIcons = [
@@ -55,7 +55,21 @@ export function AddPetPage() {
   const [microchip, setMicrochip] = useState('');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoDownloadUrl, setPhotoDownloadUrl] = useState<string | undefined>(undefined);
+  const [photoUploading, setPhotoUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  async function handlePickPhoto() {
+    const dataUrl = await takePhoto();
+    if (!dataUrl) return;
+    // Show it right away; the upload continues in the background so a slow or
+    // failing Storage write never leaves the picker looking like a no-op.
+    setPhotoPreview(dataUrl);
+    setPhotoDownloadUrl(dataUrl);
+    setPhotoUploading(true);
+    const url = await uploadPhotoOrFallback(dataUrl, 'pets', name.trim() || 'pet');
+    setPhotoDownloadUrl(url);
+    setPhotoUploading(false);
+  }
 
   const petTypeLabels: Record<string, string> = {
     reptile: t.addPet.reptile, rodent: t.addPet.rodent, ferret: t.addPet.ferret, bird: t.addPet.bird,
@@ -100,23 +114,27 @@ export function AddPetPage() {
         {/* Photo */}
         <div style={{ display: 'flex', justifyContent: 'center', paddingTop: Spacing.sm }}>
           <div
-            onClick={async () => {
-              const result = await captureAndUpload('pets', name.trim() || 'pet');
-              if (result) {
-                setPhotoPreview(result.dataUrl);
-                setPhotoDownloadUrl(result.downloadUrl);
-              }
-            }}
+            onClick={handlePickPhoto}
             style={{
               width: 110, height: 110, borderRadius: Radius.xxl + 4,
               backgroundColor: Colors.surfaceSecondary,
               border: `2px dashed ${Colors.hairline}`,
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              gap: 6, cursor: 'pointer', overflow: 'hidden',
+              gap: 6, cursor: 'pointer', overflow: 'hidden', position: 'relative',
             }}
           >
             {photoPreview ? (
-              <img src={photoPreview} alt="Pet" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <>
+                <img src={photoPreview} alt={name || 'Pet'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                {photoUploading && (
+                  <div style={{
+                    position: 'absolute', inset: 0, backgroundColor: 'rgba(59,35,96,0.35)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <div className="spinner" />
+                  </div>
+                )}
+              </>
             ) : (
               <>
                 <Camera size={28} color={Colors.inkTertiary} />
