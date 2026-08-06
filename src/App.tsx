@@ -115,16 +115,21 @@ export default function App() {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   useBadgeChecker();
 
-  // Native status bar — dark icons/text for the app's light background, and
-  // don't let the WebView draw under the status bar now that targetSdk 36
-  // enforces edge-to-edge by default on Android 15+.
+  // Native status bar. targetSdk 36 makes edge-to-edge mandatory on Android
+  // 15+ (setStatusBarColor is a no-op there), so rather than fight it we let
+  // the WebView draw behind the status bar and paint that strip from CSS —
+  // body's padding-top: env(safe-area-inset-top) fills it with the app
+  // background. Asking for overlay:false instead produces a black native
+  // strip *on top of* that padding, i.e. the double band this replaces.
+  // Icon contrast follows what's actually behind the bar: the language
+  // picker is a dark purple full-bleed screen, everything else is cream.
   useEffect(() => {
     if (!isNativePlatform()) return;
     import('@capacitor/status-bar').then(({ StatusBar, Style }) => {
-      StatusBar.setStyle({ style: Style.Light }).catch(() => {});
-      StatusBar.setOverlaysWebView({ overlay: false }).catch(() => {});
+      StatusBar.setOverlaysWebView({ overlay: true }).catch(() => {});
+      StatusBar.setStyle({ style: localeChosen ? Style.Light : Style.Dark }).catch(() => {});
     }).catch(() => {});
-  }, []);
+  }, [localeChosen]);
 
   // Android hardware/gesture back button: navigate back through in-app
   // history when possible, otherwise require a second press to exit
