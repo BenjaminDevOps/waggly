@@ -8,6 +8,7 @@ import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { usePets } from '../hooks/usePets';
 import { useI18n } from '../i18n';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
+import { PetAvatar } from '../components/PetAvatar';
 
 /** Entry point for the Santé tab: routes straight to the pet's carnet when
  * there is exactly one, otherwise lets the owner pick which NAC to open. */
@@ -57,9 +58,7 @@ export function CarnetIndexPage() {
               onClick={() => navigate(`/carnet/${pet.id}`)}
               style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: Spacing.lg }}
             >
-              <div style={{ width: 56, height: 56, borderRadius: Radius.lg, backgroundColor: color + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Icon size={28} color={color} />
-              </div>
+              <PetAvatar pet={pet} size={56} radius={Radius.lg} iconSize={28} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 18, fontWeight: Weight.bold, color: Colors.ink }}>{pet.name}</div>
                 <div style={{ fontSize: 14, color: Colors.inkSecondary }}>{pet.breed || pet.type}</div>

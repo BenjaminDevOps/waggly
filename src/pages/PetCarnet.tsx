@@ -13,6 +13,7 @@ import { useI18n } from '../i18n';
 import { useAuth } from '../hooks/useAuth';
 import { usePets } from '../hooks/usePets';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
+import { PetAvatar } from '../components/PetAvatar';
 import { PET_EMOJI } from '../models/types';
 import { CHECKLIST_ITEM_KEYS, getChecklistState } from '../services/checklistService';
 import { subscribeToAppointments, addAppointment, getNextUpcoming } from '../services/appointmentService';
@@ -113,18 +114,21 @@ export function PetCarnetPage() {
   return (
     <div className="fade-in" style={{ minHeight: '100vh', backgroundColor: Colors.background, paddingBottom: Spacing.xxl }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: Spacing.md, padding: `${Spacing.lg}px ${Spacing.xl}px` }}>
-        <button onClick={() => navigate('/carnet')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: Spacing.xs }}>
-          <ArrowLeft size={22} color={Colors.ink} />
-        </button>
+        {/* With a single pet /carnet redirects straight back here, so the
+            arrow would be a no-op — only offer it when there's a list to
+            return to. */}
+        {pets.length > 1 && (
+          <button onClick={() => navigate('/carnet')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: Spacing.xs }}>
+            <ArrowLeft size={22} color={Colors.ink} />
+          </button>
+        )}
         <span style={{ fontSize: Font.title3, fontWeight: Weight.bold, color: Colors.ink }}>{t.pets.title}</span>
       </div>
 
       <div style={{ padding: `0 ${Spacing.xl}px`, display: 'flex', flexDirection: 'column', gap: Spacing.xl }}>
         {/* Pet hero */}
         <Card style={{ display: 'flex', alignItems: 'center', gap: Spacing.lg }}>
-          <div style={{ width: 72, height: 72, borderRadius: Radius.lg, backgroundColor: petColor + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <PetIcon size={36} color={petColor} />
-          </div>
+          <PetAvatar pet={pet} size={72} radius={Radius.lg} iconSize={36} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ fontSize: 20, fontWeight: Weight.bold, color: Colors.ink }}>{pet.name}</span>

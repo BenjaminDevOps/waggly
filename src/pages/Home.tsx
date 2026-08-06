@@ -14,6 +14,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
 import { CHECKLIST_ITEM_KEYS, getChecklistState } from '../services/checklistService';
 import { PET_ICON_MAP, PET_COLOR_MAP } from '../utils/petIcons';
+import { PetAvatar } from '../components/PetAvatar';
 
 
 const ProgressCircle: React.FC<{ pct: number; size?: number; stroke?: number }> = ({ pct, size = 80, stroke = 7 }) => {
@@ -122,12 +123,7 @@ export function HomePage() {
                   transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                 }}
               >
-                <div style={{
-                  width: 56, height: 56, borderRadius: 18, backgroundColor: petColor + '18',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <PetIcon size={28} color={petColor} />
-                </div>
+                <PetAvatar pet={p} size={56} radius={18} iconSize={28} />
                 <span style={{ fontSize: Font.body, fontWeight: Weight.semibold, color: Colors.ink }}>{p.name}</span>
                 <span style={{ fontSize: Font.xs, color: Colors.inkTertiary }}>{p.breed || p.type}</span>
               </div>

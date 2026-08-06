@@ -1,14 +1,22 @@
 import { storage } from './firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-let cameraPlugin: any = null;
+// Cache the whole module shape, not just Camera — caching `mod.Camera` alone
+// and returning it directly on subsequent calls meant every call after the
+// first handed back an object with no `.Camera`, so `cam.Camera.getPhoto`
+// threw and the photo silently never appeared.
+let cameraModule: { Camera: any; CameraResultType: any; CameraSource: any } | null = null;
 
 async function getCamera() {
-  if (cameraPlugin) return cameraPlugin;
+  if (cameraModule) return cameraModule;
   try {
     const mod = await import('@capacitor/camera');
-    cameraPlugin = mod.Camera;
-    return { Camera: cameraPlugin, CameraResultType: mod.CameraResultType, CameraSource: mod.CameraSource };
+    cameraModule = {
+      Camera: mod.Camera,
+      CameraResultType: mod.CameraResultType,
+      CameraSource: mod.CameraSource,
+    };
+    return cameraModule;
   } catch {
     return null;
   }
@@ -29,7 +37,10 @@ export async function takePhoto(): Promise<string | null> {
     });
 
     return photo.dataUrl || null;
-  } catch {
+  } catch (e) {
+    // A user cancelling the picker lands here too, so this stays quiet — but
+    // log it so a genuine plugin/permission failure isn't invisible.
+    console.warn('[photo] getPhoto failed or was cancelled:', e);
     return null;
   }
 }
@@ -45,19 +56,25 @@ export async function uploadPhoto(
   return getDownloadURL(storageRef);
 }
 
-export async function captureAndUpload(
+/**
+ * Uploads to Storage, falling back to the inline data URL when that fails
+ * (Storage not reachable, rules denying the write...) so a picked photo is
+ * never lost just because the upload didn't go through.
+ *
+ * Callers should show the local data URL from `takePhoto` straight away and
+ * call this in the background — awaiting the upload before showing anything
+ * is what made the picker look like it did nothing.
+ */
+export async function uploadPhotoOrFallback(
+  dataUrl: string,
   folder: string,
   fileName: string,
-): Promise<{ dataUrl: string; downloadUrl: string } | null> {
-  const dataUrl = await takePhoto();
-  if (!dataUrl) return null;
-
+): Promise<string> {
   try {
     const path = `${folder}/${fileName}_${Date.now()}.jpg`;
-    const downloadUrl = await uploadPhoto(dataUrl, path);
-    return { dataUrl, downloadUrl };
+    return await uploadPhoto(dataUrl, path);
   } catch (e) {
-    console.warn('Photo upload failed, using local data URL:', e);
-    return { dataUrl, downloadUrl: dataUrl };
+    console.warn('[photo] upload failed, keeping local data URL:', e);
+    return dataUrl;
   }
 }
