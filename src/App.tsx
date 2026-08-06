@@ -108,13 +108,15 @@ export default function App() {
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   useBadgeChecker();
 
-  // Native status bar — dark icons/text for the app's light background.
+  // Native status bar. Icon contrast follows what's actually behind the bar:
+  // the language picker is a dark purple full-bleed screen, every other
+  // screen is cream.
   useEffect(() => {
     if (typeof (window as any).Capacitor === 'undefined' || !(window as any).Capacitor.isNativePlatform()) return;
     import('@capacitor/status-bar').then(({ StatusBar, Style }) => {
-      StatusBar.setStyle({ style: Style.Light }).catch(() => {});
+      StatusBar.setStyle({ style: localeChosen ? Style.Light : Style.Dark }).catch(() => {});
     }).catch(() => {});
-  }, []);
+  }, [localeChosen]);
 
   // Streak update — must be declared before any conditional return (Rules of Hooks)
   useEffect(() => {

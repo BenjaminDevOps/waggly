@@ -4,16 +4,19 @@
    ============================================ */
 
 /* --- Custom Properties --- */
+/* Keep these in sync with src/theme/colors.ts — the body background in
+   particular paints the status-bar safe area, so a stale value there shows
+   up as a mismatched band at the top of every screen. */
 :root {
   /* Primary */
-  --primary: #5B5EA6;
-  --primary-light: #7B7FCC;
-  --primary-pale: #EDEDF7;
-  --primary-dark: #44478A;
+  --primary: #3B2360;
+  --primary-light: #7C5CBF;
+  --primary-pale: #EDE7F5;
+  --primary-dark: #2A1948;
 
   /* Secondary */
-  --secondary: #E8985E;
-  --secondary-pale: #FDF2E9;
+  --secondary: #E0AE4A;
+  --secondary-pale: #FBF3E1;
 
   /* Accent */
   --accent: #D4726A;
@@ -26,21 +29,21 @@
   --error-pale: #FBEAE9;
 
   /* Surfaces */
-  --background: #FAF8F5;
+  --background: #FAF4E8;
   --surface: #FFFFFF;
-  --surface-secondary: #F3F0EB;
+  --surface-secondary: #F3EEE3;
 
   /* Ink */
-  --ink: #2D2D3A;
-  --ink-secondary: #6B6B80;
-  --ink-tertiary: #9D9DAF;
+  --ink: #3B2360;
+  --ink-secondary: #624F80;
+  --ink-tertiary: #91819E;
 
   /* Borders */
-  --hairline: #E8E4DF;
-  --hairline-light: #F0EDE8;
+  --hairline: #E7E0EE;
+  --hairline-light: #F1ECF6;
 
   /* Overlays */
-  --overlay: rgba(45, 45, 58, 0.4);
+  --overlay: rgba(59, 35, 96, 0.4);
 
   /* Radii */
   --radius-sm: 12px;
@@ -242,12 +245,12 @@ img {
 
 .card-interactive:hover {
   transform: scale(1.02);
-  box-shadow: 0 8px 24px rgba(45, 45, 58, 0.1);
+  box-shadow: 0 8px 24px rgba(59, 35, 96, 0.1);
 }
 
 .card-interactive:active {
   transform: scale(0.98);
-  box-shadow: 0 2px 8px rgba(45, 45, 58, 0.06);
+  box-shadow: 0 2px 8px rgba(59, 35, 96, 0.06);
 }
 
 /* --- Button Press Feedback --- */
@@ -337,7 +340,7 @@ textarea::placeholder {
   max-width: 430px;
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
-  background: rgba(250, 248, 245, 0.82);
+  background: rgba(250, 244, 232, 0.82);
   border-top: 0.5px solid var(--hairline-light);
   z-index: 900;
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -383,6 +386,6 @@ textarea::placeholder {
 }
 
 .spinner--dark {
-  border-color: rgba(45, 45, 58, 0.15);
+  border-color: rgba(59, 35, 96, 0.15);
   border-top-color: var(--ink);
 }

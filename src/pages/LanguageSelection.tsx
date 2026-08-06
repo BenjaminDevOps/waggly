@@ -28,7 +28,12 @@ export function LanguageSelectionPage({ onDone }: Props) {
       minHeight: '100vh',
       background: 'linear-gradient(160deg, #3B2360 0%, #54357F 100%)',
       display: 'flex', flexDirection: 'column',
-      maxWidth: 430, margin: '0 auto',
+      maxWidth: 430,
+      // Every other screen is cream, so body's safe-area padding blends in.
+      // This one is full-bleed purple, so cancel that padding and re-apply it
+      // inside the gradient — otherwise the status-bar strip reads as a band.
+      margin: 'calc(-1 * env(safe-area-inset-top, 0px)) auto 0',
+      paddingTop: 'env(safe-area-inset-top, 0px)',
     }}>
 
       {/* Branding */}
