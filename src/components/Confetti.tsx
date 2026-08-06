@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Colors } from '../theme/colors';
+import { playPop } from '../utils/sound';
 
 const CONFETTI_COLORS = [Colors.primary, Colors.secondary, Colors.success, Colors.sky, Colors.accent, Colors.lavender];
 
@@ -22,6 +23,9 @@ export function Confetti({ count = 28 }: { count?: number }) {
     rotate: Math.random() * 360,
     round: Math.random() > 0.6,
   })), [count]);
+
+  // Pop in time with the burst.
+  useEffect(() => { playPop(); }, []);
 
   return (
     <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 250 }}>
