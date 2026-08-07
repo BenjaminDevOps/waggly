@@ -5,23 +5,34 @@ import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { useI18n } from '../i18n';
 import type { PetType } from '../models/types';
+import { amazonProductUrl, amazonImageUrl } from '../utils/amazon';
+
+/** Link + picture come from the ASIN unless a row overrides them. */
+const productLink = (p: Product) => p.affiliateUrl ?? (p.asin ? amazonProductUrl(p.asin) : undefined);
+const productImage = (p: Product) => p.imageUrl ?? (p.asin ? amazonImageUrl(p.asin) : undefined);
 
 type PetFilter = 'all' | PetType;
 type ShopCategory = 'terrariums' | 'substrate' | 'heatingLighting' | 'food' | 'accessories';
 
-interface Product { id: string; name: string; desc: string; price: number; original?: number; rating: number; reviews: number; category: ShopCategory; pets: PetType[]; featured: boolean; isNew: boolean; affiliateUrl?: string; imageUrl?: string; }
+interface Product { id: string; name: string; desc: string; price: number; original?: number; rating: number; reviews: number; category: ShopCategory; pets: PetType[]; featured: boolean; isNew: boolean; asin?: string; affiliateUrl?: string; imageUrl?: string; }
 
-// To add a product: paste your amzn.to short link directly in affiliateUrl.
-// Short links (amzn.to) already contain your affiliate tag — do NOT append ?tag=
-// For long links (amazon.fr/dp/XXX), append ?tag=your-tag-21
-// To add images: right-click the product image on Amazon → "Copy image address" → paste in imageUrl
+// To publish a product, set `asin` to the code in its Amazon URL
+// (amazon.fr/…/dp/B004S7U6U0 → 'B004S7U6U0'). The link and the picture are
+// both derived from it, and the affiliate tag comes from AFFILIATE.amazonId,
+// so the tag is never duplicated per row.
+//
+// `affiliateUrl` / `imageUrl` stay available as overrides — use affiliateUrl
+// for an amzn.to short link (those already carry your tag, don't append one).
+// A product with none of these shows "coming soon" instead of a dead link.
 const PRODUCTS: Product[] = [
   { id: '1', name: 'Terrarium en verre 45x45x60cm', desc: 'Terrarium ventilé avec portes coulissantes, idéal reptiles', price: 89.99, original: 109.99, rating: 4.7, reviews: 340, category: 'terrariums', pets: ['reptile'], featured: true, isNew: false },
   { id: '2', name: 'Kit rampe UVB 10.0 + support', desc: 'Éclairage UVB indispensable à la synthèse de vitamine D3', price: 34.99, rating: 4.6, reviews: 210, category: 'heatingLighting', pets: ['reptile'], featured: true, isNew: false },
   { id: '3', name: 'Tapis chauffant terrarium', desc: 'Chauffage de fond thermostatable pour point chaud', price: 18.99, original: 24.99, rating: 4.5, reviews: 560, category: 'heatingLighting', pets: ['reptile', 'amphibian', 'invertebrate'], featured: false, isNew: false },
   { id: '4', name: 'Substrat fibre de coco 5kg', desc: 'Substrat fouisseur naturel, retient bien l\'humidité', price: 12.99, rating: 4.4, reviews: 180, category: 'substrate', pets: ['reptile', 'amphibian', 'invertebrate'], featured: false, isNew: true },
   { id: '5', name: 'Litière chanvre pour rongeurs', desc: 'Litière absorbante et peu poussiéreuse 10L', price: 9.99, rating: 4.6, reviews: 430, category: 'substrate', pets: ['rodent'], featured: false, isNew: false },
-  { id: '6', name: 'Foin Timothy premium 1kg', desc: 'Foin de qualité supérieure riche en fibres', price: 8.99, original: 11.99, rating: 4.7, reviews: 920, category: 'food', pets: ['rodent'], featured: false, isNew: false },
+  // EXAMPLE ROW — the only product wired to a real listing (Beaphar Care+
+  // Timothy, amazon.fr/dp/B004S7U6U0). Copy this shape for the others.
+  { id: '6', name: 'Foin Timothy premium 1kg', desc: 'Foin de qualité supérieure riche en fibres', price: 8.99, original: 11.99, rating: 4.7, reviews: 920, category: 'food', pets: ['rodent'], featured: true, isNew: false, asin: 'B004S7U6U0' },
   { id: '7', name: 'Grillons vivants nourrissants (x50)', desc: 'Proies vivantes gut-loaded pour reptiles et amphibiens', price: 6.99, rating: 4.5, reviews: 150, category: 'food', pets: ['reptile', 'amphibian', 'invertebrate'], featured: false, isNew: false },
   { id: '8', name: 'Croquettes furet haute protéine', desc: 'Alimentation carnée adaptée aux besoins du furet', price: 24.99, rating: 4.8, reviews: 310, category: 'food', pets: ['ferret'], featured: true, isNew: false },
   { id: '9', name: 'Hamac 3 niveaux pour furet', desc: 'Hamac suspendu confortable pour cage multi-niveaux', price: 15.99, rating: 4.6, reviews: 260, category: 'accessories', pets: ['ferret'], featured: false, isNew: true },
@@ -100,25 +111,26 @@ export function ShopPage() {
               </button>
             </div>
             <div style={{ height: 180, backgroundColor: Colors.primaryPale, borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, overflow: 'hidden' }}>
-              <ProductImage src={selectedProduct.imageUrl} name={selectedProduct.name} size={180} />
+              <ProductImage src={productImage(selectedProduct)} name={selectedProduct.name} size={180} />
             </div>
             <h2 style={{ fontSize: 22, fontWeight: Weight.bold, color: Colors.ink }}>{selectedProduct.name}</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-              <span style={{ fontSize: 28, fontWeight: Weight.bold, color: Colors.primary }}>${selectedProduct.price.toFixed(2)}</span>
-              {selectedProduct.original && <span style={{ fontSize: 17, color: Colors.inkTertiary, textDecoration: 'line-through' }}>${selectedProduct.original.toFixed(2)}</span>}
+              <span style={{ fontSize: 28, fontWeight: Weight.bold, color: Colors.primary }}>{selectedProduct.price.toFixed(2)} €</span>
+              {selectedProduct.original && <span style={{ fontSize: 17, color: Colors.inkTertiary, textDecoration: 'line-through' }}>{selectedProduct.original.toFixed(2)} €</span>}
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 8 }}>
               {Array.from({ length: 5 }).map((_, i) => <Star key={i} size={18} color={Colors.secondary} fill={i < Math.floor(selectedProduct.rating) ? Colors.secondary : 'none'} />)}
               <span style={{ color: Colors.inkSecondary, marginLeft: 4 }}>{selectedProduct.rating} ({selectedProduct.reviews} {t.shop.reviews})</span>
             </div>
             <p style={{ fontSize: 15, color: Colors.inkSecondary, lineHeight: 1.6, marginTop: 16 }}>{selectedProduct.desc}</p>
-            {selectedProduct.affiliateUrl ? (
+            {productLink(selectedProduct) ? (
               <Button label={t.shop.viewOnAmazon} onPress={async () => {
+                const url = productLink(selectedProduct!)!;
                 try {
                   const { Browser } = await import('@capacitor/browser');
-                  await Browser.open({ url: selectedProduct!.affiliateUrl! });
+                  await Browser.open({ url });
                 } catch {
-                  window.open(selectedProduct!.affiliateUrl!, '_blank', 'noopener,noreferrer');
+                  window.open(url, '_blank', 'noopener,noreferrer');
                 }
                 setSelectedProduct(null);
               }} icon={<ExternalLink size={22} color={Colors.inkInverse} />} size="large" style={{ marginTop: 28 }} />
@@ -165,7 +177,7 @@ function ProductCard({ product, onClick }: { product: Product; onClick: () => vo
   return (
     <button className="card-interactive" onClick={onClick} style={{ backgroundColor: Colors.surface, borderRadius: 20, overflow: 'hidden', boxShadow: Shadow.soft, textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}>
       <div style={{ height: 110, backgroundColor: Colors.primaryPale, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-        <ProductImage src={product.imageUrl} name={product.name} />
+        <ProductImage src={productImage(product)} name={product.name} />
         {discount > 0 && <span style={{ position: 'absolute', top: 8, left: 8, backgroundColor: Colors.error, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>-{discount}%</span>}
         {product.isNew && <span style={{ position: 'absolute', top: 8, right: 8, backgroundColor: Colors.success, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>NEW</span>}
         {product.featured && !product.isNew && <span style={{ position: 'absolute', top: 8, right: 8, backgroundColor: Colors.secondary, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>TOP</span>}
@@ -178,8 +190,8 @@ function ProductCard({ product, onClick }: { product: Product; onClick: () => vo
           <span style={{ fontSize: 11, color: Colors.inkTertiary }}>({product.reviews})</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-          <span style={{ fontSize: 15, fontWeight: Weight.bold, color: Colors.primary }}>${product.price.toFixed(2)}</span>
-          {product.original && <span style={{ fontSize: 11, color: Colors.inkTertiary, textDecoration: 'line-through' }}>${product.original.toFixed(2)}</span>}
+          <span style={{ fontSize: 15, fontWeight: Weight.bold, color: Colors.primary }}>{product.price.toFixed(2)} €</span>
+          {product.original && <span style={{ fontSize: 11, color: Colors.inkTertiary, textDecoration: 'line-through' }}>{product.original.toFixed(2)} €</span>}
         </div>
       </div>
     </button>
