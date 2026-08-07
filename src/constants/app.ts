@@ -31,6 +31,10 @@ export const COLLECTIONS = {
 };
 
 export const AFFILIATE = {
+  // Your Amazon Associates tracking tag — the single place it is configured.
+  // It must match the storefront in utils/amazon.ts: amazon.fr only credits
+  // tags ending in -21 ("-20" is amazon.com). A mismatch still opens the
+  // product, it just earns nothing; utils/amazon.ts warns about it on startup.
   amazonId: 'waggly-20',
   zooplusId: 'waggly',
 };
