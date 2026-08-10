@@ -1,4 +1,4 @@
-package com.ministeredesapp.waggly;
+package com.ministeredesapp.wagglynac;
 
 import com.getcapacitor.BridgeActivity;
 
