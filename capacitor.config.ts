@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.ministeredesapp.waggly',
+  appId: 'com.ministeredesapp.wagglynac',
   appName: 'Waggly NAC',
   webDir: 'dist',
   server: {
