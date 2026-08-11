@@ -5,11 +5,13 @@ import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { useI18n } from '../i18n';
 import type { PetType } from '../models/types';
-import { amazonProductUrl, amazonImageUrl } from '../utils/amazon';
+import { amazonProductUrl, amazonImageUrl, isValidAsin } from '../utils/amazon';
 
-/** Link + picture come from the ASIN unless a row overrides them. */
-const productLink = (p: Product) => p.affiliateUrl ?? (p.asin ? amazonProductUrl(p.asin) : undefined);
-const productImage = (p: Product) => p.imageUrl ?? (p.asin ? amazonImageUrl(p.asin) : undefined);
+/** Link + picture come from the ASIN unless a row overrides them. A malformed
+ *  ASIN is ignored rather than turned into a dead link, so the row falls back
+ *  to "coming soon" and the mistake is visible instead of silent. */
+const productLink = (p: Product) => p.affiliateUrl ?? (isValidAsin(p.asin) ? amazonProductUrl(p.asin) : undefined);
+const productImage = (p: Product) => p.imageUrl ?? (isValidAsin(p.asin) ? amazonImageUrl(p.asin) : undefined);
 
 type PetFilter = 'all' | PetType;
 type ShopCategory = 'terrariums' | 'substrate' | 'heatingLighting' | 'food' | 'accessories';
@@ -40,6 +42,17 @@ const PRODUCTS: Product[] = [
   { id: '11', name: 'Filtre externe aquarium 240L/h', desc: 'Filtration silencieuse pour aquariums jusqu\'à 60L', price: 39.99, original: 49.99, rating: 4.7, reviews: 410, category: 'terrariums', pets: ['fish'], featured: true, isNew: false },
   { id: '12', name: 'Thermomètre-hygromètre digital', desc: 'Sonde double pour surveiller température et humidité', price: 11.99, rating: 4.6, reviews: 380, category: 'heatingLighting', pets: ['reptile', 'amphibian', 'invertebrate', 'fish'], featured: false, isNew: false },
 ];
+
+// Flag typo'd ASINs once at startup — otherwise a bad code just shows up as a
+// product that quietly never links anywhere.
+const badAsins = PRODUCTS.filter(p => p.asin && !isValidAsin(p.asin));
+if (badAsins.length > 0) {
+  console.warn(
+    `[shop] ${badAsins.length} product(s) have a malformed ASIN (expected 10 ` +
+    `upper-case alphanumerics) and will show as "coming soon": ` +
+    badAsins.map(p => `${p.id}:${p.asin}`).join(', '),
+  );
+}
 
 const CATEGORIES: ShopCategory[] = ['terrariums', 'substrate', 'heatingLighting', 'food', 'accessories'];
 const PET_FILTERS: PetFilter[] = ['all', 'reptile', 'rodent', 'ferret', 'bird', 'fish', 'amphibian', 'invertebrate'];

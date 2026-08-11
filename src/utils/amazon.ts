@@ -27,6 +27,18 @@ if (!AFFILIATE.amazonId.endsWith(EXPECTED_TAG_SUFFIX)) {
   );
 }
 
+/**
+ * An ASIN is exactly 10 upper-case alphanumerics, as it appears in the
+ * product URL (amazon.fr/…/dp/B004S7U6U0). Anything else is a typo, and
+ * would otherwise produce a link to a 404 and an image that never loads —
+ * both of which fail silently, so check before building either.
+ */
+const ASIN_PATTERN = /^[A-Z0-9]{10}$/;
+
+export function isValidAsin(asin: string | undefined): asin is string {
+  return !!asin && ASIN_PATTERN.test(asin);
+}
+
 /** Product page URL carrying the affiliate tag. */
 export function amazonProductUrl(asin: string): string {
   return `https://${AMAZON_HOST}/dp/${encodeURIComponent(asin)}?tag=${encodeURIComponent(AFFILIATE.amazonId)}`;
