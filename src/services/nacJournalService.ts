@@ -41,12 +41,16 @@ export async function deleteJournalEntry(entryId: string): Promise<void> {
 
 export function subscribeToJournalEntries(
   petId: string,
+  userId: string,
   callback: (entries: NacJournalEntry[]) => void,
 ): () => void {
   try {
     const q = query(
       collection(db, COLLECTIONS.nacJournal),
       where('petId', '==', petId),
+      // Security rules scope these collections to their owner; a list
+      // query must carry the same constraint or Firestore rejects it.
+      where('userId', '==', userId),
     );
 
     return onSnapshot(

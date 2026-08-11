@@ -45,12 +45,16 @@ export async function deleteHealthRecord(recordId: string): Promise<void> {
 
 export function subscribeToHealthRecords(
   petId: string,
+  userId: string,
   callback: (records: HealthRecord[]) => void,
 ): () => void {
   try {
     const q = query(
       collection(db, COLLECTIONS.healthRecords),
       where('petId', '==', petId),
+      // Security rules scope these collections to their owner; a list
+      // query must carry the same constraint or Firestore rejects it.
+      where('userId', '==', userId),
     );
 
     return onSnapshot(
