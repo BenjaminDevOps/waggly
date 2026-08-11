@@ -31,10 +31,10 @@ export function PetBehaviorPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!petId) return;
-    const unsub = subscribeToJournalEntries(petId, setEntries);
+    if (!petId || !firebaseUser) return;
+    const unsub = subscribeToJournalEntries(petId, firebaseUser.uid, setEntries);
     return unsub;
-  }, [petId]);
+  }, [petId, firebaseUser]);
 
   const sheddingEntries = entries.filter((e) => e.type === 'shedding');
 

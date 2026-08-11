@@ -40,10 +40,10 @@ export function PetHabitatPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!petId) return;
-    const unsub = subscribeToJournalEntries(petId, setEntries);
+    if (!petId || !firebaseUser) return;
+    const unsub = subscribeToJournalEntries(petId, firebaseUser.uid, setEntries);
     return unsub;
-  }, [petId]);
+  }, [petId, firebaseUser]);
 
   const habitatEntries = entries.filter((e) => e.type === 'habitat');
   const sheet = pet ? SPECIES_GUIDE.find((s) => s.type === pet.type) : undefined;

@@ -1,0 +1,63 @@
+rules_version = '2';
+
+// Waggly NAC — Firestore security rules.
+//
+// Deploy with:  firebase deploy --only firestore:rules
+// (or paste into Firebase console → Firestore Database → Rules → Publish)
+//
+// Everything is private to its owner and nothing is world-readable. Note that
+// rules are not filters: a list query is rejected unless its constraints
+// already guarantee the rule holds, which is why the app's subscriptions all
+// filter on userId. Changing a query without changing these together will
+// surface as a permission-denied on read.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    // The document being written must belong to the caller.
+    function ownsIncoming() {
+      return signedIn() && request.resource.data.userId == request.auth.uid;
+    }
+    // The document already stored must belong to the caller.
+    function ownsExisting() {
+      return signedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Profile, points, streak, badges. Document id is the uid.
+    match /users/{userId} {
+      allow read, write: if signedIn() && request.auth.uid == userId;
+    }
+
+    // Pets, and everything hanging off a pet. All carry a userId written by
+    // the app, and all are queried with a matching userId constraint.
+    match /pets/{petId} {
+      allow create: if ownsIncoming();
+      allow read, update, delete: if ownsExisting();
+    }
+
+    match /health_records/{recordId} {
+      allow create: if ownsIncoming();
+      allow read, update, delete: if ownsExisting();
+    }
+
+    match /nac_journal_entries/{entryId} {
+      allow create: if ownsIncoming();
+      allow read, update, delete: if ownsExisting();
+    }
+
+    match /appointments/{appointmentId} {
+      allow create: if ownsIncoming();
+      allow read, update, delete: if ownsExisting();
+    }
+
+    match /diagnoses/{diagnosisId} {
+      allow create: if ownsIncoming();
+      allow read, update, delete: if ownsExisting();
+    }
+
+    // Anything not matched above stays denied.
+  }
+}

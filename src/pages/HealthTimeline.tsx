@@ -69,10 +69,10 @@ export function HealthTimelinePage() {
   const [generatingPdf, setGeneratingPdf] = useState(false);
 
   useEffect(() => {
-    if (!petId) return;
-    const unsub = subscribeToHealthRecords(petId, setRecords);
+    if (!petId || !firebaseUser) return;
+    const unsub = subscribeToHealthRecords(petId, firebaseUser.uid, setRecords);
     return unsub;
-  }, [petId]);
+  }, [petId, firebaseUser]);
 
   const filtered = useMemo(() => records.filter((r) => {
     if (filter === 'all') return true;

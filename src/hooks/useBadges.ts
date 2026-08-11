@@ -21,7 +21,7 @@ export function useBadgeChecker() {
   useEffect(() => {
     if (!firebaseUser || pets.length === 0) return;
     const unsubs = pets.map(p =>
-      subscribeToHealthRecords(p.id, (r) => {
+      subscribeToHealthRecords(p.id, firebaseUser.uid, (r) => {
         recordsRef.current = [
           ...recordsRef.current.filter(rec => rec.petId !== p.id),
           ...r,

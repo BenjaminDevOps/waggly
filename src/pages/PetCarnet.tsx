@@ -48,10 +48,10 @@ export function PetCarnetPage() {
   const [savingAppt, setSavingAppt] = useState(false);
 
   useEffect(() => {
-    if (!petId) return;
-    const unsub = subscribeToAppointments(petId, setAppointments);
+    if (!petId || !firebaseUser) return;
+    const unsub = subscribeToAppointments(petId, firebaseUser.uid, setAppointments);
     return unsub;
-  }, [petId]);
+  }, [petId, firebaseUser]);
 
   const checklistState = getChecklistState();
   const nextChecklistKey = CHECKLIST_ITEM_KEYS.find((k) => !checklistState[k]);

@@ -41,12 +41,16 @@ export async function deleteAppointment(appointmentId: string): Promise<void> {
 
 export function subscribeToAppointments(
   petId: string,
+  userId: string,
   callback: (appointments: Appointment[]) => void,
 ): () => void {
   try {
     const q = query(
       collection(db, COLLECTIONS.appointments),
       where('petId', '==', petId),
+      // Security rules scope these collections to their owner; a list
+      // query must carry the same constraint or Firestore rejects it.
+      where('userId', '==', userId),
     );
 
     return onSnapshot(
