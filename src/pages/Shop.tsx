@@ -1,17 +1,18 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, X, Star, ShoppingCart, ExternalLink } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight, Shadow } from '../theme/spacing';
 import { useI18n } from '../i18n';
 import type { PetType } from '../models/types';
-import { amazonProductUrl, amazonImageUrl, isValidAsin } from '../utils/amazon';
+import { amazonProductUrl, amazonImageCandidates, isValidAsin } from '../utils/amazon';
 
 /** Link + picture come from the ASIN unless a row overrides them. A malformed
  *  ASIN is ignored rather than turned into a dead link, so the row falls back
  *  to "coming soon" and the mistake is visible instead of silent. */
 const productLink = (p: Product) => p.affiliateUrl ?? (isValidAsin(p.asin) ? amazonProductUrl(p.asin) : undefined);
-const productImage = (p: Product) => p.imageUrl ?? (isValidAsin(p.asin) ? amazonImageUrl(p.asin) : undefined);
+const productImages = (p: Product): string[] =>
+  p.imageUrl ? [p.imageUrl] : (isValidAsin(p.asin) ? amazonImageCandidates(p.asin) : []);
 
 type PetFilter = 'all' | PetType;
 type ShopCategory = 'terrariums' | 'substrate' | 'heatingLighting' | 'food' | 'accessories';
@@ -124,7 +125,7 @@ export function ShopPage() {
               </button>
             </div>
             <div style={{ height: 180, backgroundColor: Colors.primaryPale, borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, overflow: 'hidden' }}>
-              <ProductImage src={productImage(selectedProduct)} name={selectedProduct.name} size={180} />
+              <ProductImage sources={productImages(selectedProduct)} name={selectedProduct.name} size={180} />
             </div>
             <h2 style={{ fontSize: 22, fontWeight: Weight.bold, color: Colors.ink }}>{selectedProduct.name}</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
@@ -177,12 +178,26 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
   );
 }
 
-function ProductImage({ src, name, size = 110 }: { src?: string; name: string; size?: number }) {
-  const [failed, setFailed] = useState(false);
-  if (src && !failed) {
-    return <img src={src} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={() => setFailed(true)} />;
-  }
-  return <ShoppingCart size={size > 130 ? 56 : 36} color={Colors.primary + '40'} />;
+function ProductImage({ sources, name, size = 110 }: { sources: string[]; name: string; size?: number }) {
+  // Walk the candidates until one actually paints, then fall back to the icon.
+  const [index, setIndex] = useState(0);
+  const key = sources.join('|');
+  useEffect(() => { setIndex(0); }, [key]);
+
+  const src = sources[index];
+  if (!src) return <ShoppingCart size={size > 130 ? 56 : 36} color={Colors.primary + '40'} />;
+
+  return (
+    <img
+      src={src}
+      alt={name}
+      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+      onError={() => setIndex(i => i + 1)}
+      // Amazon serves a 1x1 placeholder for an ASIN it doesn't know instead of
+      // failing, so a "successful" tiny load is really a miss.
+      onLoad={(e) => { if (e.currentTarget.naturalWidth <= 1) setIndex(i => i + 1); }}
+    />
+  );
 }
 
 function ProductCard({ product, onClick }: { product: Product; onClick: () => void }) {
@@ -190,7 +205,7 @@ function ProductCard({ product, onClick }: { product: Product; onClick: () => vo
   return (
     <button className="card-interactive" onClick={onClick} style={{ backgroundColor: Colors.surface, borderRadius: 20, overflow: 'hidden', boxShadow: Shadow.soft, textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}>
       <div style={{ height: 110, backgroundColor: Colors.primaryPale, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-        <ProductImage src={productImage(product)} name={product.name} />
+        <ProductImage sources={productImages(product)} name={product.name} />
         {discount > 0 && <span style={{ position: 'absolute', top: 8, left: 8, backgroundColor: Colors.error, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>-{discount}%</span>}
         {product.isNew && <span style={{ position: 'absolute', top: 8, right: 8, backgroundColor: Colors.success, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>NEW</span>}
         {product.featured && !product.isNew && <span style={{ position: 'absolute', top: 8, right: 8, backgroundColor: Colors.secondary, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>TOP</span>}
