@@ -27,20 +27,19 @@ interface Product { id: string; name: string; desc: string; price: number; origi
 // for an amzn.to short link (those already carry your tag, don't append one).
 // A product with none of these shows "coming soon" instead of a dead link.
 const PRODUCTS: Product[] = [
-  { id: '1', name: 'Terrarium en verre 45x45x60cm', desc: 'Terrarium ventilé avec portes coulissantes, idéal reptiles', price: 89.99, original: 109.99, rating: 4.7, reviews: 340, category: 'terrariums', pets: ['reptile'], featured: true, isNew: false },
-  { id: '2', name: 'Kit rampe UVB 10.0 + support', desc: 'Éclairage UVB indispensable à la synthèse de vitamine D3', price: 34.99, rating: 4.6, reviews: 210, category: 'heatingLighting', pets: ['reptile'], featured: true, isNew: false },
-  { id: '3', name: 'Tapis chauffant terrarium', desc: 'Chauffage de fond thermostatable pour point chaud', price: 18.99, original: 24.99, rating: 4.5, reviews: 560, category: 'heatingLighting', pets: ['reptile', 'amphibian', 'invertebrate'], featured: false, isNew: false },
-  { id: '4', name: 'Substrat fibre de coco 5kg', desc: 'Substrat fouisseur naturel, retient bien l\'humidité', price: 12.99, rating: 4.4, reviews: 180, category: 'substrate', pets: ['reptile', 'amphibian', 'invertebrate'], featured: false, isNew: true },
-  { id: '5', name: 'Litière chanvre pour rongeurs', desc: 'Litière absorbante et peu poussiéreuse 10L', price: 9.99, rating: 4.6, reviews: 430, category: 'substrate', pets: ['rodent'], featured: false, isNew: false },
-  // EXAMPLE ROW — the only product wired to a real listing (Beaphar Care+
-  // Timothy, amazon.fr/dp/B004S7U6U0). Copy this shape for the others.
+  { id: '1', name: 'Terrarium en verre 45x45x60cm', desc: 'Terrarium ventilé avec portes coulissantes, idéal reptiles', price: 89.99, original: 109.99, rating: 4.7, reviews: 340, category: 'terrariums', pets: ['reptile'], featured: true, isNew: false, asin: 'B07N8Y96DL' },
+  { id: '2', name: 'Kit rampe UVB 10.0 + support', desc: 'Éclairage UVB indispensable à la synthèse de vitamine D3', price: 34.99, rating: 4.6, reviews: 210, category: 'heatingLighting', pets: ['reptile'], featured: true, isNew: false, asin: 'B0GSFZPP6G' },
+  { id: '3', name: 'Tapis chauffant terrarium', desc: 'Chauffage de fond thermostatable pour point chaud', price: 18.99, original: 24.99, rating: 4.5, reviews: 560, category: 'heatingLighting', pets: ['reptile', 'amphibian', 'invertebrate'], featured: false, isNew: false, asin: 'B08M3FKC4V' },
+  { id: '4', name: 'Substrat fibre de coco 5kg', desc: 'Substrat fouisseur naturel, retient bien l\'humidité', price: 12.99, rating: 4.4, reviews: 180, category: 'substrate', pets: ['reptile', 'amphibian', 'invertebrate'], featured: false, isNew: true, asin: 'B07BRZLF6F' },
+  { id: '5', name: 'Litière chanvre pour rongeurs', desc: 'Litière absorbante et peu poussiéreuse 10L', price: 9.99, rating: 4.6, reviews: 430, category: 'substrate', pets: ['rodent'], featured: false, isNew: false, asin: 'B016UW1V72' },
   { id: '6', name: 'Foin Timothy premium 1kg', desc: 'Foin de qualité supérieure riche en fibres', price: 8.99, original: 11.99, rating: 4.7, reviews: 920, category: 'food', pets: ['rodent'], featured: true, isNew: false, asin: 'B004S7U6U0' },
-  { id: '7', name: 'Grillons vivants nourrissants (x50)', desc: 'Proies vivantes gut-loaded pour reptiles et amphibiens', price: 6.99, rating: 4.5, reviews: 150, category: 'food', pets: ['reptile', 'amphibian', 'invertebrate'], featured: false, isNew: false },
-  { id: '8', name: 'Croquettes furet haute protéine', desc: 'Alimentation carnée adaptée aux besoins du furet', price: 24.99, rating: 4.8, reviews: 310, category: 'food', pets: ['ferret'], featured: true, isNew: false },
-  { id: '9', name: 'Hamac 3 niveaux pour furet', desc: 'Hamac suspendu confortable pour cage multi-niveaux', price: 15.99, rating: 4.6, reviews: 260, category: 'accessories', pets: ['ferret'], featured: false, isNew: true },
-  { id: '10', name: 'Assortiment de perchoirs naturels', desc: 'Perchoirs de diamètres variés pour la santé des pattes', price: 13.99, rating: 4.5, reviews: 190, category: 'accessories', pets: ['bird'], featured: false, isNew: false },
-  { id: '11', name: 'Filtre externe aquarium 240L/h', desc: 'Filtration silencieuse pour aquariums jusqu\'à 60L', price: 39.99, original: 49.99, rating: 4.7, reviews: 410, category: 'terrariums', pets: ['fish'], featured: true, isNew: false },
-  { id: '12', name: 'Thermomètre-hygromètre digital', desc: 'Sonde double pour surveiller température et humidité', price: 11.99, rating: 4.6, reviews: 380, category: 'heatingLighting', pets: ['reptile', 'amphibian', 'invertebrate', 'fish'], featured: false, isNew: false },
+  { id: '7', name: 'Grillons vivants nourrissants (x50)', desc: 'Proies vivantes gut-loaded pour reptiles et amphibiens', price: 6.99, rating: 4.5, reviews: 150, category: 'food', pets: ['reptile', 'amphibian', 'invertebrate'], featured: false, isNew: false, asin: 'B0CV7M6C83' },
+  { id: '8', name: 'Croquettes furet haute protéine', desc: 'Alimentation carnée adaptée aux besoins du furet', price: 24.99, rating: 4.8, reviews: 310, category: 'food', pets: ['ferret'], featured: true, isNew: false, asin: 'B0DGL3J8R1' },
+  { id: '9', name: 'Hamac 3 niveaux pour furet', desc: 'Hamac suspendu confortable pour cage multi-niveaux', price: 15.99, rating: 4.6, reviews: 260, category: 'accessories', pets: ['ferret'], featured: false, isNew: true, asin: 'B0D6BB3DHZ' },
+  { id: '10', name: 'Assortiment de perchoirs naturels', desc: 'Perchoirs de diamètres variés pour la santé des pattes', price: 13.99, rating: 4.5, reviews: 190, category: 'accessories', pets: ['bird'], featured: false, isNew: false, asin: 'B0F3DG51P8' },
+  { id: '11', name: 'Filtre externe aquarium 240L/h', desc: 'Filtration silencieuse pour aquariums jusqu\'à 60L', price: 39.99, original: 49.99, rating: 4.7, reviews: 410, category: 'terrariums', pets: ['fish'], featured: true, isNew: false, asin: 'B00LEN0LHE' },
+  { id: '12', name: 'Thermomètre-hygromètre digital', desc: 'Sonde double pour surveiller température et humidité', price: 11.99, rating: 4.6, reviews: 380, category: 'heatingLighting', pets: ['reptile', 'amphibian', 'invertebrate', 'fish'], featured: false, isNew: false, asin: 'B07M9RXRSM' },
+  { id: '13', name: '26-en-1 Jouet pour lapin naturel avec tunnel', desc: 'De délicieuses gourmandises et des jouets pour votre lapin', price: 21.99, rating: 4.6, reviews: 216, category: 'accessories', pets: ['other'], featured: false, isNew: false, asin: 'B0DPQ91P7Q' },
 ];
 
 // Flag typo'd ASINs once at startup — otherwise a bad code just shows up as a
@@ -55,7 +54,9 @@ if (badAsins.length > 0) {
 }
 
 const CATEGORIES: ShopCategory[] = ['terrariums', 'substrate', 'heatingLighting', 'food', 'accessories'];
-const PET_FILTERS: PetFilter[] = ['all', 'reptile', 'rodent', 'ferret', 'bird', 'fish', 'amphibian', 'invertebrate'];
+// Must cover every PetType a product can be tagged with — a species missing
+// here leaves its products reachable only under "all".
+const PET_FILTERS: PetFilter[] = ['all', 'reptile', 'rodent', 'ferret', 'bird', 'fish', 'amphibian', 'invertebrate', 'other'];
 // Labels are set dynamically via i18n in the component
 
 export function ShopPage() {
