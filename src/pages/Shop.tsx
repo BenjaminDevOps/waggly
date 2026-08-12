@@ -13,6 +13,16 @@ import { amazonProductUrl, amazonImageUrl, isValidAsin } from '../utils/amazon';
 const productLink = (p: Product) => p.affiliateUrl ?? (isValidAsin(p.asin) ? amazonProductUrl(p.asin) : undefined);
 const productImage = (p: Product) => p.imageUrl ?? (isValidAsin(p.asin) ? amazonImageUrl(p.asin) : undefined);
 
+/** Opens an affiliate link in the in-app browser, falling back to a new tab. */
+async function openProductLink(url: string) {
+  try {
+    const { Browser } = await import('@capacitor/browser');
+    await Browser.open({ url });
+  } catch {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+}
+
 type PetFilter = 'all' | PetType;
 type ShopCategory = 'terrariums' | 'substrate' | 'heatingLighting' | 'food' | 'accessories';
 
@@ -139,13 +149,7 @@ export function ShopPage() {
             <p style={{ fontSize: 15, color: Colors.inkSecondary, lineHeight: 1.6, marginTop: 16 }}>{selectedProduct.desc}</p>
             {productLink(selectedProduct) ? (
               <Button label={t.shop.viewOnAmazon} onPress={async () => {
-                const url = productLink(selectedProduct!)!;
-                try {
-                  const { Browser } = await import('@capacitor/browser');
-                  await Browser.open({ url });
-                } catch {
-                  window.open(url, '_blank', 'noopener,noreferrer');
-                }
+                await openProductLink(productLink(selectedProduct!)!);
                 setSelectedProduct(null);
               }} icon={<ExternalLink size={22} color={Colors.inkInverse} />} size="large" style={{ marginTop: 28 }} />
             ) : (
@@ -201,26 +205,54 @@ function ProductImage({ src, name, size = 110 }: { src?: string; name: string; s
 
 function ProductCard({ product, onClick }: { product: Product; onClick: () => void }) {
   const discount = product.original ? Math.round(((product.original - product.price) / product.original) * 100) : 0;
+  const { t } = useI18n();
+  const link = productLink(product);
+
+  // Two targets rather than one card-wide button: tapping the product opens its
+  // details, and the buy action sits on the card itself instead of being hidden
+  // one tap deep behind a card that gave no hint it led anywhere.
   return (
-    <button className="card-interactive" onClick={onClick} style={{ backgroundColor: Colors.surface, borderRadius: 20, overflow: 'hidden', boxShadow: Shadow.soft, textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ height: 110, backgroundColor: Colors.primaryPale, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
-        <ProductImage src={productImage(product)} name={product.name} />
-        {discount > 0 && <span style={{ position: 'absolute', top: 8, left: 8, backgroundColor: Colors.error, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>-{discount}%</span>}
-        {product.isNew && <span style={{ position: 'absolute', top: 8, right: 8, backgroundColor: Colors.success, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>NEW</span>}
-        {product.featured && !product.isNew && <span style={{ position: 'absolute', top: 8, right: 8, backgroundColor: Colors.secondary, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>TOP</span>}
-      </div>
-      <div style={{ padding: 8, flex: 1 }}>
-        <div style={{ fontWeight: Weight.bold, fontSize: 15, color: Colors.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</div>
-        <div style={{ fontSize: 11, color: Colors.inkSecondary, marginTop: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{product.desc}</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 2, marginTop: 4 }}>
-          <Star size={12} color={Colors.secondary} fill={Colors.secondary} /><span style={{ fontSize: 11, fontWeight: Weight.bold }}>{product.rating}</span>
-          <span style={{ fontSize: 11, color: Colors.inkTertiary }}>({product.reviews})</span>
+    <div style={{ backgroundColor: Colors.surface, borderRadius: 20, overflow: 'hidden', boxShadow: Shadow.soft, display: 'flex', flexDirection: 'column' }}>
+      <button className="card-interactive" onClick={onClick} style={{ textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column', flex: 1, background: 'none', border: 'none', padding: 0 }}>
+        <div style={{ height: 110, width: '100%', backgroundColor: Colors.primaryPale, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+          <ProductImage src={productImage(product)} name={product.name} />
+          {discount > 0 && <span style={{ position: 'absolute', top: 8, left: 8, backgroundColor: Colors.error, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>-{discount}%</span>}
+          {product.isNew && <span style={{ position: 'absolute', top: 8, right: 8, backgroundColor: Colors.success, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>NEW</span>}
+          {product.featured && !product.isNew && <span style={{ position: 'absolute', top: 8, right: 8, backgroundColor: Colors.secondary, color: Colors.inkInverse, fontSize: 11, fontWeight: Weight.bold, padding: '2px 8px', borderRadius: 12 }}>TOP</span>}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-          <span style={{ fontSize: 15, fontWeight: Weight.bold, color: Colors.primary }}>{product.price.toFixed(2)} €</span>
-          {product.original && <span style={{ fontSize: 11, color: Colors.inkTertiary, textDecoration: 'line-through' }}>{product.original.toFixed(2)} €</span>}
+        <div style={{ padding: 8, flex: 1, width: '100%' }}>
+          <div style={{ fontWeight: Weight.bold, fontSize: 15, color: Colors.ink, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</div>
+          <div style={{ fontSize: 11, color: Colors.inkSecondary, marginTop: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{product.desc}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 2, marginTop: 4 }}>
+            <Star size={12} color={Colors.secondary} fill={Colors.secondary} /><span style={{ fontSize: 11, fontWeight: Weight.bold }}>{product.rating}</span>
+            <span style={{ fontSize: 11, color: Colors.inkTertiary }}>({product.reviews})</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+            <span style={{ fontSize: 15, fontWeight: Weight.bold, color: Colors.primary }}>{product.price.toFixed(2)} €</span>
+            {product.original && <span style={{ fontSize: 11, color: Colors.inkTertiary, textDecoration: 'line-through' }}>{product.original.toFixed(2)} €</span>}
+          </div>
         </div>
-      </div>
-    </button>
+      </button>
+
+      {link ? (
+        <button
+          className="btn-press"
+          onClick={() => openProductLink(link)}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            margin: 8, marginTop: 0, padding: '8px 0', borderRadius: 12, border: 'none', cursor: 'pointer',
+            backgroundColor: Colors.primary, color: Colors.inkInverse,
+            fontSize: 12, fontWeight: Weight.bold,
+          }}
+        >
+          <ExternalLink size={13} color={Colors.inkInverse} />
+          {t.shop.viewOnAmazon}
+        </button>
+      ) : (
+        <div style={{ margin: 8, marginTop: 0, padding: '8px 0', textAlign: 'center', fontSize: 11, color: Colors.inkTertiary }}>
+          {t.shop.comingSoon}
+        </div>
+      )}
+    </div>
   );
 }
