@@ -10,9 +10,6 @@ import { AFFILIATE } from '../constants/app';
 // an amazon.fr link must carry a tag ending in -21, a .com link one ending
 // in -20. Changing this host means changing the tag to match.
 export const AMAZON_HOST = 'www.amazon.fr';
-const AMAZON_MARKETPLACE = 'FR';
-// Associates image/widget host — ws-eu for European marketplaces.
-const ADSYSTEM_HOST = 'ws-eu.amazon-adsystem.com';
 
 // Associates tags are per-marketplace: amazon.fr only credits a tag ending in
 // -21, amazon.com one ending in -20. A mismatched tag still opens the product
@@ -45,41 +42,16 @@ export function amazonProductUrl(asin: string): string {
 }
 
 /**
- * Product image served by Amazon for an ASIN.
+ * Product image for an ASIN, straight off Amazon's CDN.
  *
- * Uses the Associates AsinImage widget rather than a hard-coded
- * m.media-amazon.com path: that path embeds an opaque image id you can only
- * get by opening the listing, and it breaks whenever the seller swaps the
- * picture. This endpoint resolves the current image from the ASIN alone.
+ * The Associates AsinImage widget was tried first and serves nothing — it
+ * needs a tag registered for the marketplace, and this path needs no tag at
+ * all, so there is nothing to fall back to.
+ *
+ * Amazon answers an unknown ASIN here with a 1x1 placeholder rather than a
+ * 404, so callers can't trust the error event alone — see ProductImage, which
+ * also treats a 1px result as a miss.
  */
-/**
- * Image URLs to try for an ASIN, best-first.
- *
- * The Associates widget needs a tag that is registered for this marketplace,
- * so it is the fallback rather than the first choice: the /images/P/ path is
- * served straight off the CDN from the ASIN and needs no tag at all.
- *
- * Amazon answers an unknown ASIN with a 1x1 placeholder rather than a 404, so
- * a caller can't rely on the error event alone — see ProductImage, which also
- * treats a 1px result as a miss and moves to the next candidate.
- */
-export function amazonImageCandidates(asin: string): string[] {
-  return [
-    `https://m.media-amazon.com/images/P/${asin}.01._SCLZZZZZZZ_.jpg`,
-    amazonImageUrl(asin),
-  ];
-}
-
-export function amazonImageUrl(asin: string, size = 'SL500'): string {
-  const q = new URLSearchParams({
-    _encoding: 'UTF8',
-    ASIN: asin,
-    Format: `_${size}_`,
-    ID: 'AsinImage',
-    MarketPlace: AMAZON_MARKETPLACE,
-    ServiceVersion: '20070822',
-    WS: '1',
-    tag: AFFILIATE.amazonId,
-  });
-  return `https://${ADSYSTEM_HOST}/widgets/q?${q.toString()}`;
+export function amazonImageUrl(asin: string): string {
+  return `https://m.media-amazon.com/images/P/${encodeURIComponent(asin)}.01._SCLZZZZZZZ_.jpg`;
 }
