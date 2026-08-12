@@ -32,8 +32,8 @@ export function LanguageSelectionPage({ onDone }: Props) {
       // Every other screen is cream, so body's safe-area padding blends in.
       // This one is full-bleed purple, so cancel that padding and re-apply it
       // inside the gradient — otherwise the status-bar strip reads as a band.
-      margin: 'calc(-1 * env(safe-area-inset-top, 0px)) auto 0',
-      paddingTop: 'env(safe-area-inset-top, 0px)',
+      margin: 'calc(-1 * var(--safe-area-inset-top, env(safe-area-inset-top, 0px))) auto 0',
+      paddingTop: 'var(--safe-area-inset-top, env(safe-area-inset-top, 0px))',
     }}>
 
       {/* Branding */}
@@ -127,7 +127,7 @@ export function LanguageSelectionPage({ onDone }: Props) {
       {/* Continue button */}
       <div style={{
         padding: '24px 24px',
-        paddingBottom: 'calc(24px + env(safe-area-inset-bottom, 0px))',
+        paddingBottom: 'calc(24px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)))',
       }}>
         <button
           onClick={handleContinue}
