@@ -35,6 +35,6 @@ export const AFFILIATE = {
   // It must match the storefront in utils/amazon.ts: amazon.fr only credits
   // tags ending in -21 ("-20" is amazon.com). A mismatch still opens the
   // product, it just earns nothing; utils/amazon.ts warns about it on startup.
-  amazonId: 'waggly-20',
+  amazonId: 'waggly-21',
   zooplusId: 'waggly',
 };
