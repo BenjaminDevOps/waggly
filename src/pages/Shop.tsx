@@ -33,9 +33,14 @@ interface Product { id: string; name: string; desc: string; price: number; origi
 // both derived from it, and the affiliate tag comes from AFFILIATE.amazonId,
 // so the tag is never duplicated per row.
 //
-// `affiliateUrl` / `imageUrl` stay available as overrides — use affiliateUrl
-// for an amzn.to short link (those already carry your tag, don't append one).
-// A product with none of these shows "coming soon" instead of a dead link.
+// The picture is best-effort: it can only be derived for ASINs Amazon still
+// serves under /images/P/. For the rest, open the listing, copy the image
+// address (an /images/I/... URL) and set `imageUrl` — it takes priority, and
+// the console names every product still missing one.
+//
+// `affiliateUrl` is the other override — use it for an amzn.to short link
+// (those already carry your tag, don't append one). A product with no usable
+// link at all shows "coming soon" instead of a dead button.
 const PRODUCTS: Product[] = [
   { id: '1', name: 'Terrarium en verre 45x45x60cm', desc: 'Terrarium ventilé avec portes coulissantes, idéal reptiles', price: 89.99, original: 109.99, rating: 4.7, reviews: 340, category: 'terrariums', pets: ['reptile'], featured: true, isNew: false, asin: 'B07N8Y96DL' },
   { id: '2', name: 'Kit rampe UVB 10.0 + support', desc: 'Éclairage UVB indispensable à la synthèse de vitamine D3', price: 34.99, rating: 4.6, reviews: 210, category: 'heatingLighting', pets: ['reptile'], featured: true, isNew: false, asin: 'B0GSFZPP6G' },
@@ -184,6 +189,12 @@ function Chip({ label, active, onClick }: { label: string; active: boolean; onCl
 
 function ProductImage({ src, name, size = 110 }: { src?: string; name: string; size?: number }) {
   const [failed, setFailed] = useState(false);
+  // Name the product, so the console lists exactly which rows still need an
+  // imageUrl rather than leaving you to spot the icons by eye.
+  const miss = (why: string) => {
+    console.warn(`[shop] no image for "${name}" (${why}) — set its imageUrl from the listing`);
+    setFailed(true);
+  };
   // Reset when the product changes, otherwise one failure would blank out
   // every product rendered afterwards through the same component slot.
   useEffect(() => { setFailed(false); }, [src]);
@@ -195,10 +206,10 @@ function ProductImage({ src, name, size = 110 }: { src?: string; name: string; s
       src={src}
       alt={name}
       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-      onError={() => setFailed(true)}
+      onError={() => miss('request failed')}
       // Amazon serves a 1x1 placeholder for an ASIN it doesn't know instead of
       // failing, so a "successful" tiny load is really a miss.
-      onLoad={(e) => { if (e.currentTarget.naturalWidth <= 1) setFailed(true); }}
+      onLoad={(e) => { if (e.currentTarget.naturalWidth <= 1) miss('1px placeholder'); }}
     />
   );
 }
