@@ -25,6 +25,14 @@ service cloud.firestore {
     function ownsExisting() {
       return signedIn() && resource.data.userId == request.auth.uid;
     }
+    // An update must leave the document owned by the caller as well: checking
+    // only the stored doc would let someone re-stamp their own record with
+    // another uid, which drops it into that person's account. On an update
+    // request.resource.data is the merged result, so a partial write that
+    // never mentions userId still passes.
+    function staysOwned() {
+      return ownsExisting() && ownsIncoming();
+    }
 
     // Profile, points, streak, badges. Document id is the uid.
     match /users/{userId} {
@@ -35,27 +43,32 @@ service cloud.firestore {
     // the app, and all are queried with a matching userId constraint.
     match /pets/{petId} {
       allow create: if ownsIncoming();
-      allow read, update, delete: if ownsExisting();
+      allow read, delete: if ownsExisting();
+      allow update: if staysOwned();
     }
 
     match /health_records/{recordId} {
       allow create: if ownsIncoming();
-      allow read, update, delete: if ownsExisting();
+      allow read, delete: if ownsExisting();
+      allow update: if staysOwned();
     }
 
     match /nac_journal_entries/{entryId} {
       allow create: if ownsIncoming();
-      allow read, update, delete: if ownsExisting();
+      allow read, delete: if ownsExisting();
+      allow update: if staysOwned();
     }
 
     match /appointments/{appointmentId} {
       allow create: if ownsIncoming();
-      allow read, update, delete: if ownsExisting();
+      allow read, delete: if ownsExisting();
+      allow update: if staysOwned();
     }
 
     match /diagnoses/{diagnosisId} {
       allow create: if ownsIncoming();
-      allow read, update, delete: if ownsExisting();
+      allow read, delete: if ownsExisting();
+      allow update: if staysOwned();
     }
 
     // Anything not matched above stays denied.
