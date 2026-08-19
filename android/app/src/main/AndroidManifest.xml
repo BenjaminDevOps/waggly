@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:allowBackup="true"
@@ -45,13 +46,32 @@
     <!-- Google Play Billing (required for in-app purchases) -->
     <uses-permission android:name="com.android.vending.BILLING" />
 
-    <!-- Camera & storage (pet photos / health records) -->
+    <!-- Camera (pet photos / health records). Needed because the permission is
+         declared: Android then requires a runtime grant before ACTION_IMAGE_CAPTURE. -->
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="29" />
+
+    <!-- No media permission is declared on purpose. Picking an existing picture
+         goes through the Android photo picker (ActivityResultContracts.PickVisualMedia,
+         used by @capacitor/camera), which hands back a single URI the user chose
+         and grants access to that URI alone — the app never gets to enumerate the
+         gallery, so there is nothing to ask for. The plugin agrees: its "photos"
+         permission alias declares an empty permission array, so READ_MEDIA_IMAGES
+         was never requested at runtime even while it sat in this manifest.
+
+         READ/WRITE_EXTERNAL_STORAGE are gone with it. They only ever covered the
+         Camera plugin's saveToGallery option, which this app does not use.
+
+         Keeping these out matters beyond tidiness: declaring READ_MEDIA_IMAGES
+         forces the Photo and Video Permissions declaration form in Play Console
+         and an ongoing justification of broad gallery access.
+
+         The removals below are defensive — a merged dependency cannot put the
+         permission back into the final manifest without this file changing. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
 
     <!-- Location (find nearby vet) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
