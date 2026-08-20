@@ -32,10 +32,7 @@ import { usePets } from './hooks/usePets';
 import { useToast } from './components/Toast';
 import { Colors } from './theme/colors';
 import { Spacing, Radius, Font, Weight } from './theme/spacing';
-
-function isNativePlatform(): boolean {
-  return typeof (window as any).Capacitor !== 'undefined' && (window as any).Capacitor.isNativePlatform();
-}
+import { isNativePlatform } from './services/platform';
 
 const leftTabs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof useI18n>['t']['tabs'] }[] = [
   { path: '/', icon: Home, key: 'home' },

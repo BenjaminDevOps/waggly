@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, indexedDBLocalPersistence, initializeAuth } from 'firebase/auth';
 import { getFirestore, initializeFirestore, persistentLocalCache, persistentSingleTabManager } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { isNativePlatform } from './platform';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -13,15 +14,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
-function isNativePlatform(): boolean {
-  try {
-    return typeof (window as any).Capacitor !== 'undefined' &&
-      (window as any).Capacitor.isNativePlatform();
-  } catch {
-    return false;
-  }
-}
 
 export const auth = isNativePlatform()
   ? initializeAuth(app, { persistence: indexedDBLocalPersistence })

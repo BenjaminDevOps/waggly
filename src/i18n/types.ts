@@ -433,6 +433,7 @@ export interface Translations {
     subscribeNow: string;
     processing: string;
     restorePurchases: string;
+    manageSubscription: string;
     bestValue: string;
     monthly: string;
     yearly: string;

@@ -1,42 +1,24 @@
 import { db } from './firebase';
-import { doc, updateDoc, increment, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, increment } from 'firebase/firestore';
 import { COLLECTIONS } from '../constants/app';
+import {
+  BASE_PLANS,
+  IOS_PRODUCT_IDS,
+  SUBSCRIPTION_ID,
+  type PlanId,
+} from '../constants/billing';
+import { getPlatform, isNativePlatform } from './platform';
+import { syncEntitlementForUser } from './entitlementService';
 
 /**
- * Google Play holds a single subscription product; the billing periods are
- * base plans inside it. Play Billing 5 dropped the old "one product per
- * period" shape, so a purchase needs both ids: the product to buy and the
- * base plan to buy it on.
- */
-export const SUBSCRIPTION_ID = 'waggly_premium';
-
-/**
- * Base plans inside SUBSCRIPTION_ID, and the app-wide key for a plan: the
- * UI selects one of these, prices are looked up under them, and
- * purchasePremium resolves them to whatever the current store expects.
- */
-export const BASE_PLANS = {
-  monthly: 'waggly-001-month',
-  yearly: 'waggly-001-year',
-} as const;
-
-export type PlanId = (typeof BASE_PLANS)[keyof typeof BASE_PLANS];
-
-/**
- * App Store Connect has no equivalent of a base plan — each billing period is
- * a separate product inside a subscription group — so iOS needs its own id per
- * plan. Keyed by PlanId so the rest of the app never branches on platform.
+ * Buying, pricing and managing the subscription.
  *
- * These must match the product ids in App Store Connect, which are not
- * required to look like the Play ids. Apple documents the allowed characters
- * as alphanumerics, underscores and periods, so check the hyphens are
- * accepted when creating the products, and change the values here (not the
- * keys) if you have to pick different ones.
+ * Whether the user *has* premium is not decided here — that is
+ * entitlementService, which asks the store. This module only performs the
+ * actions that change what the store holds, then hands over to it.
  */
-const IOS_PRODUCT_IDS: Record<PlanId, string> = {
-  [BASE_PLANS.monthly]: 'waggly-001-month',
-  [BASE_PLANS.yearly]: 'waggly-001-year',
-};
+
+export { SUBSCRIPTION_ID, BASE_PLANS, type PlanId };
 
 export interface PremiumPlan {
   id: PlanId;
@@ -47,6 +29,12 @@ export interface PremiumPlan {
   recommended?: boolean;
 }
 
+/**
+ * Fallback catalogue. Real prices come from the store via
+ * `fetchProductPricing`; these show only where no store can answer (browser
+ * preview, offline first paint, products not yet configured). They are
+ * marketing copy, not a source of truth — never charge from them.
+ */
 export const PREMIUM_PLANS: PremiumPlan[] = [
   {
     id: BASE_PLANS.monthly,
@@ -63,6 +51,11 @@ export const PREMIUM_PLANS: PremiumPlan[] = [
     recommended: true,
   },
 ];
+
+export interface LiveProductPricing {
+  priceString: string;
+  title: string;
+}
 
 /**
  * The ids to hand the store for a given plan.
@@ -85,71 +78,6 @@ function purchaseTarget(planId: string): { productIdentifier: string; planIdenti
  */
 function pricingQueryIds(): string[] {
   return getPlatform() === 'android' ? [SUBSCRIPTION_ID] : Object.values(IOS_PRODUCT_IDS);
-}
-
-export interface LiveProductPricing {
-  priceString: string;
-  title: string;
-}
-
-function isNativePlatform(): boolean {
-  try {
-    return (
-      typeof (window as any).Capacitor !== 'undefined' &&
-      (window as any).Capacitor.isNativePlatform()
-    );
-  } catch {
-    return false;
-  }
-}
-
-export function getPlatform(): 'ios' | 'android' | 'web' {
-  try {
-    if (typeof (window as any).Capacitor === 'undefined') return 'web';
-    const p: string = (window as any).Capacitor.getPlatform();
-    if (p === 'ios') return 'ios';
-    if (p === 'android') return 'android';
-    return 'web';
-  } catch {
-    return 'web';
-  }
-}
-
-/**
- * Fetches real, localized subscription prices from StoreKit / Google Play Billing.
- *
- * Store review checks that displayed prices match what Play Billing actually
- * charges for the user's storefront — the static `PREMIUM_PLANS` prices are
- * only a fallback (web preview, offline, or products not yet configured in
- * Play Console / App Store Connect).
- */
-export async function fetchProductPricing(): Promise<Record<string, LiveProductPricing> | null> {
-  if (!isNativePlatform()) return null;
-
-  try {
-    const { NativePurchases, PURCHASE_TYPE } = await import('@capgo/native-purchases');
-    const { products } = await withTimeout(
-      NativePurchases.getProducts({
-        productIdentifiers: pricingQueryIds(),
-        // Without this the plugin queries in-app products, and Play returns
-        // nothing at all for a subscription id.
-        productType: PURCHASE_TYPE.SUBS,
-      }),
-      15_000,
-    );
-
-    // `identifier` is the base plan id on Android (the subscription product id
-    // is in `planIdentifier`, the reverse of the purchase arguments) and the
-    // product id on iOS — so on both platforms it is the PlanId the UI holds.
-    const pricing: Record<string, LiveProductPricing> = {};
-    for (const product of products) {
-      pricing[product.identifier] = { priceString: product.priceString, title: product.title };
-    }
-    return Object.keys(pricing).length > 0 ? pricing : null;
-  } catch (error) {
-    console.error('[Purchase] Failed to fetch live product pricing:', error);
-    return null;
-  }
 }
 
 // Rejects after `ms` milliseconds with a timeout error.
@@ -191,6 +119,41 @@ function isCancellation(error: any): boolean {
   return msg.includes('cancel') || error?.code === 'USER_CANCELLED';
 }
 
+/**
+ * Fetches real, localized subscription prices from StoreKit / Google Play Billing.
+ *
+ * Store review checks that displayed prices match what the store actually
+ * charges for the user's storefront, so `PREMIUM_PLANS` is only a fallback.
+ */
+export async function fetchProductPricing(): Promise<Record<string, LiveProductPricing> | null> {
+  if (!isNativePlatform()) return null;
+
+  try {
+    const { NativePurchases, PURCHASE_TYPE } = await import('@capgo/native-purchases');
+    const { products } = await withTimeout(
+      NativePurchases.getProducts({
+        productIdentifiers: pricingQueryIds(),
+        // Without this the plugin queries in-app products, and Play returns
+        // nothing at all for a subscription id.
+        productType: PURCHASE_TYPE.SUBS,
+      }),
+      15_000,
+    );
+
+    // `identifier` is the base plan id on Android (the subscription product id
+    // is in `planIdentifier`, the reverse of the purchase arguments) and the
+    // product id on iOS — so on both platforms it is the PlanId the UI holds.
+    const pricing: Record<string, LiveProductPricing> = {};
+    for (const product of products) {
+      pricing[product.identifier] = { priceString: product.priceString, title: product.title };
+    }
+    return Object.keys(pricing).length > 0 ? pricing : null;
+  } catch (error) {
+    console.error('[Purchase] Failed to fetch live product pricing:', error);
+    return null;
+  }
+}
+
 export async function purchasePremium(
   planId: string,
   userId: string,
@@ -211,7 +174,21 @@ export async function purchasePremium(
       60_000, // 60-second timeout
     );
 
-    await setPremiumStatus(userId, true);
+    // The purchase call resolving is not the same as the store holding an
+    // active subscription, so confirm rather than assume — and let the same
+    // code path that runs on every launch be the one that grants premium,
+    // instead of a second, subtly different rule living here.
+    const active = await syncEntitlementForUser(userId);
+    if (!active) {
+      // Play returns PENDING for deferred payment methods such as cash. The
+      // money is not in yet, so premium is not either; the launch/resume sync
+      // will pick it up once it clears.
+      return {
+        success: false,
+        message: 'Your payment is being processed. Premium unlocks as soon as it completes.',
+      };
+    }
+
     return { success: true, message: 'Welcome to Waggly Premium!' };
   } catch (error: any) {
     if (!isCancellation(error)) {
@@ -221,6 +198,16 @@ export async function purchasePremium(
   }
 }
 
+/**
+ * Re-grants premium to someone who already paid — after a reinstall, on a new
+ * device, or under a new app account.
+ *
+ * Both stores require this to work, and it previously could not: it awaited
+ * `restorePurchases()`, whose signature returns void, then read the very
+ * Firestore flag that nothing had updated. Anyone whose cached flag was false
+ * was told they had no subscription, however much they had paid. The store is
+ * now asked directly.
+ */
 export async function restorePurchases(
   userId: string,
 ): Promise<{ success: boolean; message: string }> {
@@ -228,23 +215,17 @@ export async function restorePurchases(
     return { success: false, message: 'Restore is only available on the mobile app.' };
   }
 
-  const platform = getPlatform();
-
   try {
     const { NativePurchases } = await import('@capgo/native-purchases');
+    // Prompts for store credentials where the platform needs them, and
+    // replays transactions into the plugin so the query below sees them.
     await withTimeout(NativePurchases.restorePurchases(), 30_000);
 
-    // Read premium status from Firestore — the plugin fires restored transactions
-    // which update the entitlements; we verify the result rather than granting
-    // premium unconditionally.
-    const userRef = doc(db, COLLECTIONS.users, userId);
-    const snap = await getDoc(userRef);
-    const isPremiumNow: boolean = snap.exists() ? (snap.data().isPremium ?? false) : false;
-
-    if (isPremiumNow) {
+    if (await syncEntitlementForUser(userId)) {
       return { success: true, message: 'Premium restored successfully!' };
     }
-    const storeLabel = platform === 'android' ? 'Google Account' : 'Apple ID';
+
+    const storeLabel = getPlatform() === 'android' ? 'Google Account' : 'Apple ID';
     return { success: false, message: `No active subscriptions found for this ${storeLabel}.` };
   } catch (error: any) {
     console.error('[Purchase] Restore error:', error);
@@ -252,9 +233,23 @@ export async function restorePurchases(
   }
 }
 
-export async function setPremiumStatus(userId: string, isPremium: boolean): Promise<void> {
-  const userRef = doc(db, COLLECTIONS.users, userId);
-  await updateDoc(userRef, { isPremium });
+/**
+ * Opens the store's own subscription management page.
+ *
+ * Both stores require a subscribed user to be able to reach cancellation from
+ * inside the app, and neither lets the app cancel on their behalf. Sending
+ * them to the native page is the only compliant way to offer it.
+ */
+export async function manageSubscription(): Promise<boolean> {
+  if (!isNativePlatform()) return false;
+  try {
+    const { NativePurchases } = await import('@capgo/native-purchases');
+    await NativePurchases.manageSubscriptions();
+    return true;
+  } catch (error) {
+    console.error('[Purchase] Could not open subscription management:', error);
+    return false;
+  }
 }
 
 export async function incrementDiagnosisUsage(userId: string): Promise<void> {

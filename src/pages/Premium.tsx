@@ -10,7 +10,8 @@ import { Colors } from '../theme/colors';
 import { Spacing, Radius, Font, Weight } from '../theme/spacing';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../i18n';
-import { PREMIUM_PLANS, purchasePremium, restorePurchases, getPlatform, fetchProductPricing, type LiveProductPricing } from '../services/purchaseService';
+import { PREMIUM_PLANS, purchasePremium, restorePurchases, manageSubscription, fetchProductPricing, type LiveProductPricing } from '../services/purchaseService';
+import { getPlatform, isNativePlatform } from '../services/platform';
 
 const FEATURE_ICONS = [Sparkles, Zap, Shield, Crown, Star];
 
@@ -97,6 +98,22 @@ export function PremiumPage() {
           <h2 style={{ fontSize: Font.title2, fontWeight: Weight.bold, color: Colors.ink, marginTop: 20 }}>{t.premiumPage.youArePremium}</h2>
           <p style={{ fontSize: Font.body, color: Colors.inkSecondary, marginTop: 8, lineHeight: 1.5 }}>{t.premiumPage.enjoyPremium}</p>
           <Button label={t.premiumPage.backToApp} onPress={() => navigate(-1)} variant="primary" style={{ marginTop: 32 }} />
+          {/* Both stores require a subscriber to be able to reach cancellation
+              from inside the app, and neither allows the app to cancel for
+              them — the native page is the only compliant route. */}
+          {isNativePlatform() && (
+            <button
+              className="btn-press"
+              onClick={() => { manageSubscription(); }}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer', marginTop: Spacing.lg,
+                fontSize: Font.sm, fontWeight: Weight.semibold, color: Colors.inkSecondary,
+                textDecoration: 'underline', padding: Spacing.sm,
+              }}
+            >
+              {t.premiumPage.manageSubscription}
+            </button>
+          )}
         </div>
       </div>
     );
