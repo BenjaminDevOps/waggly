@@ -388,6 +388,7 @@ export const es: Translations = {
     subscribeNow: 'Suscribirse ahora',
     processing: 'Procesando...',
     restorePurchases: 'Restaurar compras',
+    manageSubscription: 'Gestionar o cancelar la suscripción',
     bestValue: 'MEJOR PRECIO',
     monthly: 'Mensual',
     yearly: 'Anual',

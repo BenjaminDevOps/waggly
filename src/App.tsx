@@ -31,6 +31,7 @@ import { useBadgeChecker } from './hooks/useBadges';
 import { usePets } from './hooks/usePets';
 import { Colors } from './theme/colors';
 import { Spacing, Radius, Font, Weight } from './theme/spacing';
+import { isNativePlatform } from './services/platform';
 
 const leftTabs: { path: string; icon: LucideIcon; key: keyof ReturnType<typeof useI18n>['t']['tabs'] }[] = [
   { path: '/', icon: Home, key: 'home' },
@@ -112,7 +113,7 @@ export default function App() {
   // the language picker is a dark purple full-bleed screen, every other
   // screen is cream.
   useEffect(() => {
-    if (typeof (window as any).Capacitor === 'undefined' || !(window as any).Capacitor.isNativePlatform()) return;
+    if (!isNativePlatform()) return;
     import('@capacitor/status-bar').then(({ StatusBar, Style }) => {
       StatusBar.setStyle({ style: localeChosen ? Style.Light : Style.Dark }).catch(() => {});
     }).catch(() => {});

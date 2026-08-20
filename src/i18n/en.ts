@@ -388,6 +388,7 @@ export const en: Translations = {
     subscribeNow: 'Subscribe Now',
     processing: 'Processing...',
     restorePurchases: 'Restore Purchases',
+    manageSubscription: 'Manage or cancel subscription',
     bestValue: 'BEST VALUE',
     monthly: 'Monthly',
     yearly: 'Yearly',

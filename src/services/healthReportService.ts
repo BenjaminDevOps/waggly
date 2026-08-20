@@ -1,14 +1,6 @@
 import { jsPDF } from 'jspdf';
 import type { Pet, HealthRecord, Diagnosis } from '../models/types';
-
-function isNativePlatform(): boolean {
-  try {
-    return typeof (window as any).Capacitor !== 'undefined' &&
-      (window as any).Capacitor.isNativePlatform();
-  } catch {
-    return false;
-  }
-}
+import { isNativePlatform } from './platform';
 
 export async function generateHealthReport(
   pet: Pet,
