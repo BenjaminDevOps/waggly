@@ -2,13 +2,44 @@ import { db } from './firebase';
 import { doc, updateDoc, increment, getDoc } from 'firebase/firestore';
 import { COLLECTIONS } from '../constants/app';
 
-export const PRODUCTS = {
-  premiumMonthly: 'waggly-001-month',
-  premiumYearly: 'waggly-001-year',
+/**
+ * Google Play holds a single subscription product; the billing periods are
+ * base plans inside it. Play Billing 5 dropped the old "one product per
+ * period" shape, so a purchase needs both ids: the product to buy and the
+ * base plan to buy it on.
+ */
+export const SUBSCRIPTION_ID = 'waggly_premium';
+
+/**
+ * Base plans inside SUBSCRIPTION_ID, and the app-wide key for a plan: the
+ * UI selects one of these, prices are looked up under them, and
+ * purchasePremium resolves them to whatever the current store expects.
+ */
+export const BASE_PLANS = {
+  monthly: 'waggly-001-month',
+  yearly: 'waggly-001-year',
 } as const;
 
+export type PlanId = (typeof BASE_PLANS)[keyof typeof BASE_PLANS];
+
+/**
+ * App Store Connect has no equivalent of a base plan — each billing period is
+ * a separate product inside a subscription group — so iOS needs its own id per
+ * plan. Keyed by PlanId so the rest of the app never branches on platform.
+ *
+ * These must match the product ids in App Store Connect, which are not
+ * required to look like the Play ids. Apple documents the allowed characters
+ * as alphanumerics, underscores and periods, so check the hyphens are
+ * accepted when creating the products, and change the values here (not the
+ * keys) if you have to pick different ones.
+ */
+const IOS_PRODUCT_IDS: Record<PlanId, string> = {
+  [BASE_PLANS.monthly]: 'waggly-001-month',
+  [BASE_PLANS.yearly]: 'waggly-001-year',
+};
+
 export interface PremiumPlan {
-  id: string;
+  id: PlanId;
   name: string;
   price: string;
   period: string;
@@ -18,13 +49,13 @@ export interface PremiumPlan {
 
 export const PREMIUM_PLANS: PremiumPlan[] = [
   {
-    id: PRODUCTS.premiumMonthly,
+    id: BASE_PLANS.monthly,
     name: 'Monthly',
     price: '4,99 €',
     period: '/month',
   },
   {
-    id: PRODUCTS.premiumYearly,
+    id: BASE_PLANS.yearly,
     name: 'Yearly',
     price: '29,99 €',
     period: '/year',
@@ -32,6 +63,29 @@ export const PREMIUM_PLANS: PremiumPlan[] = [
     recommended: true,
   },
 ];
+
+/**
+ * The ids to hand the store for a given plan.
+ *
+ * On Android a subscription is bought as (product, base plan); the plugin
+ * documents planIdentifier as required for Android subscriptions. On iOS the
+ * plan is the product and planIdentifier is ignored.
+ */
+function purchaseTarget(planId: string): { productIdentifier: string; planIdentifier?: string } {
+  if (getPlatform() === 'android') {
+    return { productIdentifier: SUBSCRIPTION_ID, planIdentifier: planId };
+  }
+  return { productIdentifier: IOS_PRODUCT_IDS[planId as PlanId] ?? planId };
+}
+
+/**
+ * What to ask the store about when fetching prices. Android returns one entry
+ * per base plan from the single subscription id, so asking for the base plans
+ * directly would match nothing.
+ */
+function pricingQueryIds(): string[] {
+  return getPlatform() === 'android' ? [SUBSCRIPTION_ID] : Object.values(IOS_PRODUCT_IDS);
+}
 
 export interface LiveProductPricing {
   priceString: string;
@@ -73,14 +127,20 @@ export async function fetchProductPricing(): Promise<Record<string, LiveProductP
   if (!isNativePlatform()) return null;
 
   try {
-    const { NativePurchases } = await import('@capgo/native-purchases');
+    const { NativePurchases, PURCHASE_TYPE } = await import('@capgo/native-purchases');
     const { products } = await withTimeout(
       NativePurchases.getProducts({
-        productIdentifiers: [PRODUCTS.premiumMonthly, PRODUCTS.premiumYearly],
+        productIdentifiers: pricingQueryIds(),
+        // Without this the plugin queries in-app products, and Play returns
+        // nothing at all for a subscription id.
+        productType: PURCHASE_TYPE.SUBS,
       }),
       15_000,
     );
 
+    // `identifier` is the base plan id on Android (the subscription product id
+    // is in `planIdentifier`, the reverse of the purchase arguments) and the
+    // product id on iOS — so on both platforms it is the PlanId the UI holds.
     const pricing: Record<string, LiveProductPricing> = {};
     for (const product of products) {
       pricing[product.identifier] = { priceString: product.priceString, title: product.title };
@@ -132,7 +192,7 @@ function isCancellation(error: any): boolean {
 }
 
 export async function purchasePremium(
-  productId: string,
+  planId: string,
   userId: string,
 ): Promise<{ success: boolean; message: string }> {
   if (!isNativePlatform()) {
@@ -140,10 +200,14 @@ export async function purchasePremium(
   }
 
   try {
-    const { NativePurchases } = await import('@capgo/native-purchases');
+    const { NativePurchases, PURCHASE_TYPE } = await import('@capgo/native-purchases');
 
     await withTimeout(
-      NativePurchases.purchaseProduct({ productIdentifier: productId }),
+      NativePurchases.purchaseProduct({
+        ...purchaseTarget(planId),
+        // Defaults to in-app, which would make Play reject the flow outright.
+        productType: PURCHASE_TYPE.SUBS,
+      }),
       60_000, // 60-second timeout
     );
 
