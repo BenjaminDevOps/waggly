@@ -8,7 +8,7 @@ import {
   type PlanId,
 } from '../constants/billing';
 import { getPlatform, isNativePlatform } from './platform';
-import { syncEntitlementForUser } from './entitlementService';
+import { cacheEntitlement, syncEntitlementForUser } from './entitlementService';
 
 /**
  * Buying, pricing and managing the subscription.
@@ -165,7 +165,7 @@ export async function purchasePremium(
   try {
     const { NativePurchases, PURCHASE_TYPE } = await import('@capgo/native-purchases');
 
-    await withTimeout(
+    const transaction = await withTimeout(
       NativePurchases.purchaseProduct({
         ...purchaseTarget(planId),
         // Defaults to in-app, which would make Play reject the flow outright.
@@ -174,21 +174,23 @@ export async function purchasePremium(
       60_000, // 60-second timeout
     );
 
-    // The purchase call resolving is not the same as the store holding an
-    // active subscription, so confirm rather than assume — and let the same
-    // code path that runs on every launch be the one that grants premium,
-    // instead of a second, subtly different rule living here.
-    const active = await syncEntitlementForUser(userId);
-    if (!active) {
-      // Play returns PENDING for deferred payment methods such as cash. The
-      // money is not in yet, so premium is not either; the launch/resume sync
-      // will pick it up once it clears.
+    // Judge the purchase from the transaction the store just handed back, not
+    // from a fresh getPurchases(): querying a purchase made a second ago can
+    // race its propagation, and answering "payment being processed" to
+    // someone who has just paid is far worse than the check is worth.
+    //
+    // Play reports a deferred payment method — cash, carrier billing — as
+    // PENDING. The purchase call still resolves, but no money has moved, so
+    // no premium yet; the resume sync grants it once the payment clears.
+    // StoreKit has no equivalent: it does not resolve a pending purchase.
+    if (getPlatform() === 'android' && transaction?.purchaseState === '0') {
       return {
         success: false,
         message: 'Your payment is being processed. Premium unlocks as soon as it completes.',
       };
     }
 
+    await cacheEntitlement(userId, true);
     return { success: true, message: 'Welcome to Waggly Premium!' };
   } catch (error: any) {
     if (!isCancellation(error)) {

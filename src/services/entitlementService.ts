@@ -155,6 +155,24 @@ export async function syncEntitlement(userId: string, cached: boolean): Promise<
 }
 
 /**
+ * Records an entitlement the caller already established, without asking the
+ * store again.
+ *
+ * Only for the moment a purchase completes: the transaction the store just
+ * handed back is better evidence than a fresh query, which may not yet list a
+ * purchase made a second ago. Everywhere else, ask the store.
+ */
+export async function cacheEntitlement(userId: string, active: boolean): Promise<void> {
+  try {
+    await updateDoc(doc(db, COLLECTIONS.users, userId), { isPremium: active });
+  } catch (error) {
+    // The next launch or resume reconciles, so a failure here costs the user
+    // one session at most rather than the purchase.
+    console.error('[Entitlement] Could not persist entitlement:', error);
+  }
+}
+
+/**
  * Entitlement for a user whose cached value is not already in hand — used by
  * flows that run outside the auth subscription, such as restoring purchases.
  */
