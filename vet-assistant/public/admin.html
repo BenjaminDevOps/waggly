@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Tableau de bord assistant</title>
+  <style>
+    :root { --brand: #0f766e; --ink: #1f2937; --muted: #6b7280; --line: #e5e7eb; --bg: #f7f8fa; --card: #fff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
+    main { max-width: 1050px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { font-size: 22px; margin: 0 0 4px; }
+    .sub { color: var(--muted); margin: 0 0 20px; }
+    form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    input, select, button { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    button { background: var(--brand); color: #fff; border: 0; cursor: pointer; }
+    .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+    .kpi b { display: block; font-size: 28px; }
+    .kpi span { color: var(--muted); font-size: 13px; }
+    .kpi.alert b { color: #dc2626; }
+    section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 16px; overflow-x: auto; }
+    h2 { font-size: 16px; margin: 0 0 12px; }
+    .bar { display: grid; grid-template-columns: 110px 1fr 40px; align-items: center; gap: 8px; font-size: 14px; margin: 6px 0; }
+    .bar div { height: 10px; background: var(--brand); border-radius: 5px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; }
+    .empty { color: var(--muted); font-size: 14px; }
+    .err { color: #dc2626; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>🐾 Tableau de bord de l'assistant</h1>
+  <p class="sub" id="clinicName">Connectez-vous avec votre jeton d'accès.</p>
+
+  <form id="f">
+    <input id="clinic" placeholder="Identifiant clinique (ex : demo)" required>
+    <input id="token" type="password" placeholder="Jeton d'accès" required>
+    <select id="days">
+      <option value="7">7 derniers jours</option>
+      <option value="30">30 derniers jours</option>
+      <option value="90">90 derniers jours</option>
+    </select>
+    <button>Afficher</button>
+  </form>
+  <p id="error" class="err"></p>
+
+  <div id="out" hidden>
+    <div class="kpis">
+      <div class="kpi"><b id="k-conv">0</b><span>conversations</span></div>
+      <div class="kpi"><b id="k-msg">0</b><span>questions traitées</span></div>
+      <div class="kpi"><b id="k-out">0</b><span>hors horaires d'ouverture</span></div>
+      <div class="kpi"><b id="k-rdv">0</b><span>demandes de RDV</span></div>
+      <div class="kpi alert"><b id="k-urg">0</b><span>urgences redirigées</span></div>
+    </div>
+    <section><h2>Sujets des demandes</h2><div id="intents"></div></section>
+    <section>
+      <h2>Demandes de rendez-vous</h2>
+      <table><thead><tr><th>Date</th><th>Propriétaire</th><th>Téléphone</th><th>Animal</th><th>Motif</th><th>Créneau souhaité</th></tr></thead><tbody id="rdv"></tbody></table>
+    </section>
+    <section>
+      <h2>Dernières questions</h2>
+      <table><thead><tr><th>Date</th><th>Sujet</th><th>Question</th></tr></thead><tbody id="questions"></tbody></table>
+    </section>
+  </div>
+</main>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const fmt = (ts) => new Date(ts).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
+
+  try {
+    $('clinic').value = sessionStorage.getItem('va-clinic') || new URLSearchParams(location.search).get('clinic') || '';
+    $('token').value = sessionStorage.getItem('va-token') || '';
+  } catch {}
+
+  function row(tbody, cells) {
+    const tr = document.createElement('tr');
+    for (const c of cells) {
+      const td = document.createElement('td');
+      td.textContent = c ?? '';
+      if (cells.length === 1) td.colSpan = 6;
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+
+  async function loadStats() {
+    $('error').textContent = '';
+    const clinic = $('clinic').value.trim();
+    const token = $('token').value;
+    try { sessionStorage.setItem('va-clinic', clinic); sessionStorage.setItem('va-token', token); } catch {}
+    const res = await fetch(`/api/admin/stats?clinic=${encodeURIComponent(clinic)}&days=${$('days').value}`, {
+      headers: { authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (!res.ok) { $('error').textContent = data.error; $('out').hidden = true; return; }
+
+    $('clinicName').textContent = `${data.clinic.name} · ${data.sinceDays} derniers jours`;
+    $('k-conv').textContent = data.conversations;
+    $('k-msg').textContent = data.messages;
+    $('k-out').textContent = data.outsideHours;
+    $('k-rdv').textContent = data.appointments.length;
+    $('k-urg').textContent = data.emergencies;
+
+    const intents = $('intents');
+    intents.textContent = '';
+    const entries = Object.entries(data.byIntent).sort((a, b) => b[1] - a[1]);
+    const max = Math.max(1, ...entries.map(([, n]) => n));
+    if (!entries.length) intents.innerHTML = '<p class="empty">Aucune donnée sur la période.</p>';
+    for (const [intent, n] of entries) {
+      const line = document.createElement('div');
+      line.className = 'bar';
+      const label = document.createElement('span'); label.textContent = intent;
+      const bar = document.createElement('div'); bar.style.width = `${(n / max) * 100}%`;
+      const wrap = document.createElement('span'); wrap.appendChild(bar);
+      const count = document.createElement('span'); count.textContent = n;
+      line.append(label, wrap, count);
+      intents.appendChild(line);
+    }
+
+    $('rdv').textContent = '';
+    for (const a of data.appointments) {
+      row($('rdv'), [fmt(a.ts), a.ownerName, a.phone, `${a.petName} (${a.species})`, a.reason, a.preferredSlot]);
+    }
+    if (!data.appointments.length) row($('rdv'), ['Aucune demande sur la période.']);
+
+    $('questions').textContent = '';
+    for (const q of data.recentQuestions) row($('questions'), [fmt(q.ts), q.intent, q.question]);
+    if (!data.recentQuestions.length) row($('questions'), ['Aucune question sur la période.']);
+
+    $('out').hidden = false;
+  }
+
+  $('f').addEventListener('submit', (e) => { e.preventDefault(); loadStats().catch((err) => { $('error').textContent = err.message; }); });
+  if ($('clinic').value && $('token').value) loadStats().catch(() => {});
+</script>
+</body>
+</html>

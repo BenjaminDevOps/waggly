@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clinique Vétérinaire des Tilleuls (démo)</title>
+  <style>
+    :root { --brand: #0f766e; --ink: #1f2937; --muted: #6b7280; --bg: #ffffff; --soft: #f0fdfa; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
+    .demo-banner { background: #fef3c7; color: #92400e; text-align: center; font-size: 13px; padding: 6px 16px; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid #eee; flex-wrap: wrap; gap: 8px; }
+    .logo { font-weight: 700; font-size: 18px; color: var(--brand); }
+    nav a { margin-left: 18px; color: var(--ink); text-decoration: none; font-size: 15px; }
+    .hero { background: var(--soft); padding: 64px 24px; text-align: center; }
+    .hero h1 { font-size: clamp(28px, 5vw, 42px); margin: 0 0 12px; }
+    .hero p { color: var(--muted); font-size: 18px; max-width: 620px; margin: 0 auto 24px; }
+    .btn { display: inline-block; background: var(--brand); color: #fff; padding: 12px 22px; border-radius: 10px; text-decoration: none; font-weight: 600; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; max-width: 1000px; margin: 48px auto; padding: 0 24px; }
+    .card { border: 1px solid #e5e7eb; border-radius: 14px; padding: 20px; }
+    .card h3 { margin: 0 0 8px; color: var(--brand); }
+    .card p { margin: 0; color: var(--muted); line-height: 1.5; }
+    footer { text-align: center; color: var(--muted); font-size: 14px; padding: 32px 24px; border-top: 1px solid #eee; }
+  </style>
+</head>
+<body>
+  <div class="demo-banner">Site de démonstration. Cliquez sur la bulle 🐾 en bas à droite pour tester l'assistant.</div>
+  <header>
+    <div class="logo">🐾 Clinique Vétérinaire des Tilleuls</div>
+    <nav><a href="#">Services</a><a href="#">Équipe</a><a href="#">Contact</a></nav>
+  </header>
+  <section class="hero">
+    <h1>Prendre soin de vos compagnons, ensemble</h1>
+    <p>Chiens, chats et NAC, à Lyon 6e depuis 2009. Consultations, chirurgie, imagerie et analyses sur place.</p>
+    <a class="btn" href="tel:0478000000">📞 04 78 00 00 00</a>
+  </section>
+  <section class="grid">
+    <div class="card"><h3>Consultations</h3><p>Médecine générale, vaccinations, suivi des animaux âgés.</p></div>
+    <div class="card"><h3>Chirurgie</h3><p>Stérilisation, chirurgie des tissus mous, soins dentaires.</p></div>
+    <div class="card"><h3>NAC</h3><p>Lapins, furets, rongeurs et oiseaux, le mardi et le jeudi.</p></div>
+    <div class="card"><h3>Horaires</h3><p>Lun–ven 8h30–12h30 / 14h–19h<br>Samedi 9h–12h30</p></div>
+  </section>
+  <footer>12 rue des Tilleuls, 69006 Lyon · Urgences : 04 78 00 00 99</footer>
+
+  <!-- Intégration de l'assistant : une seule ligne à ajouter sur le site de la clinique -->
+  <script src="/widget.js" data-clinic="demo" defer></script>
+</body>
+</html>

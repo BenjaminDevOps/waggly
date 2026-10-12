@@ -1,0 +1,72 @@
+{
+  "id": "demo",
+  "name": "Clinique Vétérinaire des Tilleuls",
+  "assistantName": "Lou",
+  "city": "Lyon 6e",
+  "address": "12 rue des Tilleuls, 69006 Lyon",
+  "phone": "04 78 00 00 00",
+  "emergencyPhone": "04 78 00 00 99",
+  "emergencyInfo": "En dehors des horaires d'ouverture, les urgences sont prises en charge par le service de garde au 04 78 00 00 99.",
+  "email": "accueil@clinique-tilleuls.fr",
+  "website": "https://clinique-tilleuls.fr",
+  "primaryColor": "#0f766e",
+  "allowedOrigins": ["*"],
+  "hours": [
+    "Lundi au vendredi : 8h30 - 12h30 et 14h00 - 19h00",
+    "Samedi : 9h00 - 12h30",
+    "Dimanche et jours fériés : fermé (urgences : voir numéro de garde)"
+  ],
+  "schedule": {
+    "_comment": "Horaires structurés (0 = dimanche) pour les statistiques hors horaires",
+    "1": [["08:30", "12:30"], ["14:00", "19:00"]],
+    "2": [["08:30", "12:30"], ["14:00", "19:00"]],
+    "3": [["08:30", "12:30"], ["14:00", "19:00"]],
+    "4": [["08:30", "12:30"], ["14:00", "19:00"]],
+    "5": [["08:30", "12:30"], ["14:00", "19:00"]],
+    "6": [["09:00", "12:30"]]
+  },
+  "team": [
+    "Dr Claire Martin - médecine générale, chirurgie",
+    "Dr Julien Roux - NAC (nouveaux animaux de compagnie), dermatologie",
+    "Sophie et Inès - auxiliaires spécialisées vétérinaires"
+  ],
+  "services": [
+    "Consultations chiens, chats et NAC",
+    "Vaccinations et identification (puce électronique)",
+    "Stérilisation et chirurgie de convenance",
+    "Détartrage et soins dentaires",
+    "Radiologie et échographie",
+    "Analyses sanguines sur place",
+    "Vente d'aliments vétérinaires et antiparasitaires"
+  ],
+  "prices": [
+    "Consultation : 45 €",
+    "Vaccin chien (CHPPiL + rage) : 75 € consultation incluse",
+    "Vaccin chat (typhus, coryza) : 65 € consultation incluse",
+    "Identification par puce : 70 €",
+    "Stérilisation chatte : à partir de 160 €",
+    "Castration chat : à partir de 95 €",
+    "Les tarifs exacts des chirurgies sont confirmés sur devis après consultation."
+  ],
+  "payment": "CB, espèces, chèques. Paiement en 3 fois sans frais possible à partir de 300 €.",
+  "parking": "Parking gratuit de 6 places devant la clinique.",
+  "faq": [
+    {
+      "q": "Faut-il être à jeun avant une chirurgie ?",
+      "a": "Oui : pas de nourriture à partir de 20h la veille. L'eau reste autorisée jusqu'au matin. Dépôt de l'animal entre 8h30 et 9h00."
+    },
+    {
+      "q": "Quels documents apporter pour une première visite ?",
+      "a": "Le carnet de santé ou passeport européen de l'animal, et si possible ses anciens comptes rendus et ordonnances."
+    },
+    {
+      "q": "Faites-vous les visites à domicile ?",
+      "a": "Oui, sur rendez-vous, du lundi au vendredi entre 12h30 et 14h00, dans un rayon de 10 km. Supplément de 30 €."
+    },
+    {
+      "q": "Prenez-vous les NAC (lapins, furets, rongeurs, oiseaux) ?",
+      "a": "Oui, le Dr Roux consulte les NAC le mardi et le jeudi."
+    }
+  ],
+  "appointmentNote": "Les demandes de rendez-vous sont confirmées par l'équipe par téléphone ou SMS dans les 2 heures ouvrées."
+}
